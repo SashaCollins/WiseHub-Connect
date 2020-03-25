@@ -2,6 +2,7 @@
 package main
 
 import (
+	//"go/types"
 	"golang.org/x/net/context"
 	"os"
 	"time"
@@ -59,6 +60,7 @@ var user struct {
 				DatabaseID githubv4.Int
 				//viewerCanAdminister githubv4.Boolean
 			}
+			TotalCount githubv4.Int
 			PageInfo struct {
 				EndCursor   githubv4.String
 				HasNextPage githubv4.Boolean
@@ -89,7 +91,7 @@ type githubV4Actor struct {
 	URL       githubv4.URI
 }
 
-var repo struct {
+type Repo struct {
 	Repository struct {
 		DatabaseID githubv4.Int
 		URL        githubv4.URI
@@ -115,15 +117,8 @@ var repo struct {
 			ViewerCanUpdate githubv4.Boolean
 
 			Comments struct {
-				Nodes []struct {
-					Body   githubv4.String
-					Author struct {
-						Login githubv4.String
-					}
-					Editor struct {
-						Login githubv4.String
-					}
-				}
+				TotalCount githubv4.Int
+				Nodes []comment
 				PageInfo struct {
 					StartCursor githubv4.String
 					HasPreviousPage githubv4.Boolean
@@ -151,7 +146,17 @@ var variables = map[string]interface{}{
 	"repositoryName":  githubv4.String("firstRepository"),
 	"issueNumber":     githubv4.Int(1),
 	"commentsFirst":   githubv4.NewInt(1),
-	"commentsAfter":   githubv4.NewString("Y3Vyc29yOnYyOpHOI8NEVw=="),
+	"commentsAfter":   (*githubv4.String)(nil),
+}
+type comment struct {
+	Body   githubv4.String
+	Author struct {
+		Login githubv4.String
+	}
+	Editor struct {
+		Login githubv4.String
+	}
+	ViewerCanReact bool
 }
 
 func printJSON(v interface{}) {
@@ -163,15 +168,36 @@ func printJSON(v interface{}) {
 	}
 }
 
-func run(client *githubv4.Client, query interface{}, localVar map[string]interface{}) error {
-	err := client.Query(context.Background(), &repo, localVar)
-	if err != nil {
-		return err
+func run(client *githubv4.Client, query interface{}, localVar *map[string]interface{}) error {
+	fmt.Println("in run")
+	switch currentQuery := query.(type) {
+	case *Repo:
+		fmt.Println("\tin Repo")
+		var allComments []comment
+		for {
+			err := client.Query(context.Background(), &currentQuery, *localVar)
+			if err != nil {
+				return err
+			}
+			printJSON(currentQuery)
+			allComments = append(allComments, currentQuery.Repository.Issue.Comments.Nodes...)
+
+			if !currentQuery.Repository.Issue.Comments.PageInfo.HasNextPage {
+				break
+			}
+			variables["commentsAfter"] = githubv4.NewString(currentQuery.Repository.Issue.Comments.PageInfo.EndCursor)
+		}
+		return nil
+	default:
+		fmt.Println("\tin default")
+		fmt.Println(currentQuery)
+		err := client.Query(context.Background(), &currentQuery, *localVar)
+		if err != nil {
+			return err
+		}
+		printJSON(currentQuery)
+		return nil
 	}
-	printJSON(repo)
-	//goon.Dump(out)
-	//fmt.Println(github.Stringify(out))
-	return nil
 }
 
 func main() {
@@ -182,36 +208,37 @@ func main() {
 
 	client := githubv4.NewClient(httpClient)
 	// Use client...
-
-	fuckingErr:= run(client, repo, variables)
+	var firstRepo Repo
+	fmt.Println("before run")
+	fuckingErr:= run(client, &firstRepo, &variables)
 	if fuckingErr != nil {
 		fmt.Println(fuckingErr)
 	}
 
-	err := client.Query(context.Background(), &testViewer, nil)
-	if err != nil {
-		fmt.Printf("\tQuery query failed with: %s\n",err)
-	}
-	fmt.Println("Login:", testViewer.Viewer.Login)
-	fmt.Println("CreatedAt:", testViewer.Viewer.CreatedAt)
-
-	err = client.Query(context.Background(), &orga, orgaVariables)
-	if err != nil {
-		fmt.Printf("\tQuery Organization failed with: %s\n", err)
-
-	}
-	fmt.Printf("orga name: %s\n", orga.Organization.Name)
-	fmt.Printf("orga id: %d\n", orga.Organization.DatabaseID)
-
-
-	err = client.Query(context.Background(), &user, userVariables)
-	if err != nil {
-		fmt.Printf("\tQuery User failed with: %s\n", err)
-
-	}
-	fmt.Printf("user Login: %s\n", user.User.Login)
-	fmt.Printf("user createdAt: %s\n", user.User.CreatedAt)
-	fmt.Println("user orga Node Login: ", user.User.Organizations.Nodes)
+	//err := client.Query(context.Background(), &testViewer, nil)
+	//if err != nil {
+	//	fmt.Printf("\tQuery query failed with: %s\n",err)
+	//}
+	//fmt.Println("Login:", testViewer.Viewer.Login)
+	//fmt.Println("CreatedAt:", testViewer.Viewer.CreatedAt)
+	//
+	//err = client.Query(context.Background(), &orga, orgaVariables)
+	//if err != nil {
+	//	fmt.Printf("\tQuery Organization failed with: %s\n", err)
+	//
+	//}
+	//fmt.Printf("orga name: %s\n", orga.Organization.Name)
+	//fmt.Printf("orga id: %d\n", orga.Organization.DatabaseID)
+	//
+	//
+	//err = client.Query(context.Background(), &user, userVariables)
+	//if err != nil {
+	//	fmt.Printf("\tQuery User failed with: %s\n", err)
+	//
+	//}
+	//fmt.Printf("user Login: %s\n", user.User.Login)
+	//fmt.Printf("user createdAt: %s\n", user.User.CreatedAt)
+	//fmt.Println("user orga Node Login: ", user.User.Organizations.Nodes)
 
 
 }
