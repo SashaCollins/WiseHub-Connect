@@ -30,77 +30,33 @@ type commit struct {
 	Author shortUser
 	Committer shortUser
 }
-type comment struct {
-	Body   githubv4.String
-	//Author struct {
-	//	Login githubv4.String
-	//}
-	//Editor struct {
-	//	Login githubv4.String
-	//}
-	//ViewerCanReact bool
-}
-type count struct {
-	User struct {
-		Organizations struct {
-			Nodes []struct {
-				MembersWithRole struct {
-					TotalCount githubv4.Int
-				}
-				Teams struct {
-					Nodes []struct {
-						Members struct {
-							TotalCount githubv4.Int
-						}
-					}
-				}`graphql:"teams(first:$teamFirst,after:$teamAfter)"`
-			}
-		}`graphql:"organizations(first:$organizationFirst,after:$organizationAfter)"`
-	}`graphql:"user(login:$viewer)"`
-}
 type issue struct {
 	Number			githubv4.Int
 	Title			githubv4.String
 	Body           githubv4.String
 	State			githubv4.IssueState
 	ViewerCanUpdate githubv4.Boolean
-	Comments struct {
-		TotalCount githubv4.Int
-		Nodes []comment
-		PageInfo pageInfo
-	} `graphql:"comments(first:$commentsFirst,after:$commentsAfter)"`
 }
-var allOrganizations []shortOrganization
-type shortOrganization struct {
+var allOrganizations []organization
+type organization struct {
 	Name 	githubv4.String
 	Login githubv4.String
 	URL			githubv4.URI
 	ViewerCanAdminister githubv4.Boolean
 }
-var currentOrganization organization
-type organization struct {
+var currentOrganization organizationTeams
+type organizationTeams struct {
 	Organization struct {
-		Name                githubv4.String
-		Login               githubv4.String
-		URL                 githubv4.URI
-		ViewerCanAdminister githubv4.Boolean
-		MembersWithRole     struct {
-			TotalCount githubv4.Int
-			Nodes      []shortUser
-			PageInfo   pageInfo
-		} `graphql:"membersWithRole(first:$orgaMembersFirst)"`
 		Teams struct {
 			TotalCount githubv4.Int
 			Nodes      []shortTeam
 			PageInfo   pageInfo
 		} `graphql:"teams(first:$teamFirst,after:$teamAfter)"`
-	}`graphql:"organization(owner:$viewer,name:$organizationName)"`
+	}`graphql:"organization(login:$login)"`
 }
 var orgaVariables = map[string]interface{}{
-	"viewer": (*githubv4.String)(nil), //githubv4.String("SashaCollins"),
-	"organizationName": (*githubv4.String)(nil), //githubv4.String("WiseHub-Connector"),
-	"orgaMembersFirst": githubv4.NewInt(100),
-	"teamFirst": githubv4.NewInt(1),
+	"login": (*githubv4.String)(nil), //githubv4.String("SashaCollins"),
+	"teamFirst": githubv4.NewInt(100),
 	"teamAfter": (*githubv4.String)(nil),
 }
 //var currentPageInfo pageInfo
@@ -121,22 +77,24 @@ type rateLimit struct {
 	ResetAt   githubv4.DateTime
 }
 //var currentRepository repository
-var allRepos []shortRepository
-type shortRepository struct {
+type repository struct {
 	Name githubv4.String
-	NameWithOwner githubv4.String
+	Owner shortUser
 	CreatedAt githubv4.DateTime
+	Description githubv4.String
+	URL        githubv4.URI
+	IsPrivate githubv4.Boolean
 }
 //Branch
-type ref struct {
-	Name githubv4.String
-	Target struct {
-		Node []commit
-		Commit struct {
-			TotalCount githubv4.Int
-		}
-	}'graphql:"history(first: 0)"'
-}
+//type ref struct {
+//	Name githubv4.String
+//	Target struct {
+//		Node []commit
+//		Commit struct {
+//			TotalCount githubv4.Int
+//		}
+//	}'graphql:"history(first: 0)"'
+//}
 	//repository(owner: "bertrandmartel", name: "callflow-workshop") {
 	//	refs(refPrefix: "refs/heads/", orderBy: {direction: DESC, field: TAG_COMMIT_DATE}, first: 100) {
 	//		edges {
@@ -150,79 +108,76 @@ type ref struct {
 	//									node {
 	//										... on Commit {
 	//											committedDate
-var allIssues []issue
-var currentRepository repository
-type repository struct {
+var allIssuesAssigned []issue
+var currentRepository repositoryInfo
+type repositoryInfo struct {
 	Repository struct {
-		ID githubv4.String
-		NameWithOwner githubv4.String
-		CreatedAt githubv4.DateTime
-		Description githubv4.String
-		URL        githubv4.URI
-		IsPrivate githubv4.Boolean
-
 		Issues struct {
 			TotalCount githubv4.Int
 			Nodes []issue
 			PageInfo pageInfo
-		}`graphql:"issue(filterBy:$assignee,states:$issueState)"`
-		Refs struct {
-			TotalCount githubv4.Int
-			Nodes []ref
-			PageInfo pageInfo
-		}`graphql:"ref(refPrefix:$prefix,first:$refFirst,after:$refAfter,orderBy:$orderBy)"`
+		}`graphql:"issues(first:$issueFirst,after:$issueAfter,filterBy:{assignee:$assignee},states:[$issueState])"` //,states:$issueState
+		//Refs struct {
+		//	TotalCount githubv4.Int
+		//	Nodes []ref
+		//	PageInfo pageInfo
+		//}`graphql:"ref(refPrefix:$prefix,first:$refFirst,after:$refAfter,orderBy:$orderBy)"`
 		//Commits struct {
 		//	TotalCount githubv4.Int
 		//	Nodes []commit
 		//}
 		//DefaultBranchRef ref
-	} `graphql:"repository(owner:$viewer,name:$repositoryName)"`
+	} `graphql:"repository(owner:$login,name:$repositoryName)"`
 }
 var repoVariables = map[string]interface{}{
-	"viewer": (*githubv4.String)(nil), //githubv4.String("SashaCollins"),
+	"login": (*githubv4.String)(nil), //githubv4.String("SashaCollins"),
 	"repositoryName": (*githubv4.String)(nil), //githubv4.String("project-Tide"),
 	"assignee": (*githubv4.String)(nil), //githubv4.String("SashaCollins"),
-	"issueState": nil, //githubv4.IssueStateOpen,
-	"prefix": githubv4.String("refs/heads/"),
-	"refFirst": githubv4.NewInt(1),
-	"refAfter": (*githubv4.String)(nil),
-	"orderBy": githubv4.RefOrder{githubv4.RefOrderFieldTagCommitDate,githubv4.OrderDirectionDesc },
+	"issueState": githubv4.IssueStateOpen,
+	"issueFirst": githubv4.Int(1),
+	"issueAfter": (*githubv4.String)(nil),
+	"commentsFirst": githubv4.Int(1),
+	"commentsAfter": (*githubv4.String)(nil),
+	//"prefix": githubv4.String("refs/heads/"),
+	//"refFirst": githubv4.NewInt(1),
+	//"refAfter": (*githubv4.String)(nil),
+	//"orderBy": githubv4.RefOrder{githubv4.RefOrderFieldTagCommitDate,githubv4.OrderDirectionDesc },
 }
 
 var allTeams []shortTeam
 type shortTeam struct {
-		Name githubv4.String
-		CombinedSlug githubv4.String
-		URL githubv4.URI
-		RepositoriesUrl githubv4.URI
+	Name githubv4.String
+	Slug githubv4.String
+	CombinedSlug githubv4.String
+	Description         githubv4.String
+	RepositoriesUrl githubv4.URI
+	Privacy             githubv4.TeamPrivacy
+	ViewerCanAdminister githubv4.Boolean
 }
-var allFullTeams []team
+var allTeamMembersAndRepos = team{}
 var currentTeam team
 type team struct {
-	Team struct {
-		Name                githubv4.String
-		CombinedSlug        githubv4.String
-		CreatedAt           githubv4.DateTime
-		Description         githubv4.String
-		Privacy             githubv4.TeamPrivacy
-		ViewerCanAdminister githubv4.Boolean
-		Members             struct {
-			TotalCount githubv4.Int
-			Nodes      []shortUser
-			PageInfo	pageInfo
-		} `graphql:"members(first:$teamMembersFirst)"`
-		Repositories struct {
-			TotalCount githubv4.Int
-			Nodes      []shortRepository
-			PageInfo   pageInfo
-		} `graphql:"repositories(first:$repositoryFirst,after:$repositoryAfter)"`
-		RepositoriesUrl githubv4.URI
-	}`graphql:"team(name:$teamName)"`
+	Organization struct{
+		Team struct {
+			Members struct {
+				TotalCount githubv4.Int
+				Nodes      []shortUser
+				PageInfo   pageInfo
+			} `graphql:"members(first:$teamMembersFirst,after:$teamMembersAfter)"`
+			Repositories struct {
+				TotalCount githubv4.Int
+				Nodes      []repository
+				PageInfo   pageInfo
+			} `graphql:"repositories(first:$repositoryFirst,after:$repositoryAfter)"`
+			RepositoriesUrl githubv4.URI
+		}`graphql:"team(slug:$teamName)"`
+	}`graphql:"organization(login:$login)"`
 }
 var teamVariables = map[string]interface{}{
-	"viewer": (*githubv4.String)(nil), //githubv4.String("SashaCollins"),
+	"login": (*githubv4.String)(nil), //githubv4.String("SashaCollins"),
 	"teamName": (*githubv4.String)(nil), //githubv4.String("A-Team"),
-	"teamMembersFirst": githubv4.NewInt(100),
+	"teamMembersFirst": githubv4.NewInt(1),
+	"teamMembersAfter": (*githubv4.String)(nil),
 	"repositoryFirst": githubv4.NewInt(1),
 	"repositoryAfter": (*githubv4.String)(nil),
 }
@@ -233,17 +188,15 @@ type shortUser struct {
 var currentUser user
 type user struct {
 	User struct {
-		Login      githubv4.String
-		CreatedAt  githubv4.DateTime
 		Organizations struct {
-			Nodes []shortOrganization
 			TotalCount githubv4.Int
+			Nodes []organization
 			PageInfo pageInfo
 		} `graphql:"organizations(first:$organizationFirst,after:$organizationAfter)"`
-	} `graphql:"user(login:$viewer)"`
+	} `graphql:"user(login:$login)"`
 }
 var userVariables = map[string]interface{}{
-	"viewer": (*githubv4.String)(nil), //githubv4.String("SashaCollins"),
+	"login": (*githubv4.String)(nil), //githubv4.String("SashaCollins"),
 	"organizationFirst": githubv4.NewInt(1),
 	"organizationAfter": (*githubv4.String)(nil),
 }
@@ -290,14 +243,6 @@ type viewer struct {
 //											... on Commit{
 //												committedDate
 
-var countVariables = map[string]interface{}{
-	"viewer": (*githubv4.String)(nil), //githubv4.String("SashaCollins"),
-	"organizationFirst": githubv4.NewInt(1),
-	"organizationAfter": (*githubv4.String)(nil),
-	"teamFirst": githubv4.NewInt(1),
-	"teamAfter": (*githubv4.String)(nil),
-}
-
 func PrintJSON(v interface{}) {
 	w := json.NewEncoder(os.Stdout)
 	w.SetIndent("", "\t")
@@ -306,25 +251,17 @@ func PrintJSON(v interface{}) {
 		panic(err)
 	}
 }
+
 func fetchData(client *githubv4.Client, query interface{}, localVar *map[string]interface{}) error {
-	fmt.Println("in run")
+	fmt.Println("\tin run")
 	switch currentQuery := query.(type) {
-	case *organization:
-		fmt.Println("\tin Organization")
+	case *organizationTeams:
+		fmt.Println("\t\tin Organization")
 		for {
 			err := client.Query(context.Background(), &currentQuery, *localVar)
 			if err != nil {
-				fmt.Println("\tQuery orga in line 1 failed with")
+				fmt.Println("\t\tQuery orga in line 1 failed with")
 				return err
-			}
-			//if there are more than 100 Members do a reload
-			if currentQuery.Organization.MembersWithRole.PageInfo.HasNextPage {
-				orgaVariables["orgaMembersFirst"] = githubv4.NewInt(currentQuery.Organization.MembersWithRole.TotalCount)
-				err := client.Query(context.Background(), &currentQuery, *localVar)
-				if err != nil {
-					fmt.Println("\tQuery orga in line 2 failed with")
-					return err
-				}
 			}
 			allTeams = append(allTeams, currentQuery.Organization.Teams.Nodes...)
 
@@ -335,54 +272,64 @@ func fetchData(client *githubv4.Client, query interface{}, localVar *map[string]
 		}
 		return nil
 
-	case *repository:
-		fmt.Println("\tin Repo")
-		//for {
+	case *repositoryInfo:
+		fmt.Println("\t\tin Repo")
+		for {
 			err := client.Query(context.Background(), &currentQuery, *localVar)
 			if err != nil {
-				fmt.Println("\tQuery repository failed with:")
+				fmt.Println("\t\tQuery repository failed with:")
 				return err
 			}
-			allIssues = append(allIssues, currentQuery.Repository.Issues.Nodes...)
+			allIssuesAssigned = append(allIssuesAssigned, currentQuery.Repository.Issues.Nodes...)
 
-			//if !currentQuery.Repository.Issues.PageInfo.HasNextPage {
-			//	break
-			//}
-			//repoVariables["issueAfter"] = githubv4.NewString(currentQuery.Repository.Issues.PageInfo.EndCursor)
-		//}
-		//printJSON(allComments)
+			if !currentQuery.Repository.Issues.PageInfo.HasNextPage {
+				break
+			}
+			repoVariables["issueAfter"] = githubv4.NewString(currentQuery.Repository.Issues.PageInfo.EndCursor)
+		}
 		return nil
 
 	case *team:
-		fmt.Println("\tin Team")
+		fmt.Println("\t\tin Team")
 		for {
 			err := client.Query(context.Background(), &currentQuery, *localVar)
 			if err != nil {
-				fmt.Println("\tQuery orga in line 1 failed with")
+				fmt.Println("\t\tQuery team in line 1 failed with")
 				return err
 			}
-			//if there are more than 100 Members do a reload
-			if currentQuery.Team.Members.PageInfo.HasNextPage {
-				teamVariables["teamMembersFirst"] = githubv4.NewInt(currentQuery.Team.Members.TotalCount)
-				err := client.Query(context.Background(), &currentQuery, *localVar)
-				if err != nil {
-					fmt.Println("\tQuery orga in line 2 failed with")
-					return err
-				}
+
+			fmt.Println("\t\tin Team2")
+			//to avoid appending empty node or redundant node
+			fmt.Println((githubv4.Int)(len(allTeamMembersAndRepos.Organization.Team.Members.Nodes)))
+			if (githubv4.Int)(len(allTeamMembersAndRepos.Organization.Team.Members.Nodes)) != currentQuery.Organization.Team.Members.TotalCount {
+				allTeamMembersAndRepos.Organization.Team.Members.Nodes = append(allTeamMembersAndRepos.Organization.Team.Members.Nodes, currentQuery.Organization.Team.Members.Nodes...)
+				fmt.Println("\t\t\tin Team2")
+				fmt.Println(allTeamMembersAndRepos)
 			}
-			allRepos = append(allRepos, currentQuery.Team.Repositories.Nodes...)
-			if !currentQuery.Team.Repositories.PageInfo.HasNextPage {
+			if (githubv4.Int)(len(allTeamMembersAndRepos.Organization.Team.Repositories.Nodes)) != currentQuery.Organization.Team.Repositories.TotalCount {
+				allTeamMembersAndRepos.Organization.Team.Repositories.Nodes = append(allTeamMembersAndRepos.Organization.Team.Repositories.Nodes, currentQuery.Organization.Team.Repositories.Nodes...)
+			}
+			fmt.Println("\t\tin Team3")
+			if !currentQuery.Organization.Team.Repositories.PageInfo.HasNextPage && !currentQuery.Organization.Team.Members.PageInfo.HasNextPage{
+				fmt.Println("\t\tnobody has next page")
 				break
 			}
-			teamVariables["teamAfter"] = githubv4.NewString(currentQuery.Team.Repositories.PageInfo.EndCursor)
+			if currentQuery.Organization.Team.Members.PageInfo.HasNextPage {
+				fmt.Println("\t\tmembers have next")
+				teamVariables["teamMembersAfter"] = githubv4.NewString(currentQuery.Organization.Team.Members.PageInfo.EndCursor)
+			}
+			if currentQuery.Organization.Team.Repositories.PageInfo.HasNextPage{
+				fmt.Println("\t\t repos have next")
+				teamVariables["repositoryAfter"] = githubv4.NewString(currentQuery.Organization.Team.Repositories.PageInfo.EndCursor)
+			}
 		}
-		allFullTeams = append(allFullTeams, *currentQuery)
+		fmt.Println("\t\texit team")
 		return nil
 
 	case *user:
-		fmt.Println("\tin User")
+		fmt.Println("\t\tin User")
 		for {
-			err := client.Query(context.Background(), &currentQuery, countVariables)
+			err := client.Query(context.Background(), &currentQuery, *localVar)
 			if err != nil {
 				fmt.Println("\tQuery user in line 1 failed with")
 				return err
@@ -394,90 +341,74 @@ func fetchData(client *githubv4.Client, query interface{}, localVar *map[string]
 			}
 			userVariables["organizationAfter"] = githubv4.NewString(currentQuery.User.Organizations.PageInfo.EndCursor)
 		}
-		fmt.Println("\tend User")
+		fmt.Println("\t\tend User")
 		return nil
 
 	case *viewer:
-		fmt.Println("\tin Viewer")
+		fmt.Println("\t\tin Viewer")
 		err := client.Query(context.Background(), &currentQuery, nil)
 		if err != nil {
 			fmt.Println("\tQuery viewer failed with:")
 			return err
 		}
-		currentViewer.Viewer.Login = currentQuery.Viewer.Login
-		currentViewer.Viewer.CreatedAt = currentQuery.Viewer.CreatedAt
 		return nil
 
 	default:
-		fmt.Println("\tin default")
+		fmt.Println("\t\tin default")
 		return fmt.Errorf("something went wrong with the query %s", currentQuery)
-		//fmt.Println(currentQuery)
-		//err := client.Query(context.Background(), &currentQuery, *localVar)
-		//if err != nil {
-		//	fmt.Println("\tQuery default failed with:")
-		//	return err
-		//}
-		//PrintJSON(currentQuery)
-		//return nil
 	}
 }
 
 func GetViewer() *viewer {
+	fmt.Println("in GetViewer")
 	err := fetchData(client, &currentViewer, nil)
 	if err != nil {
 		fmt.Println(err)
 	}
-	userVariables["viewer"] = currentViewer.Viewer.Login
-	orgaVariables["viewer"] = currentViewer.Viewer.Login
-	teamVariables["viewer"] = currentViewer.Viewer.Login
-	repoVariables["viewer"] = currentViewer.Viewer.Login
 	return &currentViewer
 }
-func GetOrganizations(ownerLogin string) * []shortOrganization {
-	//userVariables["viewer"] = currentViewer.Viewer.Login
+func GetOrganizations(ownerLogin githubv4.String) *[]organization {
+	fmt.Println("in GetOrganizations")
+	userVariables["login"] = ownerLogin
 	err := fetchData(client, &currentUser, &userVariables)
 	if err != nil {
 		fmt.Println(err)
 	}
 	return &allOrganizations
 }
-func GetTeamsPerOrganization(organizationName string, ownerLogin string) *[]shortTeam {
-	orgaVariables["organizationName"] = organizationName
-	//orgaVariables["viewer"] = currentViewer.Viewer.Login
+func GetTeamsPerOrganization(organizationLogin githubv4.String) *[]shortTeam {
+	fmt.Println("in GetTeamsPerOrganization")
+	orgaVariables["login"] = organizationLogin
 	err := fetchData(client, &currentOrganization, &orgaVariables)
 	if err != nil {
 		fmt.Println(err)
 	}
 	return &allTeams
 }
-func GetFullTeamInfo(teamName string, ownerLogin string) *[]team{
+func GetTeamMembersAndRepositories(organizationLogin githubv4.String, teamName githubv4.String) *team{
+	fmt.Println("in GetTeamMembersAndRepositories")
+	teamVariables["login"] = organizationLogin
 	teamVariables["teamName"] = teamName
-	//teamVariables["viewer"] = currentViewer.Viewer.Login
 	err := fetchData(client, &currentTeam, &teamVariables)
 	if err != nil {
 		fmt.Println(err)
 	}
-	return &allFullTeams
+	PrintJSON(allTeamMembersAndRepos)
+	fmt.Println("exit GetTeamMembersAndRepositories")
+	return &allTeamMembersAndRepos
 }
-func GetRepositoriesPerTeam(teamName string, ownerLogin string) * []shortRepository {
-	teamVariables["teamName"] = teamName
-	//teamVariables["viewer"] = currentViewer.Viewer.Login
-	err := fetchData(client, &currentTeam, &teamVariables)
-	if err != nil {
-		fmt.Println(err)
-	}
-	return &allRepos
-}
-func GetRepositoryIssues(repositoryName string, assignee string, ownerLogin string) *[]issue {
+func GetRepositoryInfo(repositoryName githubv4.String, ownerLogin githubv4.String, assignee githubv4.String) (*[]issue) {
+	fmt.Println("in GetRepositoryInfo")
 	repoVariables["repositoryName"] = repositoryName
+	repoVariables["login"] = ownerLogin
 	repoVariables["assignee"] = assignee
-	//repoVariables["viewer"] = currentViewer.Viewer.Login
 	err := fetchData(client, &currentRepository, &repoVariables)
 	if err != nil {
 		fmt.Println(err)
 	}
-	return &allIssues
+	return &allIssuesAssigned//, &commitCountPerUser, &codeCoverage
 }
+
 
 
 //There are these ReactionGroups aka emojis, which might be interesting at some point
