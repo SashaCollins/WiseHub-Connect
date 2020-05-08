@@ -1,0 +1,11 @@
+FROM go:latest
+LABEL maintainer="SashaCollins"
+LABEL description="Drone CI - WiseHub-Connect"
+#LABEL
+#LABEL
+#LABEL
+#LABEL
+#ENV
+COPY drone /Drone
+RUN
+
