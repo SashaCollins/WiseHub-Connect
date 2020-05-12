@@ -8,7 +8,7 @@ import (
 	"golang.org/x/oauth2"
 )
 const (
-	token = ""
+	token = "g18Ovu1pBx15IPVUVaWJCbXxEHh3dSPo"
 	host  = "http://localhost:9080"
 )
 var client drone.Client

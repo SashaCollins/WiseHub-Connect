@@ -6,7 +6,7 @@ services:
       DRONE_GITHUB_CLIENT_ID: b31b26d4109e2934876e
       DRONE_GITHUB_CLIENT_SECRET: 3a3675629294626dd68d885e13428210efc3d380
       DRONE_RPC_SECRET: 2e5e14f277c72fc21541f435f738fa2f
-      DRONE_SERVER_HOST: localhost
+      DRONE_SERVER_HOST: 127.0.0.1
       DRONE_SERVER_PROTO: http
       DRONE_USER_CREATE: username:SashaCollins,admin:true
     ports:
@@ -17,6 +17,30 @@ services:
     - "/var/lib/drone:/dat"
     networks:
       - drone
+
+  nginx:
+    image: nginx:latest
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "./nginx:/etc/nginx/conf.d"
+      - "./nginx/dhparams.pem:/etc/nginx/ssl/dhparams.pem"
+      - "./certbot/conf:/etc/letsencrypt"
+      - "./certbot/www:/var/www/certbot"
+    networks:
+      - drone
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - "./certbot/conf:/etc/letsencrypt"
+      - "./certbot/www:/var/www/certbot"
+    networks:
+      - drone
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
 
   runner:
     image: drone/drone-runner-docker:1

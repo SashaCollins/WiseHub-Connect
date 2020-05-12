@@ -1,10 +1,11 @@
-module wisehubConnect
+module github/SashaCollins/Wisehub-Connect
 
 go 1.14
 
 require (
-	github.com/bgentry/heroku-go v0.0.0-20150810151148-ee4032d686ae // indirect
+	github.com/bgentry/heroku-go v0.0.0-20150810151148-ee4032d686ae
 	github.com/drone/drone-go v1.3.1
+	github.com/joho/godotenv v1.3.0
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/pborman/uuid v1.2.0 // indirect
 	github.com/shurcooL/githubv4 v0.0.0-20191127044304-8f68eb5628d0

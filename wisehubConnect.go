@@ -3,15 +3,32 @@ package main
 
 import (
 	"fmt"
-	gh "wisehubConnect/github"
+	"github/SashaCollins/Wisehub-Connect/config"
+	"log"
+	gh "github/SashaCollins/Wisehub-Connect/github"
+	"github.com/joho/godotenv"
 )
 
-
-func show(item interface{}) {
-	gh.PrintJSON(item)
+func init() {
+	// loads values from .env into the system
+	if err := godotenv.Load(); err != nil {
+		log.Print("No .env file found")
+	}
 }
 
 func main() {
+	conf := config.New()
+	// Print out environment variables
+	fmt.Println(conf.GitHub.Username)
+	fmt.Println(conf.GitHub.APIToken)
+	fmt.Println(conf.DebugMode)
+	//fmt.Println(conf.MaxUsers)
+
+	// Print out each role
+	//for _, role := range conf.UserRoles {
+	//	fmt.Println(role)
+	//}
+
 	finished := make(chan bool)
 	gl := gh.GithubListener{}
 	go gl.StartServer(finished)

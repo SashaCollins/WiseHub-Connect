@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/shurcooL/githubv4"
+	"github/SashaCollins/Wisehub-Connect/config"
 	"golang.org/x/oauth2"
 	//"go/types"
 	"golang.org/x/net/context"
@@ -14,10 +15,12 @@ import (
 //TODO: ask for token in gui for admin or maybe get token from user credentials
 //TODO: save token in file and read from file on startup
 //TODO: error msg if no token
-const GithubToken = "43779c73fba2eff18728728abb10b0561d90ef81"
+var GithubToken
 
 var client *githubv4.Client
 func init() {
+	conf := config.New()
+	GithubToken = conf.GitHub.APIToken
 	src := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: GithubToken},
 	)
