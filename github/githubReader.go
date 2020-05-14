@@ -15,7 +15,7 @@ import (
 //TODO: ask for token in gui for admin or maybe get token from user credentials
 //TODO: save token in file and read from file on startup
 //TODO: error msg if no token
-var GithubToken
+var GithubToken string
 
 var client *githubv4.Client
 func init() {
