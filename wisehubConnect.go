@@ -6,22 +6,28 @@ import (
 	"github/SashaCollins/Wisehub-Connect/config"
 	"log"
 	gh "github/SashaCollins/Wisehub-Connect/github"
+	"sync"
+
+	//"github/SashaCollins/Wisehub-Connect/drone"
+	//"github/SashaCollins/Wisehub-Connect/heroku"
 	"github.com/joho/godotenv"
 )
 
+var lock sync.Mutex
 func init() {
 	// loads values from .env into the system
 	if err := godotenv.Load(); err != nil {
 		log.Print("No .env file found")
 	}
 }
-
 func main() {
-	conf := config.New()
-	// Print out environment variables
+	fmt.Println("start")
+	//lock.Lock()
+	conf := config.GetConfig()
+	//lock.Unlock()
 	fmt.Println(conf.GitHub.Username)
-	fmt.Println(conf.GitHub.APIToken)
-	fmt.Println(conf.DebugMode)
+	fmt.Println( conf.GitHub.APIToken)
+	//fmt.Println(conf.DebugMode)
 	//fmt.Println(conf.MaxUsers)
 
 	// Print out each role
@@ -29,12 +35,19 @@ func main() {
 	//	fmt.Println(role)
 	//}
 
-	finished := make(chan bool)
+	githubFinished := make(chan bool)
 	gl := gh.GithubListener{}
-	go gl.StartServer(finished)
-	<- finished
+	go gl.StartServer(githubFinished)
+	<- githubFinished
+	//droneFinished := make(chan bool)
+	//dl := drone.DroneListener{}
+	//go dl.StartServer(droneFinished)
+	//<- droneFinished
+	//herokuFinished := make(chan bool)
+	//hl := heroku.HerokuListener{}
+	//go hl.StartServer(herokuFinished)
+	//<- herokuFinished
 
-	//fmt.Println("before run")
 	//var viewer = *gh.GetViewer()
 	//show(viewer)
 	////printJSON(currentViewer)
@@ -51,5 +64,5 @@ func main() {
 	fmt.Println("#############################################")
 	//printJSON(currentUser)
 	//printJSON(allOrganizations)
-	fmt.Println("after run")
+	fmt.Println("end")
 }

@@ -9,14 +9,15 @@ import (
 	"golang.org/x/oauth2"
 )
 
+type droneReader struct{}
 var client drone.Client
 func init() {
 	// create an http client with oauth authentication.
 	conf := config.New()
-	DroneToken := conf.DroneCI.APIToken
 	Host := conf.DroneCI.Host
-	config := new(oauth2.Config)
-	httpClient := config.Client(
+	DroneToken := conf.DroneCI.APIToken
+	oauthConfig := new(oauth2.Config)
+	httpClient := oauthConfig.Client(
 		context.Background(),
 		&oauth2.Token{
 			AccessToken: DroneToken,
@@ -26,15 +27,23 @@ func init() {
 	client = drone.NewClient(Host, httpClient)
 	// Use client...
 }
-type droneReader struct{}
+func (gr *droneReader) fetchData(info int) (interface{}, error){
+	switch info {
 
-func fetchData() {
-	// gets the current user
-	user, err := client.Self()
-	fmt.Println(user, err)
+	case 1:
+		// gets the current user
+		user, err := client.Self()
+		fmt.Println(user, err)
+		return user, err
 
-	// gets the named repository information
-	repo, err := client.Repo("drone", "drone-go")
-	fmt.Println(repo, err)
+	case 2:
+		// gets the named repository information
+		repo, err := client.Repo("drone", "drone-go")
+		fmt.Println(repo, err)
+		return repo, err
+
+	default:
+		return nil, fmt.Errorf("something went wrong with the info number %s", info)
+	}
 }
 

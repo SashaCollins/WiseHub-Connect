@@ -7,6 +7,8 @@ import (
 	"github.com/shurcooL/githubv4"
 	"github/SashaCollins/Wisehub-Connect/config"
 	"golang.org/x/oauth2"
+	"sync"
+
 	//"go/types"
 	"golang.org/x/net/context"
 	"os"
@@ -15,11 +17,69 @@ import (
 //TODO: ask for token in gui for admin or maybe get token from user credentials
 //TODO: save token in file and read from file on startup
 //TODO: error msg if no token
-var GithubToken string
 
-var client *githubv4.Client
+type githubReader struct {}
+var (
+	GithubToken string
+	client *githubv4.Client
+	lock sync.Mutex
+
+	currentViewer viewer
+	currentUser user
+
+	currentOrganization organizationTeams
+	allOrganizations []organization
+
+	currentTeam team
+	allTeams []shortTeam
+	allTeamMembersAndRepos = team{}
+
+	currentRepository repositoryInfo
+	allRefs []ref
+	allIssuesAssigned []issue
+
+	userVariables = map[string]interface{}{
+		"login": (*githubv4.String)(nil), //githubv4.String("SashaCollins"),
+		"organizationFirst": githubv4.NewInt(1),
+		"organizationAfter": (*githubv4.String)(nil),
+	}
+	orgaVariables = map[string]interface{}{
+		"login": (*githubv4.String)(nil), //githubv4.String("SashaCollins"),
+		"teamFirst": githubv4.NewInt(100),
+		"teamAfter": (*githubv4.String)(nil),
+	}
+	teamVariables = map[string]interface{}{
+		"login": (*githubv4.String)(nil), //githubv4.String("SashaCollins"),
+		"teamName": (*githubv4.String)(nil), //githubv4.String("A-Team"),
+		"teamMembersFirst": githubv4.NewInt(1),
+		"teamMembersAfter": (*githubv4.String)(nil),
+		"repositoryFirst": githubv4.NewInt(1),
+		"repositoryAfter": (*githubv4.String)(nil),
+	}
+	repoVariables = map[string]interface{}{
+		"login": (*githubv4.String)(nil), //githubv4.String("SashaCollins"),
+		"repositoryName": (*githubv4.String)(nil), //githubv4.String("project-Tide"),
+		"assignee": (*githubv4.String)(nil), //githubv4.String("SashaCollins"),
+		"issueState": githubv4.IssueStateOpen,
+		"issueFirst": githubv4.NewInt(1),
+		"issueAfter": (*githubv4.String)(nil),
+		//"refName": githubv4.String("commit"),
+		"prefix": githubv4.String("refs/heads/"),
+		//"target": githubv4.String("Commit"),
+		"refFirst": githubv4.NewInt(10),
+		"refAfter": (*githubv4.String)(nil),
+		"targetFirst": githubv4.NewInt(10),
+		"orderBy": githubv4.RefOrder{githubv4.RefOrderFieldTagCommitDate,githubv4.OrderDirectionDesc },
+	}
+)
 func init() {
-	conf := config.New()
+	fmt.Println("init")
+	//lock.Lock()
+	//defer lock.Unlock()
+	conf := config.GetConfig()
+	username := conf.GitHub.Username
+	fmt.Println(username)
+	fmt.Println(conf.GitHub.APIToken)
 	GithubToken = conf.GitHub.APIToken
 	src := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: GithubToken},
@@ -28,8 +88,6 @@ func init() {
 	client = githubv4.NewClient(httpClient)
 	// Use client...
 }
-type githubReader struct {}
-
 type commit struct {
 	Author shortUser
 	Committer shortUser
@@ -41,14 +99,12 @@ type issue struct {
 	State			githubv4.IssueState
 	ViewerCanUpdate githubv4.Boolean
 }
-var allOrganizations []organization
 type organization struct {
 	Name 	githubv4.String
 	Login githubv4.String
 	URL			githubv4.URI
 	ViewerCanAdminister githubv4.Boolean
 }
-var currentOrganization organizationTeams
 type organizationTeams struct {
 	Organization struct {
 		Teams struct {
@@ -57,11 +113,6 @@ type organizationTeams struct {
 			PageInfo   pageInfo
 		} `graphql:"teams(first:$teamFirst,after:$teamAfter)"`
 	}`graphql:"organization(login:$login)"`
-}
-var orgaVariables = map[string]interface{}{
-	"login": (*githubv4.String)(nil), //githubv4.String("SashaCollins"),
-	"teamFirst": githubv4.NewInt(100),
-	"teamAfter": (*githubv4.String)(nil),
 }
 //var currentPageInfo pageInfo
 type pageInfo struct {
@@ -116,9 +167,7 @@ type ref struct {
 	//									node {
 	//										... on Commit {
 	//											committedDate
-var allRefs []ref
-var allIssuesAssigned []issue
-var currentRepository repositoryInfo
+
 type repositoryInfo struct {
 	Repository struct {
 		Owner shortUser
@@ -142,28 +191,10 @@ type repositoryInfo struct {
 //	Nodes []commit
 //}
 //DefaultBranchRef ref
-var repoVariables = map[string]interface{}{
-	"login": (*githubv4.String)(nil), //githubv4.String("SashaCollins"),
-	"repositoryName": (*githubv4.String)(nil), //githubv4.String("project-Tide"),
-	"assignee": (*githubv4.String)(nil), //githubv4.String("SashaCollins"),
-	"issueState": githubv4.IssueStateOpen,
-	"issueFirst": githubv4.NewInt(1),
-	"issueAfter": (*githubv4.String)(nil),
-	//"refName": githubv4.String("commit"),
-	"prefix": githubv4.String("refs/heads/"),
-	//"target": githubv4.String("Commit"),
-	"refFirst": githubv4.NewInt(10),
-	"refAfter": (*githubv4.String)(nil),
-	"targetFirst": githubv4.NewInt(10),
-	"orderBy": githubv4.RefOrder{githubv4.RefOrderFieldTagCommitDate,githubv4.OrderDirectionDesc },
-}
 
-var allTeams []shortTeam
 type shortTeam struct {
 	Slug githubv4.String
 }
-var allTeamMembersAndRepos = team{}
-var currentTeam team
 type team struct {
 	Organization struct{
 		Team struct {
@@ -186,19 +217,10 @@ type team struct {
 		}`graphql:"team(slug:$teamName)"`
 	}`graphql:"organization(login:$login)"`
 }
-var teamVariables = map[string]interface{}{
-	"login": (*githubv4.String)(nil), //githubv4.String("SashaCollins"),
-	"teamName": (*githubv4.String)(nil), //githubv4.String("A-Team"),
-	"teamMembersFirst": githubv4.NewInt(1),
-	"teamMembersAfter": (*githubv4.String)(nil),
-	"repositoryFirst": githubv4.NewInt(1),
-	"repositoryAfter": (*githubv4.String)(nil),
-}
 type shortUser struct {
 	Login     githubv4.String
 	URL       githubv4.URI
 }
-var currentUser user
 type user struct {
 	User struct {
 		Organizations struct {
@@ -208,13 +230,6 @@ type user struct {
 		} `graphql:"organizations(first:$organizationFirst,after:$organizationAfter)"`
 	} `graphql:"user(login:$login)"`
 }
-var userVariables = map[string]interface{}{
-	"login": (*githubv4.String)(nil), //githubv4.String("SashaCollins"),
-	"organizationFirst": githubv4.NewInt(1),
-	"organizationAfter": (*githubv4.String)(nil),
-}
-
-var currentViewer viewer
 type viewer struct {
 	Viewer struct {
 		Login      githubv4.String
@@ -373,52 +388,52 @@ func (gr *githubReader) fetchData(client *githubv4.Client, query interface{}, lo
 	}
 }
 
-func (gr *githubReader) getViewer() *viewer {
+func (gr *githubReader) getViewer() (*viewer, error) {
 	fmt.Println("in GetViewer")
 	err := gr.fetchData(client, &currentViewer, nil)
 	if err != nil {
-		fmt.Println(err)
+		return nil, err
 	}
-	return &currentViewer
+	return &currentViewer, nil
 }
-func (gr *githubReader) getOrganizations(ownerLogin githubv4.String) *[]organization {
+func (gr *githubReader) getOrganizations(ownerLogin githubv4.String) (*[]organization, error) {
 	fmt.Println("in GetOrganizations")
 	userVariables["login"] = ownerLogin
 	err := gr.fetchData(client, &currentUser, &userVariables)
 	if err != nil {
-		fmt.Println(err)
+		return nil, err
 	}
-	return &allOrganizations
+	return &allOrganizations, nil
 }
-func (gr *githubReader) getTeamsPerOrganization(organizationLogin githubv4.String) *[]shortTeam {
+func (gr *githubReader) getTeamsPerOrganization(organizationLogin githubv4.String) (*[]shortTeam, error) {
 	fmt.Println("in GetTeamsPerOrganization")
 	orgaVariables["login"] = organizationLogin
 	err := gr.fetchData(client, &currentOrganization, &orgaVariables)
 	if err != nil {
-		fmt.Println(err)
+		return nil, err
 	}
-	return &allTeams
+	return &allTeams, nil
 }
-func (gr *githubReader) getTeamMembersAndRepositories(organizationLogin githubv4.String, teamName githubv4.String) *team{
+func (gr *githubReader) getTeamMembersAndRepositories(organizationLogin githubv4.String, teamName githubv4.String) (*team, error){
 	fmt.Println("in GetTeamMembersAndRepositories")
 	teamVariables["login"] = organizationLogin
 	teamVariables["teamName"] = teamName
 	err := gr.fetchData(client, &currentTeam, &teamVariables)
 	if err != nil {
-		fmt.Println(err)
+		return nil, err
 	}
 	gr.printJSON(allTeamMembersAndRepos)
 	fmt.Println("exit GetTeamMembersAndRepositories")
-	return &allTeamMembersAndRepos
+	return &allTeamMembersAndRepos, nil
 }
-func (gr *githubReader) getRepositoryInfo(repositoryName githubv4.String, ownerLogin githubv4.String, assignee githubv4.String) (*[]issue, *[]ref) {
+func (gr *githubReader) getRepositoryInfo(repositoryName githubv4.String, ownerLogin githubv4.String, assignee githubv4.String) (*[]issue, *[]ref, error) {
 	fmt.Println("in GetRepositoryInfo")
 	repoVariables["repositoryName"] = repositoryName
 	repoVariables["login"] = ownerLogin
 	repoVariables["assignee"] = assignee
 	err := gr.fetchData(client, &currentRepository, &repoVariables)
 	if err != nil {
-		fmt.Println(err)
+		return nil, nil, err
 	}
-	return &allIssuesAssigned, &allRefs//, &commitCountPerUser, &codeCoverage
+	return &allIssuesAssigned, &allRefs, nil//, &commitCountPerUser, &codeCoverage
 }

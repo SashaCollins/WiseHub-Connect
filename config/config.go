@@ -1,56 +1,80 @@
 package config
 
 import (
+	"fmt"
+	"log"
 	"os"
 	"strconv"
+	"sync"
+	"github.com/joho/godotenv"
 )
 
-type GitHubConfig struct {
+// type global
+type singleton map[string]string
+
+type gitHubConfig struct {
 	Username string
 	APIToken string
 }
-type DroneCIConfig struct {
+type droneCIConfig struct {
 	Host string
 	APIToken string
 }
-type HerokuConfig struct {
+type herokuConfig struct {
 	Username string
 	Password string
 	APIToken string
 }
-type Config struct {
-	GitHub GitHubConfig
-	DroneCI DroneCIConfig
-	Heroku HerokuConfig
+type configuration struct {
+	GitHub gitHubConfig
+	DroneCI droneCIConfig
+	Heroku herokuConfig
 	DebugMode bool
 	//UserRoles []string
 	//MaxUsers  int
 }
 
-// New returns a new Config struct
-func New() *Config {
-	return &Config{
-		GitHub: GitHubConfig{
-			Username: getEnv("GITHUB_USERNAME", ""),
-			APIToken:   getEnv("GITHUB_API_TOKEN", ""),
-		},
-		DroneCI: DroneCIConfig{
-			Host: getEnv("DRONE_HOST", ""),
-			APIToken:   getEnv("DRONE_API_TOKEN", ""),
-		},
-		Heroku: HerokuConfig{
-			Username: getEnv("HEROKU_USERNAME", ""),
-			Password: getEnv("HEROKU_PASSWORD", ""),
-			APIToken:   getEnv("HEROKU_API_TOKEN", ""),
-		},
-		DebugMode: getEnvAsBool("DEBUG_MODE", true),
-		//UserRoles: getEnvAsSlice("USER_ROLES", []string{"admin"}, ","),
-		//MaxUsers:  getEnvAsInt("MAX_USERS", 1),
+var (
+	lock sync.Mutex
+	once   sync.Once
+	config *configuration
+)
+func init() {
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatalf("Error loading .env file")
 	}
+}
+// New returns a new Config struct
+func GetConfig() *configuration {
+	once.Do(func() {
+		config = &configuration{
+			GitHub: gitHubConfig{
+				Username: getEnv("GITHUB_USERNAME", ""),
+				APIToken: getEnv("GITHUB_API_TOKEN", ""),
+			},
+			DroneCI: droneCIConfig{
+				Host: getEnv("DRONE_HOST", ""),
+				APIToken: getEnv("DRONE_API_TOKEN", ""),
+			},
+			Heroku: herokuConfig{
+				Username: getEnv("HEROKU_USERNAME", ""),
+				Password: getEnv("HEROKU_PASSWORD", ""),
+				APIToken: getEnv("HEROKU_API_TOKEN", ""),
+			},
+			DebugMode: getEnvAsBool("DEBUG_MODE", true),
+			//UserRoles: getEnvAsSlice("USER_ROLES", []string{"admin"}, ","),
+			//MaxUsers:  getEnvAsInt("MAX_USERS", 1),
+		}
+	})
+	fmt.Println(config)
+	return config
 }
 
 // Simple helper function to read an environment or return a default value
 func getEnv(key string, defaultVal string) string {
+	//lock.Lock()
+	//defer lock.Unlock()
 	if value, exists := os.LookupEnv(key); exists {
 		return value
 	}
