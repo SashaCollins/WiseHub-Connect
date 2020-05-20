@@ -7,21 +7,23 @@ import (
 )
 var client heroku.Client
 func init(){
-	conf := config.New()
-	username := conf.Heroku.Username
-	password := conf.Heroku.Password
-	client = heroku.Client{Username: username, Password: password}
+	conf := config.GetConfig()
+	email := conf.Heroku.Username
+	apiToken := conf.Heroku.APIToken
+	client = heroku.Client{Username: email, Password: apiToken}
 }
 type herokuReader struct {}
 
 
-func (hr *herokuReader) fetchData(info int) ([]heroku.App, error){
+func (hr *herokuReader) fetchData(info int) (interface{}, error){
 	switch info {
 	case 1:
+		fmt.Println("\tin fetch")
 		var apps []heroku.App
 		// pass nil for options if you don't need to set any optional params
 		app, err := client.AppCreate(nil)
 		if err != nil {
+			fmt.Println("\tin fetch error")
 			return nil, err
 		}
 		fmt.Println("Created", app.Name)

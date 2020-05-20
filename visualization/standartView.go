@@ -1,5 +1,0 @@
-package visualization
-
-func showData() {
-	
-}

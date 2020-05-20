@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -59,7 +58,6 @@ func GetConfig() *configuration {
 			},
 			Heroku: herokuConfig{
 				Username: getEnv("HEROKU_USERNAME", ""),
-				Password: getEnv("HEROKU_PASSWORD", ""),
 				APIToken: getEnv("HEROKU_API_TOKEN", ""),
 			},
 			DebugMode: getEnvAsBool("DEBUG_MODE", true),
@@ -67,18 +65,21 @@ func GetConfig() *configuration {
 			//MaxUsers:  getEnvAsInt("MAX_USERS", 1),
 		}
 	})
-	fmt.Println(config)
+	//fmt.Println(conf.DebugMode)
+	//fmt.Println(conf.MaxUsers)
+
+	// Print out each role
+	//for _, role := range conf.UserRoles {
+	//	fmt.Println(role)
+	//}
 	return config
 }
 
 // Simple helper function to read an environment or return a default value
 func getEnv(key string, defaultVal string) string {
-	//lock.Lock()
-	//defer lock.Unlock()
 	if value, exists := os.LookupEnv(key); exists {
 		return value
 	}
-
 	return defaultVal
 }
 
@@ -88,7 +89,6 @@ func getEnvAsBool(name string, defaultVal bool) bool {
 	if val, err := strconv.ParseBool(valStr); err == nil {
 		return val
 	}
-
 	return defaultVal
 }
 
@@ -98,7 +98,6 @@ func getEnvAsBool(name string, defaultVal bool) bool {
 //	if value, err := strconv.Atoi(valueStr); err == nil {
 //		return value
 //	}
-//
 //	return defaultVal
 //}
 
@@ -109,7 +108,6 @@ func getEnvAsBool(name string, defaultVal bool) bool {
 //	if valStr == "" {
 //		return defaultVal
 //	}
-//
 //	val := strings.Split(valStr, sep)
 //
 //	return val

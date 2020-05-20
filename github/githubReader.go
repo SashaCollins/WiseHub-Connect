@@ -2,16 +2,14 @@
 package github
 
 import (
-	"encoding/json"
 	"fmt"
+	"sync"
+	"os"
+	"encoding/json"
+	"golang.org/x/oauth2"
+	"golang.org/x/net/context"
 	"github.com/shurcooL/githubv4"
 	"github/SashaCollins/Wisehub-Connect/config"
-	"golang.org/x/oauth2"
-	"sync"
-
-	//"go/types"
-	"golang.org/x/net/context"
-	"os"
 )
 
 //TODO: ask for token in gui for admin or maybe get token from user credentials
@@ -73,13 +71,8 @@ var (
 	}
 )
 func init() {
-	fmt.Println("init")
-	//lock.Lock()
-	//defer lock.Unlock()
+	//create an http client with oauth authentication
 	conf := config.GetConfig()
-	username := conf.GitHub.Username
-	fmt.Println(username)
-	fmt.Println(conf.GitHub.APIToken)
 	GithubToken = conf.GitHub.APIToken
 	src := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: GithubToken},
@@ -281,10 +274,10 @@ func (gr *githubReader) printJSON(v interface{}) {
 }
 
 func (gr *githubReader) fetchData(client *githubv4.Client, query interface{}, localVar *map[string]interface{}) error {
-	fmt.Println("\tin run")
+	//fmt.Println("\tin run")
 	switch currentQuery := query.(type) {
 	case *organizationTeams:
-		fmt.Println("\t\tin Organization")
+		//fmt.Println("\t\tin Organization")
 		for {
 			err := client.Query(context.Background(), &currentQuery, *localVar)
 			if err != nil {
@@ -301,7 +294,7 @@ func (gr *githubReader) fetchData(client *githubv4.Client, query interface{}, lo
 		return nil
 
 	case *repositoryInfo:
-		fmt.Println("\t\tin Repo")
+		//fmt.Println("\t\tin Repo")
 		for {
 			err := client.Query(context.Background(), &currentQuery, *localVar)
 			if err != nil {
@@ -318,7 +311,7 @@ func (gr *githubReader) fetchData(client *githubv4.Client, query interface{}, lo
 		return nil
 
 	case *team:
-		fmt.Println("\t\tin Team")
+		//fmt.Println("\t\tin Team")
 		firstLoop := true
 		for {
 			err := client.Query(context.Background(), &currentQuery, *localVar)
@@ -340,23 +333,23 @@ func (gr *githubReader) fetchData(client *githubv4.Client, query interface{}, lo
 				}
 			}
 			if !currentQuery.Organization.Team.Repositories.PageInfo.HasNextPage && !currentQuery.Organization.Team.Members.PageInfo.HasNextPage{
-				fmt.Println("\t\tnobody has next page")
+				//fmt.Println("\t\tnobody has next page")
 				break
 			}
 			if currentQuery.Organization.Team.Members.PageInfo.HasNextPage {
-				fmt.Println("\t\tmembers have next")
+				//fmt.Println("\t\tmembers have next")
 				teamVariables["teamMembersAfter"] = githubv4.NewString(currentQuery.Organization.Team.Members.PageInfo.EndCursor)
 			}
 			if currentQuery.Organization.Team.Repositories.PageInfo.HasNextPage{
-				fmt.Println("\t\t repos have next")
+				//fmt.Println("\t\t repos have next")
 				teamVariables["repositoryAfter"] = githubv4.NewString(currentQuery.Organization.Team.Repositories.PageInfo.EndCursor)
 			}
 		}
-		fmt.Println("\t\texit team")
+		//fmt.Println("\t\texit team")
 		return nil
 
 	case *user:
-		fmt.Println("\t\tin User")
+		//fmt.Println("\t\tin User")
 		for {
 			err := client.Query(context.Background(), &currentQuery, *localVar)
 			if err != nil {
@@ -370,11 +363,11 @@ func (gr *githubReader) fetchData(client *githubv4.Client, query interface{}, lo
 			}
 			userVariables["organizationAfter"] = githubv4.NewString(currentQuery.User.Organizations.PageInfo.EndCursor)
 		}
-		fmt.Println("\t\tend User")
+		//fmt.Println("\t\tend User")
 		return nil
 
 	case *viewer:
-		fmt.Println("\t\tin Viewer")
+		//fmt.Println("\t\tin Viewer")
 		err := client.Query(context.Background(), &currentQuery, nil)
 		if err != nil {
 			fmt.Println("\tQuery viewer failed with:")
@@ -383,13 +376,13 @@ func (gr *githubReader) fetchData(client *githubv4.Client, query interface{}, lo
 		return nil
 
 	default:
-		fmt.Println("\t\tin default")
+		//fmt.Println("\t\tin default")
 		return fmt.Errorf("something went wrong with the query %s", currentQuery)
 	}
 }
 
 func (gr *githubReader) getViewer() (*viewer, error) {
-	fmt.Println("in GetViewer")
+	//fmt.Println("in GetViewer")
 	err := gr.fetchData(client, &currentViewer, nil)
 	if err != nil {
 		return nil, err
@@ -397,7 +390,7 @@ func (gr *githubReader) getViewer() (*viewer, error) {
 	return &currentViewer, nil
 }
 func (gr *githubReader) getOrganizations(ownerLogin githubv4.String) (*[]organization, error) {
-	fmt.Println("in GetOrganizations")
+	//fmt.Println("in GetOrganizations")
 	userVariables["login"] = ownerLogin
 	err := gr.fetchData(client, &currentUser, &userVariables)
 	if err != nil {
@@ -406,7 +399,7 @@ func (gr *githubReader) getOrganizations(ownerLogin githubv4.String) (*[]organiz
 	return &allOrganizations, nil
 }
 func (gr *githubReader) getTeamsPerOrganization(organizationLogin githubv4.String) (*[]shortTeam, error) {
-	fmt.Println("in GetTeamsPerOrganization")
+	//fmt.Println("in GetTeamsPerOrganization")
 	orgaVariables["login"] = organizationLogin
 	err := gr.fetchData(client, &currentOrganization, &orgaVariables)
 	if err != nil {
@@ -415,7 +408,7 @@ func (gr *githubReader) getTeamsPerOrganization(organizationLogin githubv4.Strin
 	return &allTeams, nil
 }
 func (gr *githubReader) getTeamMembersAndRepositories(organizationLogin githubv4.String, teamName githubv4.String) (*team, error){
-	fmt.Println("in GetTeamMembersAndRepositories")
+	//fmt.Println("in GetTeamMembersAndRepositories")
 	teamVariables["login"] = organizationLogin
 	teamVariables["teamName"] = teamName
 	err := gr.fetchData(client, &currentTeam, &teamVariables)
@@ -423,11 +416,10 @@ func (gr *githubReader) getTeamMembersAndRepositories(organizationLogin githubv4
 		return nil, err
 	}
 	gr.printJSON(allTeamMembersAndRepos)
-	fmt.Println("exit GetTeamMembersAndRepositories")
 	return &allTeamMembersAndRepos, nil
 }
 func (gr *githubReader) getRepositoryInfo(repositoryName githubv4.String, ownerLogin githubv4.String, assignee githubv4.String) (*[]issue, *[]ref, error) {
-	fmt.Println("in GetRepositoryInfo")
+	//fmt.Println("in GetRepositoryInfo")
 	repoVariables["repositoryName"] = repositoryName
 	repoVariables["login"] = ownerLogin
 	repoVariables["assignee"] = assignee

@@ -120,7 +120,7 @@ func (gl *GithubListener) StartServer(finished chan bool) {
 	router.GET("/courses", gl.GetOrgaInfo)
 	router.GET("/courses/:orgaName", gl.GetTeamInfo)
 	router.GET("/courses/:orgaName/:teamName", gl.GetInsightTeamInfo)
-	router.GET("/courses/:orgaName/:teamName/:repoName", gl.GetInsightTeamInfo)
+	router.GET("/courses/:orgaName/:teamName/:repoName", gl.GetTeamRepoInfo)
 	log.Fatal(http.ListenAndServe(":8080", router))
 
 	finished <- true

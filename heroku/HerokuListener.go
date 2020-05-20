@@ -14,7 +14,14 @@ type HerokuListener struct{
 }
 
 func (hl *HerokuListener) GetOrgaInfo(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	fmt.Println("before fetch")
 	data, err := hl.hr.fetchData(1)
+	if err != nil {
+		fmt.Println("error:", err)
+		http.Error(w, "internal error", http.StatusNotFound)
+		return
+	}
+	fmt.Println("before marshal")
 	result, err := json.MarshalIndent(data, "", "\t")
 	if err != nil {
 		fmt.Println("error:", err)
@@ -67,7 +74,7 @@ func (hl *HerokuListener) StartServer(finished chan bool) {
 	router.GET("/courses", hl.GetOrgaInfo)
 	router.GET("/courses/:orgaName", hl.GetTeamInfo)
 	router.GET("/courses/:orgaName/:teamName", hl.GetInsightTeamInfo)
-	router.GET("/courses/:orgaName/:teamName/:repoName", hl.GetInsightTeamInfo)
+	router.GET("/courses/:orgaName/:teamName/:repoName", hl.GetTeamRepoInfo)
 	log.Fatal(http.ListenAndServe(":6080", router))
 
 	finished <- true

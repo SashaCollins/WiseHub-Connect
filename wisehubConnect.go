@@ -3,17 +3,14 @@ package main
 
 import (
 	"fmt"
-	"github/SashaCollins/Wisehub-Connect/config"
+	"github/SashaCollins/Wisehub-Connect/heroku"
 	"log"
 	gh "github/SashaCollins/Wisehub-Connect/github"
-	"sync"
-
-	//"github/SashaCollins/Wisehub-Connect/drone"
+	"github/SashaCollins/Wisehub-Connect/drone"
 	//"github/SashaCollins/Wisehub-Connect/heroku"
 	"github.com/joho/godotenv"
 )
 
-var lock sync.Mutex
 func init() {
 	// loads values from .env into the system
 	if err := godotenv.Load(); err != nil {
@@ -22,11 +19,6 @@ func init() {
 }
 func main() {
 	fmt.Println("start")
-	//lock.Lock()
-	conf := config.GetConfig()
-	//lock.Unlock()
-	fmt.Println(conf.GitHub.Username)
-	fmt.Println( conf.GitHub.APIToken)
 	//fmt.Println(conf.DebugMode)
 	//fmt.Println(conf.MaxUsers)
 
@@ -38,31 +30,19 @@ func main() {
 	githubFinished := make(chan bool)
 	gl := gh.GithubListener{}
 	go gl.StartServer(githubFinished)
+	fmt.Println("\tgithub running...")
+	droneFinished := make(chan bool)
+	dl := drone.DroneListener{}
+	go dl.StartServer(droneFinished)
+	fmt.Println("\tdrone running...")
+	herokuFinished := make(chan bool)
+	hl := heroku.HerokuListener{}
+	go hl.StartServer(herokuFinished)
+	fmt.Println("\theroku running...")
+
 	<- githubFinished
-	//droneFinished := make(chan bool)
-	//dl := drone.DroneListener{}
-	//go dl.StartServer(droneFinished)
-	//<- droneFinished
-	//herokuFinished := make(chan bool)
-	//hl := heroku.HerokuListener{}
-	//go hl.StartServer(herokuFinished)
-	//<- herokuFinished
+	<- droneFinished
+	<- herokuFinished
 
-	//var viewer = *gh.GetViewer()
-	//show(viewer)
-	////printJSON(currentViewer)
-	//var allOrgas = *gh.GetOrganizations(viewer.Viewer.Login)
-	//show(allOrgas)
-	//var allTeams = *gh.GetTeamsPerOrganization(allOrgas[0].Login)
-	//show(allTeams)
-	//var allTeamMembersAndRepos = *gh.GetTeamMembersAndRepositories(allOrgas[0].Login, allTeams[0].Slug)
-	//show(allTeamMembersAndRepos)
-	//var allIssuesAssigned, allRefs = gh.GetRepositoryInfo(allTeamMembersAndRepos.Organization.Team.Repositories.Nodes[0].Name, allTeamMembersAndRepos.Organization.Team.Repositories.Nodes[0].Owner.Login, viewer.Viewer.Login)
-	//show(allIssuesAssigned)
-	//show(allRefs)
-
-	fmt.Println("#############################################")
-	//printJSON(currentUser)
-	//printJSON(allOrganizations)
 	fmt.Println("end")
 }

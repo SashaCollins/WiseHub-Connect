@@ -1,5 +1,5 @@
 package main
 
-func show() {
-	
+type View interface {
+	Show()
 }

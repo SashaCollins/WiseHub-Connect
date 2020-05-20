@@ -1,5 +1,7 @@
 package visualization
 
-func showMoreData() {
+type AdminView struct {}
+
+func (av *AdminView) showMoreData() {
 	
 }

@@ -14,7 +14,7 @@ type DroneListener struct{
 }
 
 func (dl *DroneListener) GetOrgaInfo(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	data, err := dl.dr.fetchData(1)
+	data, err := dl.dr.fetchData(3)
 	if err != nil {
 		fmt.Println("error:", err)
 		http.Error(w, "internal error", http.StatusNotFound)
@@ -78,7 +78,7 @@ func (dl *DroneListener) StartServer(finished chan bool) {
 	router.GET("/courses", dl.GetOrgaInfo)
 	router.GET("/courses/:orgaName", dl.GetTeamInfo)
 	router.GET("/courses/:orgaName/:teamName", dl.GetInsightTeamInfo)
-	router.GET("/courses/:orgaName/:teamName/:repoName", dl.GetInsightTeamInfo)
+	router.GET("/courses/:orgaName/:teamName/:repoName", dl.GetTeamRepoInfo)
 	log.Fatal(http.ListenAndServe(":7080", router))
 
 	finished <- true
