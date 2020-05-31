@@ -1,0 +1,49 @@
+@import './custom-var.scss';
+@import '../node_modules/vue-sidebar-menu/src/scss/vue-sidebar-menu.scss';
+@import './themes/black-theme';
+@import './themes/wisehub-theme';
+
+.v-sidebar-menu {
+  .vsm--link,
+  .vsm--mobile-bg {
+      border-radius: 10px;
+  }
+  .vsm--dropdown {
+    & .vsm--list {
+      border-radius: 10px;
+    }
+    & .vsm--icon {
+      margin-left: 20px;
+    }
+  }
+  .vsm--icon {
+    margin-right: 30px;
+  }
+  .vsm--toggle-btn {
+    order: -1;
+    border-radius: 10px;
+    &:before{
+      content: '\f100' ;
+      font-family: 'Font Awesome 5 Free';
+    }
+    &:after {
+      content: '\f101';
+      font-family: 'Font Awesome 5 Free';
+    }
+  }
+  .vsm--link {
+    &_level-1 {
+      &.vsm--link_exact-active,
+      &.vsm--link_active {
+        box-shadow: 0px 0px 0px 0px $primary-color inset;
+      }
+    }
+  }
+  &.vsm_rtl {
+    .vsm--link_level-1.vsm--link_active,
+    .vsm--link_level-1.vsm--link_exact-active {
+      box-shadow: -0px 0px 0px 0px $primary-color inset;
+    }
+  }
+}
+
