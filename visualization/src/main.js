@@ -1,17 +1,28 @@
 import Vue from 'vue';
 import App from './App.vue';
 import VueResource from 'vue-resource';
-import BootstrapVue from 'bootstrap-vue/dist/bootstrap-vue.esm';
+import VeeValidate from 'vee-validate';
+
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
+// import BootstrapVue from 'bootstrap-vue/dist/bootstrap-vue.esm';
+import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
+import { LayoutPlugin } from 'bootstrap-vue'
+Vue.use(LayoutPlugin)
+import { BContainer, BRow, BCol } from 'bootstrap-vue'
+Vue.component('b-container', BContainer)
+Vue.component('b-row', BRow)
+Vue.component('b-col', BCol)
+
 import 'vue-sidebar-menu/dist/vue-sidebar-menu.css'
 import VueSidebarMenu from 'vue-sidebar-menu'
 import SidebarMenu from './scss/sidebar-menu.scss'
-import VeeValidate from 'vee-validate';
+
 import { router } from './router/router';
-import store from './store/store';
+import store from './store/index';
+
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
@@ -31,9 +42,10 @@ library.add(faHome, faUser, faUserPlus, faSignInAlt, faSignOutAlt, faCoffee, faS
 
 Vue.config.productionTip = false;
 
-Vue.use(VueSidebarMenu)
-// Vue.use(SidebarMenu)
+Vue.use(VueSidebarMenu);
+Vue.use(SidebarMenu);
 Vue.use(BootstrapVue);
+Vue.use(IconsPlugin);
 Vue.use(VeeValidate);
 Vue.use(VueResource);
 Vue.component('font-awesome-icon', FontAwesomeIcon);

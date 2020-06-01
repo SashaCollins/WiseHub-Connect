@@ -1,7 +1,6 @@
 @import './custom-var.scss';
 @import '../node_modules/vue-sidebar-menu/src/scss/vue-sidebar-menu.scss';
-@import './themes/black-theme';
-@import './themes/wisehub-theme';
+
 
 .v-sidebar-menu {
   .vsm--link,
@@ -46,4 +45,6 @@
     }
   }
 }
+@import './themes/black-theme';
+@import './themes/wisehub-theme';
 

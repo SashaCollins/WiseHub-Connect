@@ -17,6 +17,8 @@
 </template>
 
 <script>
+    import EventBus from '../bus/event.bus';
+
     export default {
         name: "Profile",
         data() {
@@ -37,8 +39,9 @@
         },
         methods: {
             updateTheme() {
-                console.log('update is called');
                 this.$store.dispatch('sidebar/theme', this.selectedTheme);
+                // localStorage.setItem('theme', this.selectedTheme)
+                EventBus.$emit('update_theme', this.selectedTheme);
             }
         }
     }

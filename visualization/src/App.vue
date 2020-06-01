@@ -6,7 +6,7 @@
   >
     <div class="container">
       <div>
-        Select theme:
+<!--        {{ selectedTheme }}:-->
         <select v-model="selectedTheme">
           <option
                   v-for="(theme, index) in themes"
@@ -17,11 +17,12 @@
           </option>
         </select>
       </div>
-      <hr style="margin: 50px ;border: 1px solid #e3e3e3;">
+<!--      <hr style="border: 1px solid #e3e3e3;">-->
     </div>
     <router-view />
     <div class="sidebar">
       <sidebar-menu
+              :key="selectedTheme"
               :menu="menu"
               :collapsed="collapsed"
               :theme="selectedTheme"
@@ -40,6 +41,7 @@
 </template>
 
 <script>
+  import EventBus from './bus/event.bus';
 
   const separator = {
     render (h) {
@@ -130,11 +132,30 @@
         isOnMobile: false
       }
     },
+    computed: {
+      currentTheme() {
+        return this.$store.state.sidebar;
+      }
+    },
     mounted () {
       this.onResize()
       window.addEventListener('resize', this.onResize)
+      window.addEventListener('storage', this.updateTheme)
+      EventBus.$on('update_theme', function (theme) {
+        this.selectedTheme = theme;
+        console.log(this.selectedTheme)
+        this.$forceUpdate();
+      });
     },
     methods: {
+      updateTheme (event) {
+        console.log("event")
+        console.log(event)
+        if (event.key === 'theme') {
+          console.log(event)
+          this.selectedTheme = '';
+        }
+      },
       onToggleCollapse (collapsed) {
         console.log(collapsed)
         this.collapsed = collapsed
@@ -161,7 +182,6 @@
 <style scoped lang="scss">
   @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600');
   @import "./scss/sidebar-menu.scss";
-
   #sidebar {
     padding-left: 350px;
     transition: 0.3s ease;
@@ -198,3 +218,4 @@
     overflow: auto;
   }
 </style>
+
