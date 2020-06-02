@@ -6,7 +6,7 @@
   >
     <div class="container">
       <div>
-<!--        {{ selectedTheme }}:-->
+<!--        {{ loggedIn }}:-->
         <select v-model="selectedTheme">
           <option
                   v-for="(theme, index) in themes"
@@ -42,6 +42,8 @@
 
 <script>
   import EventBus from './bus/event.bus';
+  // import wisehubIcon from '@/assets/wiesehub-small.svg';
+  import Icon from './assets/logo.png';
 
   const separator = {
     render (h) {
@@ -57,12 +59,23 @@
   export default {
     name: "App",
     data() {
-      return {
+        let loggedIn = true;
+        return {
         menu: [
           {
             header: true,
             title: 'WiseHub Dashboard',
             hiddenOnCollapse: true
+          },
+          {
+            href: '/',
+            title: 'Homepage',
+            icon: {
+              element: 'img',
+              attributes: {
+                  src: Icon,
+              }
+            },
           },
           {
             href: '/faq',
@@ -73,11 +86,13 @@
             href:'/repositories',
             title: 'Repositories',
             icon: 'fa fa-code fa-fw',
+            hidden: !loggedIn,
           },
           {
             href: '/courses',
             title: 'Courses',
             icon: 'fa fa-chalkboard-teacher fa-fw',
+            hidden: !loggedIn,
             child: [
               {
                 href: '/courses/\'vss\'',
@@ -90,6 +105,7 @@
             href: '/settings',
             title: 'Settings',
             icon: 'fas fa-tools fa-fw',
+            hidden: !loggedIn,
             child: [
               {
                 href: '/settings/profile',
@@ -112,9 +128,16 @@
             component: separator
           },
           {
-            href: { path: '/logout' },
+            href: '/logout' ,
             title: 'LogOut',
             icon: 'fas fa-sign-out-alt fa-fw',
+            hidden: !loggedIn,
+          },
+          {
+            href: '/login',
+            title: 'LogIn',
+            icon: 'fas fa-sign-out-alt fa-fw',
+            hidden: loggedIn,
           },
         ],
         themes: [
@@ -129,13 +152,12 @@
         ],
         selectedTheme: 'wisehub-theme',
         collapsed: false,
-        isOnMobile: false
+        isOnMobile: false,
+
       }
     },
     computed: {
-      currentTheme() {
-        return this.$store.state.sidebar;
-      }
+
     },
     mounted () {
       this.onResize()
@@ -182,6 +204,7 @@
 <style scoped lang="scss">
   @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600');
   @import "./scss/sidebar-menu.scss";
+
   #sidebar {
     padding-left: 350px;
     transition: 0.3s ease;
@@ -217,5 +240,6 @@
     line-height: 1.5;
     overflow: auto;
   }
+
 </style>
 

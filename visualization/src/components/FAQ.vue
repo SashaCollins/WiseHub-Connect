@@ -4,7 +4,7 @@
                <h2>WiseHub-How-To</h2>
         </b-container>
         <b-container fluid="true" class="container-fluid">
-            <div>
+            <div id="test">
             <!-- WITH SCOPED SLOTS and INITIAL OPEN VALUES-->
                 <VueFaqAccordion
                         id="accordion"
@@ -13,7 +13,7 @@
                         :items="myItems"
                         v-slot="itemData"
                         initialTab="Basic Usage"
-                        :initialQuestionIndex="1"
+                        :initialQuestionIndex="0"
                         activeColor="#008B8B"
                 >
                     <!-- any html -->
@@ -104,6 +104,7 @@
         padding-bottom: 30px;
         margin-left: 80px;
     }
+
     h2 {
         color: #008B8B;
         width: 100%;
@@ -115,7 +116,11 @@
     @media screen and (max-width: 800px) {
         .container-fluid {
             width: 100%;
-            padding: 0;
+        }
+    }
+    @media screen and (max-width: 1650px) {
+        #accordion {
+            margin-left: 0px;
         }
     }
 

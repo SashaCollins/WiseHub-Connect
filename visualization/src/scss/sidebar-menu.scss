@@ -21,15 +21,20 @@
   .vsm--toggle-btn {
     order: -1;
     border-radius: 10px;
-    &:before{
-      content: '\f100' ;
+  }
+  &.vsm_expanded .vsm--toggle-btn {
+    &:after {
+      content: '\f100';
       font-family: 'Font Awesome 5 Free';
     }
+  }
+  &.vsm_collapsed .vsm--toggle-btn {
     &:after {
       content: '\f101';
       font-family: 'Font Awesome 5 Free';
     }
   }
+
   .vsm--link {
     &_level-1 {
       &.vsm--link_exact-active,
