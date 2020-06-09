@@ -37,7 +37,7 @@ export const router = new Router({
        },
        {
            name: 'impressum',
-           path: '/settings/impressum',
+           path: '/impressum',
            component: Impressum,
        },
        {

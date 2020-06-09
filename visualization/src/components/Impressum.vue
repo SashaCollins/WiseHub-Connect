@@ -1,11 +1,12 @@
 <template>
     <div>
-        <b-container fluid="true" class="container-fluid">
+        <div class="position-sticky">
             <h2>WiseHub-Impressum</h2>
-        </b-container>
-        <b-container fluid="true" class="container-fluid">
-            <div class='impressum'>
-                <h1>Impressum</h1>
+        </div>
+<!--        TODO schmalen container links anheften -->
+        <div class="container-fluid">
+            <div class="container-fluid" id='impressum'>
+                <h3>Impressum</h3>
                 <p>Angaben gemäß § 5 TMG</p>
                 <p>
                     Alexander Collin Wimmer <br>
@@ -124,7 +125,7 @@
                 <a href="https://www.impressum-generator.de">Impressum Generator</a> der
                 <a href="https://www.kanzlei-hasselbach.de/standorte/bonn/">Kanzlei Hasselbach, Bonn</a>
             </div>
-        </b-container>
+        </div>
     </div>
 </template>
 
@@ -134,7 +135,8 @@
     }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+
     h2 {
         color: #008B8B;
         width: 100%;
@@ -143,19 +145,12 @@
         text-align: center;
         background: #F5FFFA;
     }
-    .container-fluid {
+
+    #impressum{
+        margin: 0px;
         width: 75%;
-        height: fit-content;
-        margin-top: 35px;
-        padding: 20px;
-        border-radius: 10px;
-        background: #F5FFFA;
+        alignment: center;
 
     }
-    @media screen and (max-width: 800px) {
-        .container-fluid {
-            width: 100%;
-            padding: 0;
-        }
-    }
+
 </style>

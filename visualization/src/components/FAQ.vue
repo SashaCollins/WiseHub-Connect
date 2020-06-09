@@ -1,8 +1,8 @@
 <template>
     <div>
-        <b-container fluid="true" class="container-fluid">
+        <div class="position-sticky">
                <h2>WiseHub-How-To</h2>
-        </b-container>
+        </div>
         <b-container fluid="true" class="container-fluid">
             <div id="test">
             <!-- WITH SCOPED SLOTS and INITIAL OPEN VALUES-->
@@ -88,15 +88,13 @@
     }
 </script>
 
-<style scoped lang="scss">
-    .container-fluid {
-        width: 75%;
-        height: fit-content;
-        margin-top: 35px;
-        padding: 20px;
-        border-radius: 10px;
-        background: #F5FFFA;
-
+<style lang="scss">
+    .vertical-center {
+        margin: 0;
+        position: absolute;
+        top: 50%;
+        -ms-transform: translateY(-50%);
+        transform: translateY(-50%);
     }
     #accordion {
         width: 100%;
@@ -113,11 +111,7 @@
         text-align: center;
         background: #F5FFFA;
     }
-    @media screen and (max-width: 800px) {
-        .container-fluid {
-            width: 100%;
-        }
-    }
+
     @media screen and (max-width: 1650px) {
         #accordion {
             margin-left: 0px;

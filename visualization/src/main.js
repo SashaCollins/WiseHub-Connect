@@ -8,7 +8,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 // import BootstrapVue from 'bootstrap-vue/dist/bootstrap-vue.esm';
-import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
+import {BootstrapVue, IconsPlugin, vue} from 'bootstrap-vue'
 import { LayoutPlugin } from 'bootstrap-vue'
 Vue.use(LayoutPlugin)
 import { BContainer, BRow, BCol } from 'bootstrap-vue'
@@ -23,22 +23,14 @@ import SidebarMenu from './scss/sidebar-menu.scss'
 import { router } from './router/router';
 import store from './store/index';
 
-import { library } from '@fortawesome/fontawesome-svg-core';
+import { library, dom } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import {
-  faHome,
-  faUser,
-  faUserPlus,
-  faSignInAlt,
-  faSignOutAlt,
-  faCoffee, faSpinner, faEdit, faCircle, faCheck,
-  faPlus, faEquals, faArrowRight, faPencilAlt, faComment,
-} from '@fortawesome/free-solid-svg-icons';
-import '@fortawesome/fontawesome-free/css/all.css'
-import '@fortawesome/fontawesome-free/js/all.js'
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import '@fortawesome/fontawesome-free/css/all.css';
+import '@fortawesome/fontawesome-free/js/all.js';
 
-library.add(faHome, faUser, faUserPlus, faSignInAlt, faSignOutAlt, faCoffee, faSpinner, faEdit, faCircle, faCheck,
-    faPlus, faEquals, faArrowRight, faPencilAlt, faComment,);
+dom.watch();
+library.add(fas);
 
 Vue.config.productionTip = false;
 
