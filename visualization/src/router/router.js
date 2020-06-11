@@ -6,6 +6,8 @@ import Profile from "../components/Profile"
 import Contact from "../components/Contact"
 import Impressum from "../components/Impressum";
 import LogIn from '../components/LogIn.vue';
+import SignUp from '../components/SignUp.vue';
+import Forgot from '../components/Forgot.vue';
 Vue.use(Router);
 
 export const router = new Router({
@@ -49,6 +51,16 @@ export const router = new Router({
            name: 'login',
            path: '/login',
            component: LogIn,
+       },
+       {
+           name: 'signup',
+           path: '/signup',
+           component: SignUp,
+       },
+       {
+           name: 'forgot',
+           path: '/forgot',
+           component: Forgot,
        },
    ]
 });

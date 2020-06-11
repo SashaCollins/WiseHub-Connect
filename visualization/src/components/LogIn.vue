@@ -1,17 +1,5 @@
 <template>
 	<div class="bg-img">
-
-<!--		<form @submit.prevent="handleSubmit" class="container">-->
-<!--			<h1>Login</h1>-->
-
-<!--			<label for="email"><b>Email</b></label>-->
-<!--			<input type="text" placeholder="Enter Email" name="email" required>-->
-
-<!--			<label for="psw"><b>Password</b></label>-->
-<!--			<input type="password" placeholder="Enter Password" name="psw" required>-->
-
-<!--			<button type="submit" class="btn">Login</button>-->
-<!--		</form>-->
 		<div class="container">
 			<form @submit.prevent="handleSubmit">
 				<div class="row">
@@ -19,7 +7,7 @@
 					<div class="vl">
 						<span class="vl-innertext">or</span>
 					</div>
-
+<!--TODO-->
 					<div class="col">
 						<a href="#" class="github btn">
 							<i class="fas fa-github fa-fw"></i> Login with GitHub
@@ -34,8 +22,8 @@
 							<p>Or sign in manually:</p>
 						</div>
 
-						<input type="text" name="username" placeholder="Username" required>
-						<input type="password" name="password" placeholder="Password" required>
+						<input type="text" name="username" placeholder="Username" required v-model="user.name">
+						<input type="password" name="password" placeholder="Password" required v-model="user.password">
 						<input type="submit" class="btn" value="Login">
 					</div>
 
@@ -44,10 +32,10 @@
 			<div class="bottom-container">
 				<div class="row">
 					<div class="col">
-						<a href="#" style="color:white" class="btn">Sign up</a>
+						<router-link to="/signup" style="color:white" class="btn">Sign up</router-link>
 					</div>
 					<div class="col">
-						<a href="#" style="color:white" class="btn">Forgot password?</a>
+						<router-link to="/forgot" style="color:white" class="btn">Forgot password?</router-link>
 					</div>
 				</div>
 			</div>
@@ -57,9 +45,19 @@
 </template>
 
 <script>
-
+	import User from '../model/user'
     export default {
         name: "LogIn",
+        data () {
+          return {
+            user: new User("", ""),
+          }
+        },
+        methods: {
+          handleSubmit: function() {
+			console.log(this.user);
+          },
+        }
     }
 </script>
 
@@ -104,29 +102,26 @@
 	}
 
 	/*!* Full-width input fields *!*/
-	/*input[type=text], input[type=password] {*/
-	/*	width: 100%;*/
-	/*	padding: 15px;*/
-	/*	margin: 5px 0 22px 0;*/
-	/*	border: none;*/
-	/*	background: #f1f1f1;*/
-	/*}*/
+	input[type=text], input[type=password], input[type=email] {
+		width: 100%;
+		padding: 15px;
+		margin: 5px 0 22px 0;
+		border: none;
+		background: #f1f1f1;
+	}
 
-	/*input[type=text]:focus, input[type=password]:focus {*/
-	/*	background-color: #ddd;*/
-	/*	outline: none;*/
-	/*}*/
+	input[type=text]:focus, input[type=password]:focus, input[type=email]:focus {
+		background-color: #ddd;
+		outline: none;
+	}
 
 	/* !*Set a style for the submit button*!*/
-	/*.btn {*/
-	/*	background-color: #4CAF50;*/
-	/*	color: white;*/
-	/*	padding: 16px 20px;*/
-	/*	border: none;*/
-	/*	cursor: pointer;*/
-	/*	width: 100%;*/
-	/*	opacity: 0.9;*/
-	/*}*/
+	.btn {
+		background-color: #469898;
+		color: white;
+		padding: 16px 20px;
+		cursor: pointer;
+	}
 
 	/* style inputs and link buttons */
 	input,
@@ -215,7 +210,7 @@
 	/* bottom container */
 	.bottom-container {
 		text-align: center;
-		background-color: #469898;
+		/*background-color: #469898;*/
 		border-radius: 0px 0px 4px 4px;
 	}
 

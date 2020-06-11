@@ -18,7 +18,7 @@
     }
 </script>
 
-<style lang="scss">
+<style scoped lang="scss">
     h1 {
         color: #008B8B;
         width: 100%;

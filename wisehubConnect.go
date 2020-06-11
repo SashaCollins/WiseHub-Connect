@@ -3,12 +3,13 @@ package main
 
 import (
 	"fmt"
-	"github/SashaCollins/Wisehub-Connect/heroku"
-	"log"
-	gh "github/SashaCollins/Wisehub-Connect/github"
-	"github/SashaCollins/Wisehub-Connect/drone"
-	//"github/SashaCollins/Wisehub-Connect/heroku"
 	"github.com/joho/godotenv"
+	"github/SashaCollins/Wisehub-Connect/data"
+	"log"
+	//"github/SashaCollins/Wisehub-Connect/heroku"
+	//gh "github/SashaCollins/Wisehub-Connect/github"
+	//"github/SashaCollins/Wisehub-Connect/drone"
+	//"github/SashaCollins/Wisehub-Connect/heroku"
 )
 
 func init() {
@@ -19,30 +20,29 @@ func init() {
 }
 func main() {
 	fmt.Println("start")
-	//fmt.Println(conf.DebugMode)
-	//fmt.Println(conf.MaxUsers)
 
-	// Print out each role
-	//for _, role := range conf.UserRoles {
-	//	fmt.Println(role)
-	//}
+	fmt.Println("1")
+	ds := data.Datastore{}
+	fmt.Println("1")
+	ds.Start()
+	fmt.Println("1")
 
-	githubFinished := make(chan bool)
-	gl := gh.GithubListener{}
-	go gl.StartServer(githubFinished)
-	fmt.Println("\tgithub running...")
-	droneFinished := make(chan bool)
-	dl := drone.DroneListener{}
-	go dl.StartServer(droneFinished)
-	fmt.Println("\tdrone running...")
-	herokuFinished := make(chan bool)
-	hl := heroku.HerokuListener{}
-	go hl.StartServer(herokuFinished)
-	fmt.Println("\theroku running...")
-
-	<- githubFinished
-	<- droneFinished
-	<- herokuFinished
+	//githubFinished := make(chan bool)
+	//gl := gh.GithubListener{}
+	//go gl.StartServer(githubFinished)
+	//fmt.Println("\tgithub running...")
+	//droneFinished := make(chan bool)
+	//dl := drone.DroneListener{}
+	//go dl.StartServer(droneFinished)
+	//fmt.Println("\tdrone running...")
+	//herokuFinished := make(chan bool)
+	//hl := heroku.HerokuListener{}
+	//go hl.StartServer(herokuFinished)
+	//fmt.Println("\theroku running...")
+	//
+	//<- githubFinished
+	//<- droneFinished
+	//<- herokuFinished
 
 	fmt.Println("end")
 }
