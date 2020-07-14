@@ -7,13 +7,14 @@
 					<div class="vl">
 						<span class="vl-innertext">or</span>
 					</div>
-<!--TODO-->
+<!--TODO-->cd 
 					<div class="col">
-						<a href="#" class="github btn">
-							<i class="fas fa-github fa-fw"></i> Login with GitHub
+						<a href="https://github.com/login/oauth/authorize?scope=user:email&client_id=aec4d6e8accd119a47ab"
+						   class="github btn">
+							<i class="fab fa-github" aria-hidden="true"></i> Login with GitHub
 						</a>
 						<a href="#" class="gitlab btn">
-							<i class="fas fa-gitlab fa-fw"></i> Login with GitLab
+							<i class="fab fa-gitlab"></i> Login with GitLab
 						</a>
 					</div>
 
@@ -21,10 +22,37 @@
 						<div class="hide-md-lg">
 							<p>Or sign in manually:</p>
 						</div>
-
-						<input type="text" name="username" placeholder="Username" required v-model="user.name">
-						<input type="password" name="password" placeholder="Password" required v-model="user.password">
-						<input type="submit" class="btn" value="Login">
+						<span
+								v-show="submitted && errors.has('email')"
+								class="alert-danger">
+							{{errors.first('email')}}
+						</span>
+						<input
+								type="email"
+								placeholder="Email"
+								name="email"
+								v-validate="'required'"
+								v-model="user.email">
+						<span
+								v-show="submitted && errors.has('password')"
+								class="alert-danger">
+							{{errors.first('password')}}
+						</span>
+						<input
+								type="password"
+								name="password"
+								placeholder="Password"
+								v-validate="'required'"
+								v-model="user.password">
+						<input
+								type="submit"
+								class="btn"
+								value="Login">
+						<div
+								v-if="message"
+								class="alert-danger">
+							{{message}}
+						</div>
 					</div>
 
 				</div>
@@ -47,17 +75,42 @@
 <script>
 	import User from '../model/user'
     export default {
-        name: "LogIn",
-        data () {
-          return {
-            user: new User("", ""),
-          }
-        },
-        methods: {
-          handleSubmit: function() {
-			console.log(this.user);
-          },
+      name: "LogIn",
+      data () {
+        return {
+          user: new User( "","", ""),
+          submitted: false,
+          message: "",
         }
+      },
+	  computed: {
+		loggedIn() {
+		  return this.$store.state.auth.status.loggedIn;
+		}
+	  },
+      methods: {
+		handleSubmit: function() {
+		  this.submitted = true;
+		  this.$validator.validate().then(isValid => {
+			if (isValid) {
+			  this.$store.dispatch("auth/login", this.user).then(
+				  onSuccess => {
+					this.$router.push("/repositories");
+				  },
+				  onFailure => {
+					this.message = onFailure.toString();
+					this.submitted = false;
+				  })
+			}
+		  })
+		  console.log(this.user);
+		},
+      },
+	  mounted() {
+		if (this.loggedIn){
+		  this.$router.push("/");
+		}
+	  },
     }
 </script>
 

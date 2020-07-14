@@ -3,7 +3,7 @@ package heroku
 import (
 	"fmt"
 	"github.com/bgentry/heroku-go"
-	"github/SashaCollins/Wisehub-Connect/config"
+	"github/SashaCollins/Wisehub-Connect/model/config"
 )
 var client heroku.Client
 func init(){

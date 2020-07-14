@@ -3,11 +3,11 @@ package github
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/julienschmidt/httprouter"
 	"github.com/shurcooL/githubv4"
 	"log"
 	"net/http"
 	_ "strings"
-	"github.com/julienschmidt/httprouter"
 )
 
 type GithubListener struct{

@@ -23,7 +23,6 @@
 </template>
 
 <script>
-    import EventBus from '../bus/event.bus';
     import { mapState, mapActions } from 'vuex'
 
     export default {

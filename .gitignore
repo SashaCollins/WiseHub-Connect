@@ -4,8 +4,10 @@
 *.dll
 *.so
 *.dylib
+*.db
 .idea
 .env
+package-lock.json
 
 # Test binary, built with `go test -c`
 *.test
@@ -19,3 +21,4 @@ vendor/
 bin/
 certbot/
 nginx/
+node_modules/

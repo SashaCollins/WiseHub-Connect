@@ -41,7 +41,6 @@
 </template>
 
 <script>
-    import EventBus from './bus/event.bus';
     // import wisehubIcon from '@/assets/wiesehub-small.svg';
     import Icon from './assets/logo.png';
 
@@ -163,11 +162,6 @@
             this.onResize()
             window.addEventListener('resize', this.onResize)
             window.addEventListener('storage', this.updateTheme)
-            EventBus.$on('update_theme', function (theme) {
-                this.selectedTheme = theme;
-                console.log(this.selectedTheme)
-                this.$forceUpdate();
-            });
         },
         methods: {
             updateTheme (event) {

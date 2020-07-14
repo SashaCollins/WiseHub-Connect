@@ -4,12 +4,58 @@
 		<form @submit.prevent="handleSubmit" class="container">
 			<h3>SignUp</h3>
 
-			<input type="text" placeholder="Username" name="name" required v-model="user.name">
-			<input type="password" placeholder="Password" name="password" required v-model="user.password">
-			<input type="password" placeholder="repeat Password" name="password" required v-model="user.password">
-			<input type="email" placeholder="Email" name="email" required v-model="user.email">
-
+			<span
+					v-show="submitted && errors.has('name')"
+					class="alert-danger">
+				{{errors.first('name')}}
+			</span>
+			<input
+					type="text"
+					placeholder="Username"
+					name="name"
+					v-validate="'required|min:3|max:512'"
+					v-model="user.name">
+			<span
+					v-show="submitted && errors.has('password')"
+					class="alert-danger">
+				{{errors.first('password')}}
+			</span>
+			<input
+					type="password"
+					placeholder="Password"
+					ref="password"
+					name="password"
+					v-validate="'required|min:10|max:512'"
+					v-model="user.password">
+			{{ user.password }}
+			<span
+					v-show="submitted && errors.has('confirm')"
+					class="alert-danger">
+				{{errors.first('confirm')}}
+			</span>
+			<input
+					type="password"
+					placeholder="repeat Password"
+					name="repeat"
+					v-validate="'required|confirmed:password'"
+					v-model="confirm">
+			<span
+					v-show="submitted && errors.has('email')"
+					class="alert-danger">
+				{{errors.first('email')}}
+			</span>
+			<input
+					type="email"
+			        placeholder="Email"
+			        name="email"
+			        v-validate="'required|email|max:50'"
+			        v-model="user.email">
 			<button type="submit" class="btn">SignUp</button>
+			<div
+					v-if="message"
+					class="alert-danger">
+				{{message}}
+			</div>
 		</form>
 	</div>
 </template>
@@ -20,14 +66,42 @@
 	name: "SignUp",
 	data () {
 	  return {
+	    password: "",
+		confirm: "",
 		user: new User("", "", ""),
+	    submitted: false,
+	    message: "",
 	  }
 	},
+    computed: {
+	  loggedIn() {
+	    return this.$store.state.auth.status.loggedIn
+	  }
+    },
 	methods: {
 	  handleSubmit: function() {
-		console.log(this.user);
+	    this.submitted = true
+	    this.$validator.validate().then(isValid => {
+	      if (isValid) {
+			console.log(this.user.password);
+			this.$store.dispatch("auth/register", this.user).then(
+				onSuccess => {
+				  console.log(onSuccess);
+					this.$router.push("/login")
+			},
+				onFailure => {
+					this.message = onFailure.toString()
+				    this.submitted = false
+			})
+	      }
+	    })
 	  },
-	}
+	},
+    mounted() {
+      if (this.loggedIn){
+        this.$router.push("/")
+      }
+    },
   }
 </script>
 

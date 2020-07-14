@@ -1,7 +1,7 @@
 import AuthService from '../services/auth.service';
 import jwtDecode from "jwt-decode";
 
-const user = sessionStorage.getItem('shared');
+const user = sessionStorage.getItem('user');
 const initialState = user
     ? { status: { loggedIn: true }, user }
     : { status: { loggedIn: false }, user: null };
@@ -12,32 +12,15 @@ export const auth = {
     actions: {
         login({ commit }, user) {
             return AuthService.login(user).then(
-                response => {
-                    let decoded = jwtDecode(response.data.access)
-                    user.id = decoded.identity.user_ref;
-                    user.username = decoded.identity.user_name;
-                    user.password = '';
-                    commit('loginSuccess', user);
+                onSuccess => {
+                    if (onSuccess.data.access){
+                        commit('loginSuccess', user);
+                    }
                     return Promise.resolve(user);
                 },
-                error => {
+                onFailure => {
                     commit('loginFailure');
-                    return Promise.reject(error);
-                }
-            );
-        },
-        refresh({ commit }) {
-            return AuthService.refresh().then(
-                response => {
-                    if (response.data) {
-                        console.log(response);
-                        commit('refreshSuccess');
-                    }
-                    return Promise.resolve(response);
-                },
-                error => {
-                    commit('refreshFailure');
-                    return Promise.reject(error);
+                    return Promise.reject(onFailure);
                 }
             );
         },
@@ -47,14 +30,14 @@ export const auth = {
         },
         register({ commit }, user) {
             return AuthService.register(user).then(
-                response => {
+                onSuccess => {
                     user.password = '';
                     commit('registerSuccess');
-                    return Promise.resolve(response.data);
+                    return Promise.resolve(onSuccess.data);
                 },
-                error => {
+                onFailure => {
                     commit('registerFailure');
-                    return Promise.reject(error);
+                    return Promise.reject(onFailure);
                 }
             );
         },

@@ -1,11 +1,11 @@
 package config
 
 import (
+	"github.com/joho/godotenv"
 	"log"
 	"os"
 	"strconv"
 	"sync"
-	"github.com/joho/godotenv"
 )
 
 // type global
@@ -25,9 +25,9 @@ type herokuConfig struct {
 	APIToken string
 }
 type configuration struct {
-	GitHub gitHubConfig
-	DroneCI droneCIConfig
-	Heroku herokuConfig
+	GitHub    gitHubConfig
+	DroneCI   droneCIConfig
+	Heroku    herokuConfig
 	DebugMode bool
 	//UserRoles []string
 	//MaxUsers  int
@@ -53,7 +53,7 @@ func GetConfig() *configuration {
 				APIToken: getEnv("GITHUB_API_TOKEN", ""),
 			},
 			DroneCI: droneCIConfig{
-				Host: getEnv("DRONE_HOST", ""),
+				Host:     getEnv("DRONE_HOST", ""),
 				APIToken: getEnv("DRONE_API_TOKEN", ""),
 			},
 			Heroku: herokuConfig{

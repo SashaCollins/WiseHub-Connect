@@ -2,14 +2,14 @@
 package github
 
 import (
-	"fmt"
-	"sync"
-	"os"
 	"encoding/json"
-	"golang.org/x/oauth2"
-	"golang.org/x/net/context"
+	"fmt"
 	"github.com/shurcooL/githubv4"
-	"github/SashaCollins/Wisehub-Connect/config"
+	"github/SashaCollins/Wisehub-Connect/model/config"
+	"golang.org/x/net/context"
+	"golang.org/x/oauth2"
+	"os"
+	"sync"
 )
 
 //TODO: ask for token in gui for admin or maybe get token from user credentials
@@ -23,17 +23,17 @@ var (
 	lock sync.Mutex
 
 	currentViewer viewer
-	currentUser user
+	currentUser   user
 
 	currentOrganization organizationTeams
-	allOrganizations []organization
+	allOrganizations    []organization
 
-	currentTeam team
-	allTeams []shortTeam
+	currentTeam            team
+	allTeams               []shortTeam
 	allTeamMembersAndRepos = team{}
 
 	currentRepository repositoryInfo
-	allRefs []ref
+	allRefs           []ref
 	allIssuesAssigned []issue
 
 	userVariables = map[string]interface{}{
@@ -82,7 +82,7 @@ func init() {
 	// Use client...
 }
 type commit struct {
-	Author shortUser
+	Author    shortUser
 	Committer shortUser
 }
 type issue struct {
@@ -126,9 +126,9 @@ type rateLimit struct {
 }
 //var currentRepository repository
 type repository struct {
-	Name githubv4.String
+	Name  githubv4.String
 	Owner shortUser
-	URL        githubv4.URI
+	URL   githubv4.URI
 }
 //Branch
 type ref struct {
@@ -163,19 +163,19 @@ type ref struct {
 
 type repositoryInfo struct {
 	Repository struct {
-		Owner shortUser
-		CreatedAt githubv4.DateTime
+		Owner       shortUser
+		CreatedAt   githubv4.DateTime
 		Description githubv4.String
-		IsPrivate githubv4.Boolean
-		Issues struct {
+		IsPrivate   githubv4.Boolean
+		Issues      struct {
 			TotalCount githubv4.Int
-			Nodes []issue
-			PageInfo pageInfo
+			Nodes      []issue
+			PageInfo   pageInfo
 		}`graphql:"issues(first:$issueFirst,after:$issueAfter,filterBy:{assignee:$assignee},states:[$issueState])"` //,states:$issueState
 		Refs struct {
 			TotalCount githubv4.Int //number of branches
-			Nodes []ref
-			PageInfo pageInfo
+			Nodes      []ref
+			PageInfo   pageInfo
 		}`graphql:"refs(refPrefix:$prefix,first:$refFirst,after:$refAfter,orderBy:$orderBy)"`
 	} `graphql:"repository(owner:$login,name:$repositoryName)"`
 }
@@ -218,8 +218,8 @@ type user struct {
 	User struct {
 		Organizations struct {
 			TotalCount githubv4.Int
-			Nodes []organization
-			PageInfo pageInfo
+			Nodes      []organization
+			PageInfo   pageInfo
 		} `graphql:"organizations(first:$organizationFirst,after:$organizationAfter)"`
 	} `graphql:"user(login:$login)"`
 }
@@ -427,5 +427,5 @@ func (gr *githubReader) getRepositoryInfo(repositoryName githubv4.String, ownerL
 	if err != nil {
 		return nil, nil, err
 	}
-	return &allIssuesAssigned, &allRefs, nil//, &commitCountPerUser, &codeCoverage
+	return &allIssuesAssigned, &allRefs, nil //, &commitCountPerUser, &codeCoverage
 }

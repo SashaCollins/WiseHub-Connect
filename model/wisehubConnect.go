@@ -4,12 +4,14 @@ package main
 import (
 	"fmt"
 	"github.com/joho/godotenv"
-	"github/SashaCollins/Wisehub-Connect/data"
+	//"github/SashaCollins/Wisehub-Connect/model/data"
 	"log"
 	//"github/SashaCollins/Wisehub-Connect/heroku"
 	//gh "github/SashaCollins/Wisehub-Connect/github"
 	//"github/SashaCollins/Wisehub-Connect/drone"
 	//"github/SashaCollins/Wisehub-Connect/heroku"
+	"github/SashaCollins/Wisehub-Connect/viewmodel"
+
 )
 
 func init() {
@@ -20,12 +22,9 @@ func init() {
 }
 func main() {
 	fmt.Println("start")
-
-	fmt.Println("1")
-	ds := data.Datastore{}
-	fmt.Println("1")
-	ds.Start()
-	fmt.Println("1")
+	//ds := data.Datastore{}
+	//ds.Save()
+	//ds.Load("name092","pw092","email092")
 
 	//githubFinished := make(chan bool)
 	//gl := gh.GithubListener{}
@@ -43,6 +42,12 @@ func main() {
 	//<- githubFinished
 	//<- droneFinished
 	//<- herokuFinished
+
+	normalViewFinished := make(chan bool)
+	nv := viewmodel.NormalView{}
+	go nv.Run(normalViewFinished)
+	<- normalViewFinished
+
 
 	fmt.Println("end")
 }

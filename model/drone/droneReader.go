@@ -4,15 +4,15 @@ import (
 	"context"
 	"fmt"
 	"github.com/drone/drone-go/drone"
-	"github/SashaCollins/Wisehub-Connect/config"
+	"github/SashaCollins/Wisehub-Connect/model/config"
 	"golang.org/x/oauth2"
 )
 
 type droneReader struct{}
 var (
-	client drone.Client
+	client       drone.Client
 	currentBuild build
-	currentRepo repo
+	currentRepo  repo
 )
 func init() {
 	// create an http client with oauth authentication
@@ -49,10 +49,10 @@ type build struct {
 	Stages []stage
 }
 type repo struct {
-	Name string
-	Owner string
+	Name   string
+	Owner  string
 	Branch string
-	Build build
+	Build  build
 }
 func (dr *droneReader) jsonBuildToStructBuild(target *build, source drone.Build) *build {
 	target.Branch = source.Ref

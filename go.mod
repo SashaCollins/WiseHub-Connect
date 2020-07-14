@@ -5,6 +5,7 @@ go 1.14
 require (
 	github.com/bgentry/heroku-go v0.0.0-20150810151148-ee4032d686ae
 	github.com/drone/drone-go v1.3.1
+	github.com/golang/gddo v0.0.0-20200611223618-a4829ef13274
 	github.com/joho/godotenv v1.3.0
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
