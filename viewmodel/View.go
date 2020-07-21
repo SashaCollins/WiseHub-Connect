@@ -11,6 +11,11 @@ import (
 	_ "github/SashaCollins/Wisehub-Connect/model/listener"
 )
 
+type Response struct{
+	Success bool
+}
 type View interface {
+	SignUp()
+	SignIn()
 	Show()
 }

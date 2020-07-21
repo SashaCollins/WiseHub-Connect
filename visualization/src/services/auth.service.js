@@ -11,10 +11,14 @@ class AuthService {
             email: user.email,
             password: hashed_pw
         }).then((response) => {
+            //set user to loggedIn
+            console.log(response.data.Success)
             if (response.data) {
-                sessionStorage.setItem('user', response.data.access);
+                if (response.data.Success) {
+                    sessionStorage.setItem('loggedIn', response.data.Success);
+                }
             }
-            console.log(sessionStorage.getItem('user'));
+            console.log(sessionStorage.getItem('loggedIn'));
             console.log(response);
             user.password = '';
             return response;
@@ -35,9 +39,8 @@ class AuthService {
             name: user.name,
             password: hashed_pw,
             email: user.email
-        }, {
-            "content-type": "text/plain"
-        });
+        },
+        );
     }
 }
 

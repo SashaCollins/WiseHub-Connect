@@ -68,7 +68,7 @@ export const router = new Router({
 router.beforeEach((to,from,next) => {
     let publicPages = ['/','/login','/faq','/impressum','/signup','/forgot'];
     let authRequired = !publicPages.includes(to.path);
-    let loggedIn = sessionStorage.getItem('user');
+    let loggedIn = sessionStorage.getItem('loggedIn');
     if (authRequired && !loggedIn) {
         return next('/login');
     }

@@ -94,11 +94,14 @@
 		  this.$validator.validate().then(isValid => {
 			if (isValid) {
 			  this.$store.dispatch("auth/login", this.user).then(
-				  onSuccess => {
+				  (onSuccess) => {
+				    console.log(onSuccess)
 					this.$router.push("/repositories");
 				  },
-				  onFailure => {
-					this.message = onFailure.toString();
+				  (onFailure) => {
+				    console.log(onFailure.response)
+					this.message = onFailure.response.data;
+					console.log(this.message)
 					this.submitted = false;
 				  })
 			}

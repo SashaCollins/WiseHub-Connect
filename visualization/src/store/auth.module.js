@@ -1,7 +1,7 @@
 import AuthService from '../services/auth.service';
 import jwtDecode from "jwt-decode";
 
-const user = sessionStorage.getItem('user');
+const user = sessionStorage.getItem('loggedIn');
 const initialState = user
     ? { status: { loggedIn: true }, user }
     : { status: { loggedIn: false }, user: null };
@@ -12,13 +12,13 @@ export const auth = {
     actions: {
         login({ commit }, user) {
             return AuthService.login(user).then(
-                onSuccess => {
-                    if (onSuccess.data.access){
+                (onSuccess) => {
+                    if (onSuccess.data.Success){
                         commit('loginSuccess', user);
                     }
                     return Promise.resolve(user);
                 },
-                onFailure => {
+                (onFailure) => {
                     commit('loginFailure');
                     return Promise.reject(onFailure);
                 }

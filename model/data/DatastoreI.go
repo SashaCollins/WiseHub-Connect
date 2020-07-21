@@ -6,17 +6,15 @@ do not edit or delete.
  */
 package data
 
-import "database/sql"
-
 type User struct {
-	Id int
-	Name string
-	Password string
-	Email string
+	//gorm.Model
+	Name     string `json:"name"`
+	Password string `json:"password"`
+	Email    string `json:"email"`
 }
 
 type DatastoreI interface {
-	Load(args ...string) (users sql.Result ,err error)
+	Load(args ...string) (users User ,err error)
 	Save(name string, password string, email string) error
 	Del(email string, password string ) error
 }
