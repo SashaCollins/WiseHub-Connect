@@ -23,7 +23,7 @@
     <div class="sidebar">
       <sidebar-menu
               :key="selectedTheme"
-              :menu="menu"
+              :menu="loggedIn ? menuLoggedIn : menuLoggedOut"
               :collapsed="collapsed"
               :theme="selectedTheme"
               :show-one-child="true"
@@ -58,9 +58,9 @@
     export default {
         name: "App",
         data() {
-            let loggedIn = false;
+            let loggedIn = this.loggedIn;
             return {
-            menu: [
+            menuLoggedOut: [
                 {
                     header: true,
                     title: 'WiseHub Dashboard',
@@ -82,43 +82,6 @@
                     icon: 'far fa-comments fa-fw',
                 },
                 {
-                    href:'/repositories',
-                    title: 'Repositories',
-                    icon: 'fa fa-code fa-fw',
-                    hidden: !loggedIn,
-                },
-                {
-                    href: '/courses',
-                    title: 'Courses',
-                    icon: 'fa fa-chalkboard-teacher fa-fw',
-                    hidden: !loggedIn,
-                    child: [
-                        {
-                            href: '/courses/\'vss\'',
-                            title: '\'VSS\'',
-                            icon: 'fas fa-code-branch fa-fw',
-                        },
-                    ]
-                },
-                {
-                    href: '/settings',
-                    title: 'Settings',
-                    icon: 'fas fa-tools fa-fw',
-                    hidden: !loggedIn,
-                    child: [
-                        {
-                            href: '/settings/profile',
-                            title: 'Profile',
-                            icon: 'fas fa-user fa-fw',
-                        },
-                        {
-                            href: '/settings/contact',
-                            title: 'Contact',
-                            icon: 'fas fa-bullhorn fa-fw',
-                        },
-                    ]
-                },
-                {
                     href: '/impressum',
                     title: 'Impressum',
                     icon: 'fas fa-copyright fa-fw',
@@ -127,17 +90,80 @@
                     component: separator
                 },
                 {
-                    href: '/logout' ,
-                    title: 'LogOut',
-                    icon: 'fas fa-sign-out-alt fa-fw',
-                    hidden: !loggedIn,
-                },
-                {
                     href: '/login',
                     title: 'LogIn',
                     icon: 'fas fa-sign-out-alt fa-fw',
                     hidden: loggedIn,
                 },
+            ],
+            menuLoggedIn: [
+              {
+                header: true,
+                title: 'WiseHub Dashboard',
+                hiddenOnCollapse: true
+              },
+              {
+                href: '/',
+                title: 'Homepage',
+                icon: {
+                  element: 'img',
+                  attributes: {
+                    src: Icon,
+                  }
+                },
+              },
+              {
+                href: '/faq',
+                title:  'FAQ',
+                icon: 'far fa-comments fa-fw',
+              },
+              {
+                href:'/repositories',
+                title: 'Repositories',
+                icon: 'fa fa-code fa-fw',
+              },
+              {
+                href: '/courses',
+                title: 'Courses',
+                icon: 'fa fa-chalkboard-teacher fa-fw',
+                child: [
+                  {
+                    href: '/courses/\'vss\'',
+                    title: '\'VSS\'',
+                    icon: 'fas fa-code-branch fa-fw',
+                  },
+                ]
+              },
+              {
+                href: '/settings',
+                title: 'Settings',
+                icon: 'fas fa-tools fa-fw',
+                child: [
+                  {
+                    href: '/settings/profile',
+                    title: 'Profile',
+                    icon: 'fas fa-user fa-fw',
+                  },
+                  {
+                    href: '/settings/contact',
+                    title: 'Contact',
+                    icon: 'fas fa-bullhorn fa-fw',
+                  },
+                ]
+              },
+              {
+                href: '/impressum',
+                title: 'Impressum',
+                icon: 'fas fa-copyright fa-fw',
+              },
+              {
+                component: separator
+              },
+              {
+                href: '/logout',
+                title: 'LogOut',
+                icon: 'fas fa-sign-out-alt fa-fw',
+              },
             ],
             themes: [
                 {
@@ -155,23 +181,16 @@
 
           }
         },
-        // computed () {
-        //
-        // },
+        computed: {
+          loggedIn() {
+            return this.$store.state.auth.status.loggedIn
+          }
+        },
         mounted () {
             this.onResize()
             window.addEventListener('resize', this.onResize)
-            window.addEventListener('storage', this.updateTheme)
         },
         methods: {
-            updateTheme (event) {
-                console.log("event")
-                console.log(event)
-                if (event.key === 'theme') {
-                    console.log(event)
-                    this.selectedTheme = '';
-                }
-            },
             onToggleCollapse (collapsed) {
                 console.log(collapsed)
                 this.collapsed = collapsed
@@ -180,6 +199,20 @@
                 console.log('onItemClick')
                 console.log(event)
                 console.log(item)
+                if (item.href === '/logout') {
+                  this.$store.dispatch("auth/logout").then(
+                      (onSuccess) => {
+                        console.log(onSuccess)
+                        console.log(this.loggedIn)
+                        this.$router.push("/");
+                      },
+                      (onFailure) => {
+                        console.log(onFailure.response)
+                        this.message = onFailure.response.data;
+                        console.log(this.message)
+                        this.submitted = false;
+                      })
+                }
                 this.$router.push(item.href)
             },
             onResize () {

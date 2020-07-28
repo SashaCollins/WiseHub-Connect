@@ -27,11 +27,10 @@
 					name="password"
 					v-validate="'required|min:10|max:512'"
 					v-model="user.password">
-			{{ user.password }}
 			<span
-					v-show="submitted && errors.has('confirm')"
+					v-show="submitted && errors.has('repeat')"
 					class="alert-danger">
-				{{errors.first('confirm')}}
+				{{errors.first('repeat')}}
 			</span>
 			<input
 					type="password"
@@ -78,25 +77,28 @@
 	    return this.$store.state.auth.status.loggedIn
 	  }
     },
-	methods: {
-	  handleSubmit: function() {
-	    this.submitted = true
-	    this.$validator.validate().then(isValid => {
-	      if (isValid) {
-			console.log(this.user.password);
-			this.$store.dispatch("auth/register", this.user).then(
-				onSuccess => {
-				  console.log(onSuccess);
-					this.$router.push("/login")
-			},
-				onFailure => {
-					this.message = onFailure.toString()
-				    this.submitted = false
-			})
-	      }
-	    })
-	  },
-	},
+    methods: {
+      handleSubmit: function() {
+        this.submitted = true
+        this.$validator.validate().then(isValid => {
+          if (isValid) {
+            console.log(this.user.password);
+            this.$store.dispatch("auth/register", this.user).then(
+              (onSuccess) => {
+                console.log(onSuccess);
+                this.$router.push("/login")
+              },
+              (onFailure) => {
+                console.log(onFailure.response)
+                this.message = onFailure.response.data;
+                console.log(this.message)
+                this.submitted = false;
+              },
+            )
+          }
+        })
+      },
+    },
     mounted() {
       if (this.loggedIn){
         this.$router.push("/")

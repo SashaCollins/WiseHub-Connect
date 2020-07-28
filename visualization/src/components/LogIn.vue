@@ -83,37 +83,37 @@
           message: "",
         }
       },
-	  computed: {
-		loggedIn() {
-		  return this.$store.state.auth.status.loggedIn;
-		}
-	  },
-      methods: {
-		handleSubmit: function() {
-		  this.submitted = true;
-		  this.$validator.validate().then(isValid => {
-			if (isValid) {
-			  this.$store.dispatch("auth/login", this.user).then(
-				  (onSuccess) => {
-				    console.log(onSuccess)
-					this.$router.push("/repositories");
-				  },
-				  (onFailure) => {
-				    console.log(onFailure.response)
-					this.message = onFailure.response.data;
-					console.log(this.message)
-					this.submitted = false;
-				  })
-			}
-		  })
-		  console.log(this.user);
-		},
+      computed: {
+        loggedIn() {
+          return this.$store.state.auth.status.loggedIn;
+        }
       },
-	  mounted() {
-		if (this.loggedIn){
-		  this.$router.push("/");
-		}
-	  },
+      methods: {
+        handleSubmit: function() {
+          this.submitted = true;
+          this.$validator.validate().then(isValid => {
+            if (isValid) {
+              this.$store.dispatch("auth/login", this.user).then(
+                (onSuccess) => {
+                  console.log(onSuccess)
+                  this.$router.push("/repositories");
+                },
+                (onFailure) => {
+                  console.log(onFailure.response)
+                  this.message = onFailure.response.data;
+                  console.log(this.message)
+                  this.submitted = false;
+                })
+            }
+          })
+          console.log(this.user);
+        },
+      },
+      mounted() {
+        if (this.loggedIn){
+          this.$router.push("/");
+        }
+      },
     }
 </script>
 

@@ -12,6 +12,8 @@ import (
     "fmt"
     _ "github.com/mattn/go-sqlite3"
     "log"
+    "os"
+
     //"os"
 )
 var (
@@ -21,7 +23,7 @@ var (
 type Datastore struct{}
 
 func init() {
-    //_ = os.Remove("./data/wisehub.db")
+    _ = os.Remove("./data/wisehub.db")
     var err error
     db, err = sql.Open("sqlite3", "./data/wisehub.db")
     if err != nil {
