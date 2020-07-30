@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="position-sticky">
+        <div class="header">
             <h2>WiseHub-Contact</h2>
         </div>
         <b-container fluid="true" class="container-fluid">
@@ -57,13 +57,9 @@
 </script>
 
 <style scoped lang="scss">
-    h2 {
-        color: #008B8B;
-        width: 100%;
-        margin-top: 15px;
-        border-radius: 10px;
-        text-align: center;
-        background: #F5FFFA;
+
+    h3 {
+      font-size: 50px;
     }
 
     * {
@@ -97,9 +93,12 @@
     input[type=submit]:hover {
         background-color: #9a2020;
     }
-
+    .container-fluid {
+      padding-top: 30px;
+    }
     /* Style the container/contact section */
     #containerContact {
+        width: 75%;
         border-radius: 10px;
         background-color: #002828;
         padding: 10px;

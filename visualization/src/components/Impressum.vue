@@ -1,6 +1,6 @@
 <template>
-    <div>
-        <div class="position-sticky">
+    <div class="container">
+        <div class="header">
             <h2>WiseHub-Impressum</h2>
         </div>
 <!--        TODO schmalen container links anheften -->
@@ -137,16 +137,8 @@
 
 <style scoped lang="scss">
 
-    h2 {
-        color: #008B8B;
-        width: 100%;
-        margin-top: 15px;
-        border-radius: 10px;
-        text-align: center;
-        background: #F5FFFA;
-    }
-
     #impressum{
+        padding-top: 30px;
         margin: 0px;
         width: 75%;
         alignment: center;

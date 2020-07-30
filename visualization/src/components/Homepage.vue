@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <div class="position-sticky">
+        <div class="header">
             <h1>WiseHub-Connect</h1>
         </div>
         <b-container fluid="true" class="container-fluid">
@@ -19,6 +19,7 @@
 </script>
 
 <style scoped lang="scss">
+
     h1 {
         color: #008B8B;
         width: 100%;

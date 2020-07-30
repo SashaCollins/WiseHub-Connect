@@ -1,24 +1,107 @@
 <template>
     <div class="container">
-        <div class="position-sticky">
+        <div class="header">
             <h2>WiseHub-Profile</h2>
         </div>
-        <b-container fluid="true" class="container-fluid">
-<!--            <h4>Hi {{account.user.firstName}}!</h4>-->
-<!--            <p>You're logged in with Vue + Vuex & JWT!!</p>-->
-<!--            <h6>Users from secure api end point:</h6>-->
-<!--            <em v-if="users.loading">Loading users...</em>-->
-<!--            <span v-if="users.error" class="text-danger">ERROR: {{users.error}}</span>-->
-<!--            <ul v-if="users.items">-->
-<!--                <li v-for="user in users.items" :key="user.id">-->
-<!--                    {{user.firstName + ' ' + user.lastName}}-->
-<!--                    <span v-if="user.deleting"><em> - Deleting...</em></span>-->
-<!--                    <span v-else-if="user.deleteError" class="text-danger"> - ERROR: {{user.deleteError}}</span>-->
-<!--                    <span v-else> - <a @click="deleteUser(user.id)" class="text-danger">Delete</a></span>-->
-<!--                </li>-->
-<!--            </ul>-->
-        </b-container>
-
+        <div class="container-fluid">
+          <div class="picture">
+            <img src="../assets/avatar.png" alt="Avatar" class="avatar">
+          </div>
+          <div class="row">
+            <div class="col">
+              <h3 class="text-lg-center">Account</h3>
+              <form>
+                <div class="row form-group">
+                  <label
+                      for="staticName"
+                      class="col-sm-2 col-form-label-lg">
+                    Name:
+                  </label>
+                  <div class="col-sm">
+                    <input
+                        type="text"
+                        readonly
+                        class="form-control-plaintext form-control-lg"
+                        id="staticName"
+                        value="Heinrich Pumpernickl">
+                  </div>
+                  <div class="col-sm-1">
+                    <button
+                        type="button"
+                        class="btn btn-outline-primary btn-sm">
+                      Edit
+                    </button>
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label
+                      for="staticEmail"
+                      class="col-sm-2 col-form-label-lg">
+                    Email:
+                  </label>
+                  <div class="col-sm">
+                    <input
+                        type="text"
+                        readonly
+                        class="form-control-plaintext form-control-lg"
+                        id="staticEmail"
+                        value="email@example.com">
+                  </div>
+                  <div class="col-sm-1">
+                    <button
+                        type="button"
+                        class="btn btn-outline-primary btn-sm">
+                      Edit
+                    </button>
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label
+                      class="col-sm-2 col-form-label-lg">
+                    Password:
+                  </label>
+<!--                  <div class="col-sm">-->
+<!--                    <input-->
+<!--                        type="password"-->
+<!--                        class="form-control-lg"-->
+<!--                        id="inputPassword"-->
+<!--                        placeholder="Password">-->
+<!--                  </div>-->
+                  <div class="col-sm">
+                    <button
+                        type="button"
+                        class="btn btn-primary">
+                      change Password
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <div class="card">
+                <h2>About Me</h2>
+                <div class="fakeimg" style="height:100px;">Image</div>
+                <p>Some text about me in culpa qui officia deserunt mollit anim..</p>
+              </div>
+            </div>
+            <div class="col">
+              <div class="card">
+                <h3>Popular Post</h3>
+                <div class="fakeimg">Image</div><br>
+                <div class="fakeimg">Image</div><br>
+                <div class="fakeimg">Image</div>
+              </div>
+            </div>
+            <div class="col">
+              <div class="card">
+                <h3>Follow Me</h3>
+                <p>Some text..</p>
+              </div>
+            </div>
+          </div>
+        </div>
     </div>
 </template>
 
@@ -28,34 +111,79 @@
     export default {
         name: "Profile",
         computed: {
-            ...mapState({
-                account: state => state.account,
-                users: state => state.users.all
-            })
+
         },
-        created () {
-            this.getAllUsers();
-        },
+
         methods: {
-            ...mapActions('users', {
-                getAllUsers: 'getAll',
-                deleteUser: 'delete'
-            })
+
         }
     }
 </script>
 
 <style scoped lang="scss">
-    h2 {
-        color: #008B8B;
-        width: 100%;
-        margin-top: 15px;
-        border-radius: 10px;
-        text-align: center;
-        background: #F5FFFA;
+
+    .container {
+      //font-family: Arial;
+      background: #f1f1f1;
+    }
+
+    .picture {
+      text-align: center;
+      padding-top: 30px;
+      padding-bottom: 30px;
+    }
+    .avatar {
+      vertical-align: middle;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background-color: #008B8B;
+    }
+
+    /* Create two unequal columns that floats next to each other */
+
+    /* Right column */
+    .row {
+      width: 100%;
+      padding-left: 20px;
+    }
+    .row:after {
+      content: "";
+      display: table;
+      clear: both;
+    }
+
+    /* Fake image */
+    .fakeimg {
+      background-color: #aaa;
+      width: 100%;
+      padding: 20px;
+    }
+
+    .col {
+      background-color: #9a2020;
+      padding: 20px;
+      margin-top: 20px;
+    }
+    /* Add a card effect for articles */
+    .card {
+      float: inside;
+      background-color: white;
+      padding: 20px;
+      margin-top: 20px;
+    }
+
+    /* Clear floats after the columns */
+    .container-fluid:after {
+      content: "";
+      display: table;
+      clear: both;
     }
 
     @media screen and (max-width: 800px) {
-
+      .general, .plugins {
+        width: 100%;
+        padding: 0;
+      }
     }
 </style>

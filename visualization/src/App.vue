@@ -5,18 +5,6 @@
           :class="[{'collapsed' : collapsed}, {'onmobile' : isOnMobile}]"
   >
     <div class="container" id="containerTheme">
-      <div>
-<!--        {{ loggedIn }}:-->
-        <select v-model="selectedTheme">
-          <option
-                  v-for="(theme, index) in themes"
-                  :key="index"
-                  :value="theme.input"
-          >
-            {{ theme.name }}
-          </option>
-        </select>
-      </div>
 <!--      <hr style="border: 1px solid #e3e3e3;">-->
     </div>
     <router-view />
@@ -36,6 +24,18 @@
               class="sidebar-overlay"
               @click="collapsed = true"
       />
+    </div>
+    <div class="theme">
+      <!--        {{ loggedIn }}:-->
+      <select v-model="selectedTheme">
+        <option
+            v-for="(theme, index) in themes"
+            :key="index"
+            :value="theme.input"
+        >
+          {{ theme.name }}
+        </option>
+      </select>
     </div>
   </div>
 </template>
@@ -123,7 +123,6 @@
                 icon: 'fa fa-code fa-fw',
               },
               {
-                href: '/courses',
                 title: 'Courses',
                 icon: 'fa fa-chalkboard-teacher fa-fw',
                 child: [
@@ -135,7 +134,6 @@
                 ]
               },
               {
-                href: '/settings',
                 title: 'Settings',
                 icon: 'fas fa-tools fa-fw',
                 child: [
@@ -213,7 +211,10 @@
                         this.submitted = false;
                       })
                 }
-                this.$router.push(item.href)
+                if (item.href !== ''){
+                  this.$router.push(item.href)
+
+                }
             },
             onResize () {
                 if (window.innerWidth <= 767) {
@@ -228,28 +229,41 @@
     }
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
     @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600');
     @import "./scss/sidebar-menu.scss";
 
-    div.position-sticky {
+    div.header {
         margin-top: 35px;
-        padding: 20px;
         background: #F5FFFA;
-        align-content: center;
+        //align-content: center;
         position: -webkit-sticky; /* Safari */
         position: sticky;
         top: 0;
+        width: 100%;
+        padding-top: 20px;
+        padding-bottom: 20px;
+        text-align: center;
     }
-    .container-fluid {
-        width: 75%;
-        height: fit-content;
-        margin-top: 35px;
-        padding: 20px;
-        border-radius: 10px;
-        background: #F5FFFA;
-        align-content: center;
+    h2 {
+      color: #008B8B;
+      width: 100%;
+      margin-top: 15px;
+      border-radius: 10px;
+      text-align: center;
+      background: #F5FFFA;
     }
+
+
+    //.container-fluid {
+    //    width: 75%;
+    //    height: fit-content;
+    //    margin-top: 35px;
+    //    padding: 20px;
+    //    border-radius: 10px;
+    //    background: #F5FFFA;
+    //    align-content: center;
+    //}
     @media screen and (max-width: 767px) {
         .container-fluid {
             width: 100%;
@@ -290,6 +304,11 @@
         padding: 15px;
         line-height: 1.5;
         overflow: auto;
+    }
+    .theme {
+      //position: -webkit-sticky; /* Safari */
+      position: fixed;
+      bottom: 0;
     }
 
 
