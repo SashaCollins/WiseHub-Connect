@@ -244,6 +244,7 @@
         padding-top: 20px;
         padding-bottom: 20px;
         text-align: center;
+        z-index: 1;
     }
     h2 {
       color: #008B8B;
@@ -254,16 +255,6 @@
       background: #F5FFFA;
     }
 
-
-    //.container-fluid {
-    //    width: 75%;
-    //    height: fit-content;
-    //    margin-top: 35px;
-    //    padding: 20px;
-    //    border-radius: 10px;
-    //    background: #F5FFFA;
-    //    align-content: center;
-    //}
     @media screen and (max-width: 767px) {
         .container-fluid {
             width: 100%;

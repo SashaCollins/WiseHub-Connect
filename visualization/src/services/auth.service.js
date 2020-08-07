@@ -15,12 +15,13 @@ class AuthService {
             console.log(response.data.Success)
             if (response.data) {
                 if (response.data.Success) {
+                    user.password = "";
                     sessionStorage.setItem('loggedIn', response.data.Success);
+                    sessionStorage.setItem('user', JSON.stringify(user));
                 }
             }
             console.log(sessionStorage.getItem('loggedIn'));
             console.log(response);
-            user.password = '';
             return response;
         });
     }

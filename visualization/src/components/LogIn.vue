@@ -96,11 +96,12 @@
               this.$store.dispatch("auth/login", this.user).then(
                 (onSuccess) => {
                   console.log(onSuccess)
+                  this.$store.dispatch("user/setUserState", this.$store.state.auth.status.user);
                   this.$router.push("/repositories");
                 },
                 (onFailure) => {
                   console.log(onFailure.response)
-                  this.message = onFailure.response.data;
+                  this.message = (onFailure.response && onFailure.response.data) || onFailure.message || onFailure.toString();
                   console.log(this.message)
                   this.submitted = false;
                 })

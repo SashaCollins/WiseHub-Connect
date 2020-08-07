@@ -4,17 +4,28 @@
 		<form @submit.prevent="handleSubmit" class="container">
 			<h3>SignUp</h3>
 
+<!--			<span-->
+<!--					v-show="submitted && errors.has('name')"-->
+<!--					class="alert-danger">-->
+<!--				{{errors.first('name')}}-->
+<!--			</span>-->
+<!--			<input-->
+<!--					type="text"-->
+<!--					placeholder="Username"-->
+<!--					name="name"-->
+<!--					v-validate="'required|min:3|max:512'"-->
+<!--					v-model="user.name">-->
 			<span
-					v-show="submitted && errors.has('name')"
+					v-show="submitted && errors.has('email')"
 					class="alert-danger">
-				{{errors.first('name')}}
+				{{errors.first('email')}}
 			</span>
 			<input
-					type="text"
-					placeholder="Username"
-					name="name"
-					v-validate="'required|min:3|max:512'"
-					v-model="user.name">
+					type="email"
+			        placeholder="Email"
+			        name="email"
+			        v-validate="'required|email|max:50'"
+			        v-model="user.email">
 			<span
 					v-show="submitted && errors.has('password')"
 					class="alert-danger">
@@ -38,17 +49,6 @@
 					name="repeat"
 					v-validate="'required|confirmed:password'"
 					v-model="confirm">
-			<span
-					v-show="submitted && errors.has('email')"
-					class="alert-danger">
-				{{errors.first('email')}}
-			</span>
-			<input
-					type="email"
-			        placeholder="Email"
-			        name="email"
-			        v-validate="'required|email|max:50'"
-			        v-model="user.email">
 			<button type="submit" class="btn">SignUp</button>
 			<div
 					v-if="message"
@@ -67,7 +67,7 @@
 	  return {
 	    password: "",
 		confirm: "",
-		user: new User("", "", ""),
+		user: new User("", "", "normal"),
 	    submitted: false,
 	    message: "",
 	  }

@@ -1,13 +1,15 @@
 import AuthService from '../services/auth.service';
 import jwtDecode from "jwt-decode";
 
-const user = sessionStorage.getItem('loggedIn');
-const initialState = user
-    ? { status: { loggedIn: true }, user }
-    : { status: { loggedIn: false }, user: null };
+const loggedIn = sessionStorage.getItem('loggedIn');
+const user = sessionStorage.getItem('user');
+const initialState = loggedIn
+    ? { status: {loggedIn: loggedIn, user: user}}
+    : { status: {loggedIn: loggedIn, user: null }};
 
 export const auth = {
     namespaced: true,
+    // { status: loggedIn, user: user }
     state: initialState,
     actions: {
         login({ commit }, user) {
@@ -41,50 +43,19 @@ export const auth = {
                 }
             );
         },
-        update_profile({ commit }, user) {
-            return UserService.update(user).then(response => {
-                commit("updateSuccess", user)
-                return Promise.resolve(response);
-            }, error => {
-                commit("updateFailure")
-                return Promise.reject(error);
-            });
-        },
-        update_password({ commit }, user) {
-            return UserService.update(user).then(response => {
-                user.password = '';
-                commit("updateSuccess", user)
-                return Promise.resolve(response);
-            }, error => {
-                commit("updateFailure")
-                return Promise.reject(error);
-            });
-        },
-        delete({ commit }, user) {
-            return UserService.delete(user).then(response => {
-                commit("deleteSuccess")
-                user.password = '';
-                sessionStorage.clear();
-                localStorage.clear();
-                return Promise.resolve(response);
-            }, error => {
-                commit("deleteFailure")
-                return Promise.reject(error);
-            });
-        }
     },
     mutations: {
         loginSuccess(state, user) {
             state.status.loggedIn = true;
-            state.user = user;
+            state.status.user = user;
         },
         loginFailure(state) {
             state.status.loggedIn = false;
-            state.user = null;
+            state.status.user = null;
         },
         logout(state) {
             state.status.loggedIn = false;
-            state.user = null;
+            state.status.user = null;
         },
         registerSuccess(state) {
             state.status.loggedIn = false;
@@ -92,19 +63,5 @@ export const auth = {
         registerFailure(state) {
             state.status.loggedIn = false;
         },
-        updateSuccess(state, user) {
-            state.status.loggedIn = true;
-            state.user = user;
-        },
-        updateFailure(state) {
-            state.status.loggedIn = true;
-        },
-        deleteSuccess(state) {
-            state.status.loggedIn = false;
-            state.user = null;
-        },
-        deleteFailure(state) {
-            state.status.loggedIn = true;
-        }
     }
 };

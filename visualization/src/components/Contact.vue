@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="container">
         <div class="header">
             <h2>WiseHub-Contact</h2>
         </div>
