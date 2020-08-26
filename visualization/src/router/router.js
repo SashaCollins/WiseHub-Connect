@@ -1,13 +1,15 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import Homepage from '../components/Homepage';
-import FAQ from '../components/FAQ.vue';
-import Profile from "../components/Profile"
-import Contact from "../components/Contact"
-import Impressum from "../components/Impressum";
-import LogIn from '../components/LogIn.vue';
-import SignUp from '../components/SignUp.vue';
-import Forgot from '../components/Forgot.vue';
+
+import Homepage from '../components/hub/Homepage';
+import FAQ from '../components/info/FAQ.vue';
+import Profile from "../components/profile/Profile"
+import Contact from "../components/info/Contact"
+import Impressum from "../components/info/Impressum";
+import LogIn from '../components/auth/LogIn.vue';
+import SignUp from '../components/auth/SignUp.vue';
+import Forgot from '../components/auth/Forgot.vue';
+
 Vue.use(Router);
 
 export const router = new Router({
@@ -45,7 +47,6 @@ export const router = new Router({
        {
            name: 'logout',
            path: '/logout',
-           // function: logout(),
        },
        {
            name: 'login',

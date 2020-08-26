@@ -12,13 +12,106 @@ import (
     "fmt"
     _ "github.com/mattn/go-sqlite3"
     "log"
-    //"os"
+    "strconv"
+    "strings"
 )
+
 var (
     db *sql.DB
+    err error
+    rows *sql.Rows
+    row *sql.Row
 )
 
 type Datastore struct{}
+
+func stringToIntArray(arr []string) (b []int) {
+    for _, v := range arr {
+        num, _ := strconv.Atoi(v)
+        b = append(b, num)
+    }
+    return b
+}
+
+func loadPluginsByIds(pluginIds []int) (plugins []Plugin, err error) {
+    loadPlugins := `
+	select name, token, other from Plugin where Plugin.id = ?;
+	`
+    tx, err := db.Begin()
+    if err != nil {
+        return nil, err
+    }
+    stmt, err := tx.Prepare(loadPlugins)
+    if err != nil {
+        return nil, err
+    }
+    defer stmt.Close()
+    var plugin Plugin
+    for pluginId := range pluginIds {
+        row = stmt.QueryRow(pluginId)
+        if err := row.Scan(&plugin.Name, &plugin.Token, &plugin.Description); err != nil {
+            plugins = append(plugins, plugin)
+        }
+    }
+    return plugins, nil
+}
+
+func loadAllUsers() (user User, plugins []Plugin, err error) {
+    sqlStmt := `select name, password, email, plugins from User;`
+    stmt, err := db.Prepare(sqlStmt)
+    if err != nil {
+        return user, plugins, err
+    }
+    rows, err = stmt.Query()
+    if err != nil {
+        return user, plugins, err
+    }
+    for rows.Next() {
+        if err := row.Scan(&user.Name, &user.Password, &user.Email, &user.Plugins); err != nil {
+            if check := len(user.Plugins); check > 0 {
+                splittedIds := strings.Split(user.Plugins, ",")
+                plugins, err := loadPluginsByIds(stringToIntArray(splittedIds))
+                if err != nil {
+                    return user, plugins, err
+                }
+            }
+            return user, plugins, err
+        }
+        fmt.Println(user.Name, user.Password, user.Email, user.Plugins)
+    }
+    err = rows.Err()
+    if err != nil {
+        err = errors.New("something went wrong while fetching all Users")
+        return user, plugins, err
+    }
+    return user, plugins,nil
+}
+
+func loadUserByEmail(email string) (user User, plugins []Plugin, err error) {
+    sqlStmt := `
+           select name, password, email, plugins
+           from User
+           where User.email = ?;
+       `
+    stmt, err := db.Prepare(sqlStmt)
+    fmt.Println(stmt)
+    if err != nil {
+        return user, plugins, err
+    }
+    row = stmt.QueryRow(email)
+    if err := row.Scan(&user.Name, &user.Password, &user.Email, &user.Plugins); err != nil {
+        return user, plugins, err
+    }
+    fmt.Println(user.Name, user.Password, user.Email, user.Plugins)
+    if check := len(user.Plugins); check > 0 {
+        splittedIds := strings.Split(user.Plugins, ",")
+        plugins, err := loadPluginsByIds(stringToIntArray(splittedIds))
+        if err != nil {
+            return user, plugins, err
+        }
+    }
+    return user, plugins,nil
+}
 
 func init() {
     //_ = os.Remove("./data/wisehub.db")
@@ -27,16 +120,31 @@ func init() {
     if err != nil {
       fmt.Printf("ERROR: %s\n", err)
     }
-
-    sqlStmt := `
-	create table if not exists User (id integer not null primary key autoincrement , name text, password text, email text unique);
--- 	delete from User;
+    defer db.Close()
+    createUser := `
+	create table if not exists User (id integer not null primary key autoincrement , name text, password text, email text unique, plugins text);
+    delete from User;
 	`
-    _, err = db.Exec(sqlStmt)
+    createPlugins := `
+	create table if not exists Plugin (id integer not null primary key autoincrement , name text unique, token text, description text);
+    delete from Plugin;
+	`
+    _, err = db.Exec(createUser)
     if err != nil {
-       log.Printf("%q: %s\n", err, sqlStmt)
-       fmt.Printf("%q: %s\n", err, sqlStmt)
+       log.Printf("init %q: %s\n", err, createUser)
        return
+    }
+    _, err = db.Exec(createPlugins)
+    if err != nil {
+       log.Printf("init %q: %s\n", err, createPlugins)
+       return
+    }
+}
+
+func openDb() {
+    db, err = sql.Open("sqlite3", "./data/wisehub.db")
+    if err != nil {
+        fmt.Printf("openDB: %s\n", err)
     }
 }
 
@@ -48,126 +156,52 @@ two loads user based on email and password
  @param email string
  @param password string
 */
-func (ds *Datastore) Load(args ...string) (user User ,err error){
-    // We initialize each of the optional parameters to their default value.
-    email := "" // ← We initialize email to empty string.
-    //password := "" // ← We initialize password to empty string.
-
-    var (
-        sqlStmt string
-        rows *sql.Rows
-        row *sql.Row
-    )
+func (ds *Datastore) Load(email ...string) (user User ,plugins []Plugin, err error) {
+    // open DB
+    openDb()
+    defer db.Close()
 
     // Get any parameters passed to us out of the args variable into "real"
     // variables we created for them.
-    l := len(args)
-    switch l {
-    //LoadAll
+    check := len(email)
+    switch check {
     case 0:
-        fmt.Println("\tat 0")
-        sqlStmt = `select name, password, email from User;`
-        stmt, err := db.Prepare(sqlStmt)
-        if err != nil {
-            return user, err
-        }
-        rows, err = stmt.Query()
-        if err != nil {
-            return user, err
-        }
-        for rows.Next() {
-            if err := row.Scan(&user.Name, &user.Password, &user.Email); err != nil {
-                return user, err
-            }
-            fmt.Println(user.Name, user.Password, user.Email)
-        }
-        //defer rows.Close()
-        err = rows.Err()
-        if err != nil {
-            err = errors.New("something went wrong while fetching all Users")
-            return user, err
-        }
-        //only last user is returned; multi-user loading for ui not supported yet
-        return user, nil
-
-    //register, login, forgot
-    case 1: // email
-        fmt.Println("\tat 1")
-        email = args[0]
-        sqlStmt = `
-           select name, password, email
-           from User
-           where User.email = ?;
-       `
-        stmt, err := db.Prepare(sqlStmt)
-        if err != nil {
-            return user, err
-        }
-        defer stmt.Close()
-        row = stmt.QueryRow(email)
-        if err := row.Scan(&user.Name, &user.Password, &user.Email); err != nil {
-            err = errors.New("no matching user was found")
-            return user, err
-        }
-        return user, nil
-
-    ////login
-    //case 2: // email, password
-    //    fmt.Println("\tat 2")
-    //    email = args[0]
-    //    password = args[1]
-    //    sqlStmt = `
-    //       select name, password, email
-    //       from User
-    //       where User.email = ?
-    //       and User.password = ?;
-    //   `
-    //    stmt, err := db.Prepare(sqlStmt)
-    //    if err != nil {
-    //        return user, err
-    //    }
-    //    defer stmt.Close()
-    //    row = stmt.QueryRow(email, password)
-    //    if err := row.Scan(&user.Name, &user.Password, &user.Email); err != nil {
-    //        err = errors.New("no matching user was found")
-    //        return user, err
-    //    }
-    //    return user, nil
-
-
-    // Since we have 0 mandatory parameter, but a maximum of 3 make sure
-    // we have no more than 3.
-    //
+        fmt.Println("Load \tat 0")
+        return loadAllUsers()
+    case 1:
+        fmt.Println("Load \tat 1")
+        return loadUserByEmail(email[0])
     default:
-        err = errors.New("too many parameters.")
-        return user, err
+        err := fmt.Errorf("too many arguments in function load: %v", len(email))
+        return user, plugins, err
     }
 }
 
-func (ds *Datastore) Save(name string, password string, email string) error{
+//TODO Plugin Save
+func (ds *Datastore) Save(name string, password string, email string) error {
+    fmt.Println("Save \tin Save")
+    // open DB
+    openDb()
+    defer db.Close()
 
-    fmt.Println("\tin Save")
-    //fmt.Printf("%s\n", name)
-    //fmt.Printf("%s\n", password)
-    //fmt.Printf("%s\n", email)
     tx, err := db.Begin()
     if err != nil {
        return err
     }
 
-    sqlStmt := `
+    saveUser := `
        insert 
-       into User(name, password, email) 
-       values(?, ?, ?);
+       into User(name, password, email, plugins) 
+       values(?, ?, ?, ?);
     `
-    stmt, err := tx.Prepare(sqlStmt)
+    stmt, err := tx.Prepare(saveUser)
     if err != nil {
        return err
     }
     //fmt.Println("\tafter prepare")
     defer stmt.Close()
 
-    _, err = stmt.Exec(name, password, email)
+    _, err = stmt.Exec(name, password, email, "")
     if err != nil {
        return err
     }
@@ -177,37 +211,88 @@ func (ds *Datastore) Save(name string, password string, email string) error{
     if err != nil {
       return err
     }
-    fmt.Println("\tend Save")
+    fmt.Println("Save \tend Save")
     return nil
 }
-func (ds *Datastore) Del(email string, password string) error{
+
+// TODO plugin update
+func (ds *Datastore) Update(option string, data ...string) error {
+    // open DB
+    openDb()
+    defer db.Close()
+
+    fmt.Println("Update \tin Update")
+    //fmt.Printf("%s\n", data)
+    //fmt.Printf("%s\n", option)
+    tx, err := db.Begin()
+    if err != nil {
+       return err
+    }
+
+    sqlStmt := ""
+    switch option {
+    case "email":
+        sqlStmt = `
+            update User
+            set User.email = ?
+            where User.email = ?;
+        `
+    case "password":
+        sqlStmt = `
+            update User
+            set User.password = ?
+            where User.email = ?;
+        `
+    case "plugins":
+        sqlStmt = `
+            update User
+            set User.plugins = ?
+            where User.email = ?;
+        `
+    }
+    stmt, err := tx.Prepare(sqlStmt)
+    if err != nil {
+       return err
+    }
+    //fmt.Println("\tafter prepare")
+    defer stmt.Close()
+
+    _, err = stmt.Exec(data[0], data[1])
+    if err != nil {
+       return err
+    }
+    //fmt.Println("\tafter exec")
+
+    err = tx.Commit()
+    if err != nil {
+      return err
+    }
+    fmt.Println("Update \tend Save")
+    return nil
+}
+
+func (ds *Datastore) Delete(email string) error {
+    // open DB
+    openDb()
+    defer db.Close()
+
     tx, err := db.Begin()
     if err != nil {
         return err
     }
 
-    sqlStmt := `
+    deleteProfile := `
        delete 
        from User
-       where User.email = ? 
-       and User.password = ?;
+       where User.email = ?;
     `
-    stmt, err := tx.Prepare(sqlStmt)
+    stmt, err := tx.Prepare(deleteProfile)
     if err != nil {
         return err
     }
     defer stmt.Close()
-    _, err = ds.Load(email, password)
-    if err != nil {
-        return err
-    }
 
-    _, err = stmt.Exec(email, password)
-    if err != nil {
-        return err
-    }
-
-    err = tx.Commit()
+    _, err = stmt.Exec(email)
     if err != nil {
         return err
     }

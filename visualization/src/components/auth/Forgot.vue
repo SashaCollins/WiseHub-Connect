@@ -12,7 +12,8 @@
 </template>
 
 <script>
-  import User from '../model/user'
+  import User from "../../model/user";
+
   export default {
 	name: "SignUp",
 	data () {

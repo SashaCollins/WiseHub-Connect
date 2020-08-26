@@ -3,12 +3,8 @@ package main
 
 import (
 	"fmt"
+	//_ "github/SashaCollins/Wisehub-Connect"
 	"github/SashaCollins/Wisehub-Connect/model/data"
-
-	//"github/SashaCollins/Wisehub-Connect/heroku"
-	//gh "github/SashaCollins/Wisehub-Connect/github"
-	//"github/SashaCollins/Wisehub-Connect/drone"
-	//"github/SashaCollins/Wisehub-Connect/heroku"
 	"github/SashaCollins/Wisehub-Connect/viewmodel"
 )
 
@@ -23,11 +19,11 @@ func main() {
 	ds := data.Datastore{}
 	err := ds.Save("name092","pw092","email092")
 	if err != nil {
-		fmt.Printf("\tERROR: %s\n", err)
+		fmt.Printf("\tmain: %s\n", err)
 	}
-	_, err = ds.Load("email092")
+	_, _, err = ds.Load()
 	if err != nil {
-		fmt.Printf("\tERROR: %s\n", err)
+		fmt.Printf("\tmain: %s\n", err)
 	}
 
 	//githubFinished := make(chan bool)
@@ -48,7 +44,7 @@ func main() {
 	//<- herokuFinished
 
 	normalViewFinished := make(chan bool)
-	nv := viewmodel.NormalView{&ds, nil}
+	nv := viewmodel.NormalView{Datastore: &ds}
 	go nv.Run(normalViewFinished)
 	<- normalViewFinished
 

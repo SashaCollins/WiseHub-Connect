@@ -1,7 +1,9 @@
 import UserService from '../services/user.service';
 
 const userObject = sessionStorage.getItem('user');
-const initialState = userObject ? {status: {user: userObject}} : {status: {user: null}};
+const initialState = userObject
+	? { user: userObject }
+	: { user: null };
 
 export const user = {
   namespaced: true,
@@ -11,54 +13,56 @@ export const user = {
 		commit("setUserState", user)
 	},
 	fetchProfile({ commit }, user) {
-	  return UserService.fetchProfile(user).then(response => {
-		commit("fetchSuccess", user)
-		return Promise.resolve(response);
-	  }, error => {
-		return Promise.reject(error);
+	  return UserService.fetchProfile(user).then(onSuccess => {
+	    if (onSuccess.data.Success) {
+		  commit("fetchSuccess", user)
+		}
+		return Promise.resolve(onSuccess);
+	  }, onFailure => {
+		return Promise.reject(onFailure);
 	  });
 	},
-	updateEmail({ commit }, user) {
-	  return UserService.updateEmail(user).then(response => {
-		commit("updateSuccess", user)
-		return Promise.resolve(response);
-	  }, error => {
-		return Promise.reject(error);
+	updateEmail({ commit }, payload) {
+	  return UserService.updateEmail(payload).then(onSuccess => {
+	    let updatedUser = user.state.status.user.email = payload.newEmail;
+		commit("updateSuccess",updatedUser)
+		return Promise.resolve(onSuccess);
+	  }, onFailure => {
+		return Promise.reject(onFailure);
 	  });
 	},
 	updatePassword({ commit }, user) {
-	  return UserService.updatePassword(user).then(response => {
+	  return UserService.updatePassword(user).then(onSuccess => {
 		user.password = '';
-		commit("updateSuccess", user)
-		return Promise.resolve(response);
-	  }, error => {
-		return Promise.reject(error);
+		return Promise.resolve(onSuccess);
+	  }, onFailure => {
+		return Promise.reject(onFailure);
 	  });
 	},
 	deleteAccount({ commit }, user) {
-	  return UserService.delete(user).then(response => {
+	  return UserService.delete(user).then(onSuccess => {
 		commit("deleteSuccess")
-		user.password = '';
+		user = null;
 		sessionStorage.clear();
 		localStorage.clear();
-		return Promise.resolve(response);
-	  }, error => {
-		return Promise.reject(error);
+		return Promise.resolve(onSuccess);
+	  }, onFailure => {
+		return Promise.reject(onFailure);
 	  });
 	}
   },
   mutations: {
 	setUserState(state, user) {
-	  state.status.user = user;
+	  state.user = user;
 	},
 	fetchSuccess(state, user) {
-	  state.status.user = user;
+	  state.user = user;
 	},
 	updateSuccess(state, user) {
-	  state.status.user = user;
+	  state.user = user;
 	},
 	deleteSuccess(state) {
-	  state.status.user = null;
+	  state.user = null;
 	}
   },
 }

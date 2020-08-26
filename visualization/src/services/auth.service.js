@@ -1,15 +1,14 @@
 import axios from 'axios';
-// import authHeader from "./auth-header";
 
 const API_URL = 'http://localhost:9010/auth/';
 
 class AuthService {
     login(user) {
-        let hashed_pw = require('crypto').createHash('sha512')
+        let hashedPassword = require('crypto').createHash('sha512')
             .update(user.password).digest('hex');
         return axios.post(API_URL + 'signin', {
             email: user.email,
-            password: hashed_pw
+            password: hashedPassword
         }).then((response) => {
             //set user to loggedIn
             console.log(response.data.Success)
@@ -17,6 +16,7 @@ class AuthService {
                 if (response.data.Success) {
                     user.password = "";
                     sessionStorage.setItem('loggedIn', response.data.Success);
+                    // browser session storage for user module
                     sessionStorage.setItem('user', JSON.stringify(user));
                 }
             }
@@ -32,11 +32,11 @@ class AuthService {
     }
 
     register(user) {
-        let hashed_pw = require('crypto').createHash('sha512')
+        let hashedPassword = require('crypto').createHash('sha512')
             .update(user.password).digest('hex');
         return axios.post(API_URL + 'signup', {
             name: user.name,
-            password: hashed_pw,
+            password: hashedPassword,
             email: user.email
         },
         );

@@ -1,24 +1,21 @@
 import AuthService from '../services/auth.service';
-import jwtDecode from "jwt-decode";
 
 const loggedIn = sessionStorage.getItem('loggedIn');
-const user = sessionStorage.getItem('user');
 const initialState = loggedIn
-    ? { status: {loggedIn: loggedIn, user: user}}
-    : { status: {loggedIn: loggedIn, user: null }};
+    ? { status: {loggedIn: loggedIn}}
+    : { status: {loggedIn: loggedIn}};
 
 export const auth = {
     namespaced: true,
-    // { status: loggedIn, user: user }
     state: initialState,
     actions: {
         login({ commit }, user) {
             return AuthService.login(user).then(
                 (onSuccess) => {
                     if (onSuccess.data.Success){
-                        commit('loginSuccess', user);
+                        commit('loginSuccess');
                     }
-                    return Promise.resolve(user);
+                    return Promise.resolve(onSuccess);
                 },
                 (onFailure) => {
                     commit('loginFailure');
@@ -45,17 +42,14 @@ export const auth = {
         },
     },
     mutations: {
-        loginSuccess(state, user) {
+        loginSuccess(state) {
             state.status.loggedIn = true;
-            state.status.user = user;
         },
         loginFailure(state) {
             state.status.loggedIn = false;
-            state.status.user = null;
         },
         logout(state) {
             state.status.loggedIn = false;
-            state.status.user = null;
         },
         registerSuccess(state) {
             state.status.loggedIn = false;
