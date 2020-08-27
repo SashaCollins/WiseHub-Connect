@@ -12,7 +12,7 @@ export const auth = {
         login({ commit }, user) {
             return AuthService.login(user).then(
                 (onSuccess) => {
-                    if (onSuccess.data.Success){
+                    if (onSuccess.data.success){
                         commit('loginSuccess');
                     }
                     return Promise.resolve(onSuccess);

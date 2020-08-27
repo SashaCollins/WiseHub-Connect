@@ -261,16 +261,13 @@ func (nv *NormalView) Show(w http.ResponseWriter, req *http.Request, ps httprout
 		fmt.Printf("Show: %s\n", err)
 		http.Error(w, "Invalid email", 668)
 	}
-	response.Email = dbUser.Email
-	if dbPlugins != nil {
-		response.Plugins = dbPlugins
-	}
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	response.Success = true
+	response.Email = dbUser.Email
+	response.Plugins = dbPlugins
 	resp, err := json.Marshal(response)
-	fmt.Println(resp)
 	if err != nil {
 		fmt.Printf("Show: %s\n", err)
 	}

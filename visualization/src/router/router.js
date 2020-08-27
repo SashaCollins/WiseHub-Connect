@@ -26,10 +26,6 @@ export const router = new Router({
            component: FAQ,
        },
        {
-           name: 'settings',
-           path: '/settings',
-       },
-       {
            name: 'profile',
            path: '/settings/profile',
            component: Profile,

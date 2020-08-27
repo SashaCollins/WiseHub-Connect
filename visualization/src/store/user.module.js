@@ -10,12 +10,13 @@ export const user = {
   state: initialState,
   actions: {
 	setUserState({commit}, user) {
-		commit("setUserState", user)
+		commit("setUserState", user);
 	},
 	fetchProfile({ commit }, user) {
 	  return UserService.fetchProfile(user).then(onSuccess => {
-	    if (onSuccess.data.Success) {
-		  commit("fetchSuccess", user)
+	    if (onSuccess.data.success) {
+	      user.plugins = onSuccess.data.plugins;
+		  commit("fetchSuccess", user);
 		}
 		return Promise.resolve(onSuccess);
 	  }, onFailure => {
@@ -25,7 +26,7 @@ export const user = {
 	updateEmail({ commit }, payload) {
 	  return UserService.updateEmail(payload).then(onSuccess => {
 	    let updatedUser = user.state.status.user.email = payload.newEmail;
-		commit("updateSuccess",updatedUser)
+		commit("updateSuccess",updatedUser);
 		return Promise.resolve(onSuccess);
 	  }, onFailure => {
 		return Promise.reject(onFailure);
@@ -41,7 +42,7 @@ export const user = {
 	},
 	deleteAccount({ commit }, user) {
 	  return UserService.delete(user).then(onSuccess => {
-		commit("deleteSuccess")
+		commit("deleteSuccess");
 		user = null;
 		sessionStorage.clear();
 		localStorage.clear();

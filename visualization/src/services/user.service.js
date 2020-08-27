@@ -7,7 +7,12 @@ class UserService {
    return axios.post(API_URL + 'profile', {
      email: user.email
    }
-  );
+  ).then((response) => {
+     console.log(response.data.success);
+     console.log(response.data.email);
+     console.log(response.data.plugins[0]);
+     return response;
+   });
   }
 
   updateEmail(payload) {

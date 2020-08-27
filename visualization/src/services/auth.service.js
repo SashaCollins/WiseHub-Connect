@@ -11,17 +11,15 @@ class AuthService {
             password: hashedPassword
         }).then((response) => {
             //set user to loggedIn
-            console.log(response.data.Success)
+            console.log(response.data.success)
             if (response.data) {
-                if (response.data.Success) {
+                if (response.data.success) {
                     user.password = "";
-                    sessionStorage.setItem('loggedIn', response.data.Success);
+                    sessionStorage.setItem('loggedIn', response.data.success);
                     // browser session storage for user module
-                    sessionStorage.setItem('user', JSON.stringify(user));
+                    sessionStorage.setItem('user', user.email);
                 }
             }
-            console.log(sessionStorage.getItem('loggedIn'));
-            console.log(response);
             return response;
         });
     }

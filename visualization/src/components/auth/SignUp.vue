@@ -87,7 +87,7 @@
             this.$store.dispatch("auth/register", this.user).then(
               (onSuccess) => {
                 console.log(onSuccess);
-                this.$router.push("/login")
+                this.$router.push({name: 'login'})
               },
               (onFailure) => {
                 console.log(onFailure.response)

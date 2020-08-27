@@ -13,9 +13,9 @@ import (
 )
 
 type Response struct{
-	Success bool
-	Email string
-	Plugins []data.Plugin
+	Success bool `json:"success"`
+	Email string `json:"email"`
+	Plugins []data.Plugin `json:"plugins"`
 }
 
 type View interface {

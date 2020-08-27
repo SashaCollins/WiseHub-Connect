@@ -72,7 +72,7 @@
                       <button
                           type="button"
                           class="btn btn-primary">
-                        change Password
+                        Change Password
                       </button>
                     </div>
                   </div>
@@ -83,7 +83,7 @@
           <div class="row">
             <div v-for="(item, index) in plugins" :key="index" class="col-lg-4 col-md-6 col-sm-12">
               <div class="card">
-                <h3 class="mb-3">{{ item.h3 }}</h3>
+                <h3 class="text-center">{{ item.description }}</h3>
                 <div class="card-body">
                   <label
                       :for="item.name"
@@ -93,10 +93,9 @@
                   <div class="col-md col-form-label">
                     <input
                         type="text"
-                        disabled
                         class="form-control"
                         :id="item.name"
-                        :value="item.name">
+                        v-model="item.name">
                   </div>
                   <label
                       :for="item.token"
@@ -106,159 +105,32 @@
                   <div class="col-md">
                     <input
                         type="text"
-                        disabled
                         class="form-control"
                         :id="item.token"
-                        :value="item.token">
+                        placeholder="*************"
+                        v-model="item.token">
                   </div>
-                  <div class="btn-group mt-5" role="group">
-                    <button type="button" class="btn btn-primary" disabled>Submit</button>
-                    <button type="button" class="btn btn-danger">Edit</button>
-                  </div>
+                </div>
+                <div class="btn-group" role="group">
+<!--                  <button type="button" class="btn btn-primary" disabled>Submit</button>-->
+                  <button @click="updatePlugin" type="button" class="btn btn-primary">Update</button>
                 </div>
               </div>
             </div>
-
-
-
-
-<!--            <div class="col-lg-4 col-md-6 col-sm-12">-->
-<!--              <div class="card">-->
-<!--                <h3 class="mb-3">GitHub</h3>-->
-<!--                <label-->
-<!--                    for="githubUsername"-->
-<!--                    class="col-md">-->
-<!--                  Username:-->
-<!--                </label>-->
-<!--                <div class="col-md col-form-label">-->
-<!--                  <input-->
-<!--                      type="text"-->
-<!--                      disabled-->
-<!--                      class="form-control"-->
-<!--                      id="githubUsername"-->
-<!--                      :value="github.name">-->
-<!--                </div>-->
-<!--                <label-->
-<!--                    for="githubApiToken"-->
-<!--                    class="col-md col-form-label">-->
-<!--                  API Token:-->
-<!--                </label>-->
-<!--                <div class="col-md">-->
-<!--                  <input-->
-<!--                      type="text"-->
-<!--                      disabled-->
-<!--                      class="form-control"-->
-<!--                      id="githubApiToken"-->
-<!--                      :value="github.token">-->
-<!--                </div>-->
-<!--                <div class="btn-group mt-5" role="group">-->
-<!--                  <button type="button" class="btn btn-primary" disabled>Submit</button>-->
-<!--                  <button type="button" class="btn btn-danger">Edit</button>-->
-<!--                </div>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--            <div class="col-lg-4 col-md-6 col-sm-12">-->
-<!--              <div class="card">-->
-<!--                <h3 class="mb-3">Drone CI</h3>-->
-<!--                <label-->
-<!--                    for="droneHost"-->
-<!--                    class="col-md">-->
-<!--                  Host:-->
-<!--                </label>-->
-<!--                <div class="col-md col-form-label">-->
-<!--                  <input-->
-<!--                      type="text"-->
-<!--                      disabled-->
-<!--                      class="form-control"-->
-<!--                      id="droneHost"-->
-<!--                  <div class="d-flex justify-content-between align-items-center">-->
-<!--                    <div class="btn-group">-->
-<!--                      <button type="button" @click="item.btn_function" class="btn btn-sm btn-outline-primary">{{ item.btn_option }}</button>-->
-<!--                      <span v-show="loading" class="spinner-border spinner-border-sm"></span>-->
-<!--                      <button type="button" @click="item.delete" :disabled="!(item.status  === 'exited')" class="btn btn-sm btn-outline-danger">Delete</button>-->
-<!--                      <span v-show="loading_del" class="spinner-border spinner-border-sm"></span>-->
-<!--                    </div>-->
-<!--                  </div>-->
-<!--                      :value="drone.name">-->
-<!--                </div>-->
-<!--                <label-->
-<!--                    for="droneApiToken"-->
-<!--                    class="col-md col-form-label">-->
-<!--                  API Token:-->
-<!--                </label>-->
-<!--                <div class="col-md">-->
-<!--                  <input-->
-<!--                      type="text"-->
-<!--                      disabled-->
-<!--                      class="form-control"-->
-<!--                      id="droneApiToken"-->
-<!--                      :value="drone.token">-->
-<!--                </div>-->
-<!--                <div class="btn-group mt-5" role="group">-->
-<!--                  <button type="button" class="btn btn-primary" disabled>Submit</button>-->
-<!--                  <button type="button" class="btn btn-danger">Edit</button>-->
-<!--                </div>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--            <div class="col-lg-4 col-md-6 col-sm-12">-->
-<!--              <div class="card">-->
-<!--                <h3 class="mb-3">Heroku</h3>-->
-<!--                <label-->
-<!--                    for="herokuUsername"-->
-<!--                    class="col-md">-->
-<!--                  Username:-->
-<!--                </label>-->
-<!--                <div class="col-md col-form-label">-->
-<!--                  <input-->
-<!--                      type="text"-->
-<!--                      disabled-->
-<!--                      class="form-control"-->
-<!--                      id="herokuUsername"-->
-<!--                      :value="heroku.name">-->
-<!--                </div>-->
-<!--                <label-->
-<!--                    for="herokuApiToken"-->
-<!--                    class="col-md col-form-label">-->
-<!--                  API Token:-->
-<!--                </label>-->
-<!--                <div class="col-md">-->
-<!--                  <input-->
-<!--                      type="text"-->
-<!--                      disabled-->
-<!--                      class="form-control"-->
-<!--                      id="herokuApiToken"-->
-<!--                      :value="heroku.token">-->
-<!--                </div>-->
-<!--                <div class="btn-group mt-5" role="group">-->
-<!--                  <button type="button" class="btn btn-primary" disabled>Submit</button>-->
-<!--                  <button type="button" class="btn btn-danger">Edit</button>-->
-<!--                </div>-->
-<!--              </div>-->
-<!--            </div>-->
           </div>
         </div>
     </div>
 </template>
 
 <script>
-    import User from "../../model/user";
-
     export default {
         name: "Profile",
         data() {
           return {
             plugins: [{
-              'h3': 'Github',
-              'name': 'SashaCollins',
-              'token': '098765432123456789jhdsfafjkl'
-            },{
-              'h3': 'Drone CI',
-              'name': 'drone.maxuniverse.de',
-              'token': '0987654dfklj;sdfsdfgsdfgsfd'
-            },{
-              'h3': 'Heroku',
-              'name': 'SashaCollins',
-              'token': 'jhgsdhfkadslkjlkgd9874198071397'
+              'description': 'Dummy',
+              'name': 'Test',
+              'token': 'testToken'
             }]
           }
         },
@@ -268,14 +140,16 @@
           }
         },
         methods: {
-
+          updatePlugin: function() {
+            console.log(this.plugins);
+          }
         },
         mounted() {
           console.log(this.getUser);
           this.$store.dispatch('user/fetchProfile', this.getUser).then(
               (onSuccess) => {
-                if (onSuccess.data.Success) {
-                  this.plugins.push(onSuccess.data.Plugins);
+                if (onSuccess.data.success) {
+                  this.plugins = this.getUser.plugins;
                 }
               },
               (onError) => {

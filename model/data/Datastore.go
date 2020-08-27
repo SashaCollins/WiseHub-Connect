@@ -12,8 +12,6 @@ import (
     "fmt"
     _ "github.com/mattn/go-sqlite3"
     "log"
-    "strconv"
-    "strings"
 )
 
 var (
@@ -25,17 +23,9 @@ var (
 
 type Datastore struct{}
 
-func stringToIntArray(arr []string) (b []int) {
-    for _, v := range arr {
-        num, _ := strconv.Atoi(v)
-        b = append(b, num)
-    }
-    return b
-}
-
-func loadPluginsByIds(pluginIds []int) (plugins []Plugin, err error) {
+func loadAllPlugins() (plugins []Plugin, err error) {
     loadPlugins := `
-	select name, token, other from Plugin where Plugin.id = ?;
+	select name, description from Plugin;
 	`
     tx, err := db.Begin()
     if err != nil {
@@ -43,15 +33,26 @@ func loadPluginsByIds(pluginIds []int) (plugins []Plugin, err error) {
     }
     stmt, err := tx.Prepare(loadPlugins)
     if err != nil {
-        return nil, err
+       return nil, err
     }
-    defer stmt.Close()
     var plugin Plugin
-    for pluginId := range pluginIds {
-        row = stmt.QueryRow(pluginId)
-        if err := row.Scan(&plugin.Name, &plugin.Token, &plugin.Description); err != nil {
-            plugins = append(plugins, plugin)
+    rows, err = stmt.Query()
+    if err != nil {
+        return plugins, err
+    }
+    defer rows.Close()
+    for rows.Next() {
+        if err := rows.Scan(&plugin.Name, &plugin.Description); err != nil {
+            return plugins, err
         }
+        plugin.Token = "****"
+        plugins = append(plugins, plugin)
+        fmt.Println(plugin.Name, plugin.Description)
+    }
+    err = rows.Err()
+    if err != nil {
+        err = errors.New("something went wrong while fetching all Users")
+        return plugins, err
     }
     return plugins, nil
 }
@@ -66,16 +67,16 @@ func loadAllUsers() (user User, plugins []Plugin, err error) {
     if err != nil {
         return user, plugins, err
     }
+    defer rows.Close()
     for rows.Next() {
-        if err := row.Scan(&user.Name, &user.Password, &user.Email, &user.Plugins); err != nil {
-            if check := len(user.Plugins); check > 0 {
-                splittedIds := strings.Split(user.Plugins, ",")
-                plugins, err := loadPluginsByIds(stringToIntArray(splittedIds))
-                if err != nil {
-                    return user, plugins, err
-                }
-            }
+        if err := rows.Scan(&user.Name, &user.Password, &user.Email, &user.Plugins); err != nil {
             return user, plugins, err
+        }
+        if check := len(user.Plugins); check > 0 {
+            plugins, err = loadAllPlugins()
+            if err != nil {
+                return user, plugins, err
+            }
         }
         fmt.Println(user.Name, user.Password, user.Email, user.Plugins)
     }
@@ -94,7 +95,6 @@ func loadUserByEmail(email string) (user User, plugins []Plugin, err error) {
            where User.email = ?;
        `
     stmt, err := db.Prepare(sqlStmt)
-    fmt.Println(stmt)
     if err != nil {
         return user, plugins, err
     }
@@ -102,10 +102,8 @@ func loadUserByEmail(email string) (user User, plugins []Plugin, err error) {
     if err := row.Scan(&user.Name, &user.Password, &user.Email, &user.Plugins); err != nil {
         return user, plugins, err
     }
-    fmt.Println(user.Name, user.Password, user.Email, user.Plugins)
     if check := len(user.Plugins); check > 0 {
-        splittedIds := strings.Split(user.Plugins, ",")
-        plugins, err := loadPluginsByIds(stringToIntArray(splittedIds))
+        plugins, err = loadAllPlugins()
         if err != nil {
             return user, plugins, err
         }
@@ -113,20 +111,23 @@ func loadUserByEmail(email string) (user User, plugins []Plugin, err error) {
     return user, plugins,nil
 }
 
-func init() {
-    //_ = os.Remove("./data/wisehub.db")
-    var err error
+func openDb() {
     db, err = sql.Open("sqlite3", "./data/wisehub.db")
     if err != nil {
-      fmt.Printf("ERROR: %s\n", err)
+        fmt.Printf("openDB: %s\n", err)
     }
-    defer db.Close()
+}
+
+func init() {
+    var err error
+    openDb()
+
     createUser := `
 	create table if not exists User (id integer not null primary key autoincrement , name text, password text, email text unique, plugins text);
     delete from User;
 	`
     createPlugins := `
-	create table if not exists Plugin (id integer not null primary key autoincrement , name text unique, token text, description text);
+	create table if not exists Plugin (id integer not null primary key autoincrement , name text, token text, description text unique);
     delete from Plugin;
 	`
     _, err = db.Exec(createUser)
@@ -139,12 +140,30 @@ func init() {
        log.Printf("init %q: %s\n", err, createPlugins)
        return
     }
-}
 
-func openDb() {
-    db, err = sql.Open("sqlite3", "./data/wisehub.db")
+    initGithub := `
+	insert into Plugin (name, token, description) values(?, ?, ?);
+	`
+    initDrone := `
+	insert into Plugin (name, token, description) values(?, ?, ?);
+	`
+    initHeroku := `
+	insert into Plugin (name, token, description) values(?, ?, ?);
+	`
+    _, err = db.Exec(initGithub, "", "", "Github")
     if err != nil {
-        fmt.Printf("openDB: %s\n", err)
+        log.Printf("init %q: %s\n", err, createPlugins)
+        return
+    }
+    _, err = db.Exec(initDrone, "", "", "Drone CI")
+    if err != nil {
+        log.Printf("init %q: %s\n", err, createPlugins)
+        return
+    }
+    _, err = db.Exec(initHeroku, "", "", "Heroku")
+    if err != nil {
+        log.Printf("init %q: %s\n", err, createPlugins)
+        return
     }
 }
 
@@ -159,7 +178,7 @@ two loads user based on email and password
 func (ds *Datastore) Load(email ...string) (user User ,plugins []Plugin, err error) {
     // open DB
     openDb()
-    defer db.Close()
+    //defer db.Close()
 
     // Get any parameters passed to us out of the args variable into "real"
     // variables we created for them.
@@ -182,12 +201,14 @@ func (ds *Datastore) Save(name string, password string, email string) error {
     fmt.Println("Save \tin Save")
     // open DB
     openDb()
-    defer db.Close()
+    //defer db.Close()
 
     tx, err := db.Begin()
     if err != nil {
        return err
     }
+
+    defaultPlugins := "1,2,3"
 
     saveUser := `
        insert 
@@ -198,14 +219,12 @@ func (ds *Datastore) Save(name string, password string, email string) error {
     if err != nil {
        return err
     }
-    //fmt.Println("\tafter prepare")
     defer stmt.Close()
 
-    _, err = stmt.Exec(name, password, email, "")
+    _, err = stmt.Exec(name, password, email, defaultPlugins)
     if err != nil {
        return err
     }
-    //fmt.Println("\tafter exec")
 
     err = tx.Commit()
     if err != nil {
@@ -219,7 +238,7 @@ func (ds *Datastore) Save(name string, password string, email string) error {
 func (ds *Datastore) Update(option string, data ...string) error {
     // open DB
     openDb()
-    defer db.Close()
+    //defer db.Close()
 
     fmt.Println("Update \tin Update")
     //fmt.Printf("%s\n", data)
@@ -274,7 +293,7 @@ func (ds *Datastore) Update(option string, data ...string) error {
 func (ds *Datastore) Delete(email string) error {
     // open DB
     openDb()
-    defer db.Close()
+    //defer db.Close()
 
     tx, err := db.Begin()
     if err != nil {

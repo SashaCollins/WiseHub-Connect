@@ -17,14 +17,14 @@ import (
 func main() {
 	fmt.Println("start")
 	ds := data.Datastore{}
-	err := ds.Save("name092","pw092","email092")
-	if err != nil {
-		fmt.Printf("\tmain: %s\n", err)
-	}
-	_, _, err = ds.Load()
-	if err != nil {
-		fmt.Printf("\tmain: %s\n", err)
-	}
+	//err := ds.Save("name092","pw092","email092")
+	//if err != nil {
+	//	fmt.Printf("\tmain: %s\n", err)
+	//}
+	//_, _, err = ds.Load("email092")
+	//if err != nil {
+	//	fmt.Printf("\tmain: %s\n", err)
+	//}
 
 	//githubFinished := make(chan bool)
 	//gl := gh.GithubListener{}
