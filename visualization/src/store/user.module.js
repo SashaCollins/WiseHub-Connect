@@ -9,14 +9,25 @@ export const user = {
   namespaced: true,
   state: initialState,
   actions: {
-	setUserState({commit}, user) {
-		commit("setUserState", user);
+	initUser({commit}, user) {
+		commit("initUser", user);
 	},
 	fetchProfile({ commit }, user) {
 	  return UserService.fetchProfile(user).then(onSuccess => {
 	    if (onSuccess.data.success) {
 	      user.plugins = onSuccess.data.plugins;
 		  commit("fetchSuccess", user);
+		}
+		return Promise.resolve(onSuccess);
+	  }, onFailure => {
+		return Promise.reject(onFailure);
+	  });
+	},
+	updatePlugins({ commit }, payload) {
+	  return UserService.updatePlugins(payload).then(onSuccess => {
+	    if (onSuccess.data.success) {
+	      user.plugins = onSuccess.data.plugins;
+		  commit("updateSuccess", user);
 		}
 		return Promise.resolve(onSuccess);
 	  }, onFailure => {
@@ -53,7 +64,7 @@ export const user = {
 	}
   },
   mutations: {
-	setUserState(state, user) {
+	initUser(state, user) {
 	  state.user = user;
 	},
 	fetchSuccess(state, user) {

@@ -97,7 +97,7 @@
               this.$store.dispatch("auth/login", this.user).then(
                 (onSuccess) => {
                   console.log(onSuccess)
-                  this.$store.dispatch("user/setUserState", this.user);
+                  this.$store.dispatch("user/initUser", this.user);
                   this.$router.push("/repositories");
                 },
                 (onFailure) => {

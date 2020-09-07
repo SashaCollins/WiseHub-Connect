@@ -6,24 +6,32 @@ do not edit or delete.
  */
 package data
 
+import (
+	"gorm.io/gorm"
+)
+
 type User struct {
 	//gorm.Model
-	Name     string `json:"name"`
-	Password string `json:"password"`
-	Email    string `json:"email"`
-	Plugins  string `json:"plugins"`
+	ID 		 		uint		`gorm:"primaryKey;not null"`
+	Name     		string
+	Password 		string
+	Email    		string		`gorm:"unique;not null"`
+	Plugins  		[]Plugin
 }
 
 type Plugin struct {
 	//gorm.Model
-	Name string `json:"name"`
-	Token string `json:"token"`
-	Description string `json:"description"`
+	ID 				uint		`gorm:"primaryKey;not null"`
+	UserNameHost 	string
+	Token 			string
+	Description 	string		`gorm:"unique;not null"`
+	Updated 		bool
 }
 
 type DatastoreI interface {
-	Load(email ...string) (users User, plugin []Plugin, err error)
-	Save(name string, password string, email string) error
-	Update(option string, data ...string) error
+	New(driver string, data map[string]interface{}) (db *gorm.DB)
+	Load(email ...string) (users User)
+	Save(name, password, email string) error
+	Update(option string, data ...interface{}) error
 	Delete(email string) error
 }

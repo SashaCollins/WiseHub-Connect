@@ -82,7 +82,7 @@
           </div>
           <div class="row">
             <div v-for="(item, index) in plugins" :key="index" class="col-lg-4 col-md-6 col-sm-12">
-              <div class="card">
+              <div class="card" @submit.prevent="updatePlugin">
                 <h3 class="text-center">{{ item.description }}</h3>
                 <div class="card-body">
                   <label
@@ -113,7 +113,7 @@
                 </div>
                 <div class="btn-group" role="group">
 <!--                  <button type="button" class="btn btn-primary" disabled>Submit</button>-->
-                  <button @click="updatePlugin" type="button" class="btn btn-primary">Update</button>
+                  <button @click="item.updated = !item.updated" type="submit" class="btn btn-primary">Update</button>
                 </div>
               </div>
             </div>
@@ -127,6 +127,7 @@
         name: "Profile",
         data() {
           return {
+            updatedPlugin: [],
             plugins: [{
               'description': 'Dummy',
               'name': 'Test',
@@ -141,7 +142,18 @@
         },
         methods: {
           updatePlugin: function() {
-            console.log(this.plugins);
+            this.$store.dispatch('user/updatePlugins', {
+              email: this.getUser.email,
+              plugins: this.plugins
+            }).then(
+                (onSuccess) => {
+
+                },
+                (onError) => {
+
+                }
+            )
+            
           }
         },
         mounted() {

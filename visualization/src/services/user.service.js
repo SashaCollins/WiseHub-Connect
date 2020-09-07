@@ -22,6 +22,13 @@ class UserService {
     })
   }
 
+  updatePlugins(payload) {
+    return axios.post(API_URL + 'update/plugins', {
+      email: payload.email,
+      plugins: payload.plugins
+    })
+  }
+
   updatePassword(user) {
     let hashedPassword = require('crypto').createHash('sha512')
         .update(user.password).digest('hex');
