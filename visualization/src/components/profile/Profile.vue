@@ -34,10 +34,10 @@
 <!--                      </button>-->
 <!--                    </div>-->
 <!--                  </div>-->
-                  <div class="form-group row">
+                  <div class="form-group row" @submit.prevent="updateEmail">
                     <label
                         for="staticEmail"
-                        class="col-sm-2 col-form-label-lg">
+                        class="col-sm-4 col-form-label-lg">
                       Email:
                     </label>
                     <div class="col-sm">
@@ -58,7 +58,7 @@
                   </div>
                   <div class="form-group row">
                     <label
-                        class="col-sm-2 col-form-label-lg">
+                        class="col-sm-4 col-form-label-lg">
                       Password:
                     </label>
   <!--                  <div class="col-sm">-->
@@ -71,7 +71,8 @@
                     <div class="col-sm">
                       <button
                           type="button"
-                          class="btn btn-primary">
+                          class="btn btn-primary"
+                          @click="updatePassword">
                         Change Password
                       </button>
                     </div>
@@ -83,10 +84,10 @@
           <div class="row">
             <div v-for="(item, index) in plugins" :key="index" class="col-lg-4 col-md-6 col-sm-12">
               <div class="card" @submit.prevent="updatePlugin">
-                <h3 class="text-center">{{ item.description }}</h3>
+                <h3 class="text-center">{{ item.PluginName }}</h3>
                 <div class="card-body">
                   <label
-                      :for="item.name"
+                      :for="item.UsernameHost"
                       class="col-md">
                     Username / Host:
                   </label>
@@ -94,11 +95,11 @@
                     <input
                         type="text"
                         class="form-control"
-                        :id="item.name"
-                        v-model="item.name">
+                        :id="item.UsernameHost"
+                        v-model="item.UsernameHost">
                   </div>
                   <label
-                      :for="item.token"
+                      :for="item.Token"
                       class="col-md col-form-label">
                     Token:
                   </label>
@@ -106,9 +107,9 @@
                     <input
                         type="text"
                         class="form-control"
-                        :id="item.token"
+                        :id="item.Token"
                         placeholder="*************"
-                        v-model="item.token">
+                        v-model="item.Token">
                   </div>
                 </div>
                 <div class="btn-group" role="group">
@@ -129,9 +130,10 @@
           return {
             updatedPlugin: [],
             plugins: [{
-              'description': 'Dummy',
-              'name': 'Test',
-              'token': 'testToken'
+              'PluginName': 'Dummy',
+              'UsernameHost': 'Test',
+              'Token': 'testToken',
+              'Description': '',
             }]
           }
         },
@@ -147,13 +149,40 @@
               plugins: this.plugins
             }).then(
                 (onSuccess) => {
-
+                  console.log("onSuccess in Update")
                 },
                 (onError) => {
-
+                  console.log("onError in Update")
                 }
             )
-            
+          },
+          updateEmail: function() {
+            this.$store.dispatch('user/updateEmail', {
+              email: this.getUser.email,
+              plugins: this.plugins
+            }).then(
+                (onSuccess) => {
+                  console.log("onSuccess in Update")
+                },
+                (onError) => {
+                  console.log("onError in Update")
+                }
+            )
+
+          },
+          updatePassword: function() {
+            this.$store.dispatch('user/updatePassword', {
+              email: this.getUser.email,
+              plugins: this.plugins
+            }).then(
+                (onSuccess) => {
+                  console.log("onSuccess in Update")
+                },
+                (onError) => {
+                  console.log("onError in Update")
+                }
+            )
+
           }
         },
         mounted() {

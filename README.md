@@ -6,7 +6,9 @@ Status | Message
 ---: | :---
 666 | user already exists
 667 | Invalid email or password
-668 | 
+668 | Invalid email
+669 | 
+670 | 
 
 ####Ports
 Port | Listener

@@ -6,7 +6,6 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github/SashaCollins/Wisehub-Connect/model/data"
 	"github/SashaCollins/Wisehub-Connect/model/listener"
-	_ "github/SashaCollins/Wisehub-Connect/model/listener"
 	"io/ioutil"
 	"net/http"
 )
@@ -17,60 +16,73 @@ type NormalView struct {
 }
 
 func (nv *NormalView) SignUp(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
-	var user data.User
+	var user User
 	var response Response
 
-	//fmt.Println(req.Body)
-	//_, _ = fmt.Fprintf(w, "%v: %v\n", req.Body, req.Form)
 	reqBody, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		fmt.Printf("SignUp: %s\n", err)
+		http.Error(w, "Internal server error", 500)
 	}
 
 	err = json.Unmarshal(reqBody, &user)
 	if err != nil {
 		fmt.Printf("SignUp: %s\n", err)
+		http.Error(w, "Internal server error", 500)
 	}
-	user = nv.Datastore.Load(user.Email)
-	if user.Name == "" {
-		fmt.Printf("SignUp: %v\n", user)
+
+	dbUser, _ := nv.Datastore.Load(user.Email)
+	if dbUser.Email != "" || dbUser.Email == user.Email {
+		fmt.Printf("SignUp: %s\n", err)
+		http.Error(w, "User already exists!", 666)
+		return
 	}
-	//fmt.Printf("%s\n", user)
-	//fmt.Println(nv.Datastore)
+
 	err = nv.Datastore.Save(user.Name, user.Password, user.Email)
 	if err != nil {
-		fmt.Printf("SignUp: %s\n", err)
+		fmt.Println("3: User already exists!")
+		http.Error(w, "User already exists!", 666)
+		return
 	}
+
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	response.Success = true
 	resp, err := json.Marshal(response)
 	if err != nil {
 		fmt.Printf("SignUp: %s\n", err)
+		http.Error(w, "Internal server error", 500)
+		return
 	}
 	_, _ = w.Write(resp)
 	return
 }
 
 func (nv *NormalView) SignIn(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
-	var user data.User
+	var user User
 	var response Response
 
 	reqBody, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		fmt.Printf("SignIn: %s\n", err)
+		http.Error(w, "Internal server error", 500)
+		return
 	}
 
 	err = json.Unmarshal(reqBody, &user)
 	if err != nil {
 		fmt.Printf("SignIn: %s\n", err)
+		http.Error(w, "Internal server error", 500)
+		return
 	}
 
-	dbUser := nv.Datastore.Load(user.Email)
+	dbUser, err := nv.Datastore.Load(user.Email)
 	if err != nil {
 		fmt.Printf("SignIn: %v\n", dbUser)
+		http.Error(w, "Invalid email or password", 667)
+		return
 	}
-	if err == nil && dbUser.Password == user.Password {
+	if dbUser.Password == user.Password {
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		response.Success = true
@@ -78,6 +90,7 @@ func (nv *NormalView) SignIn(w http.ResponseWriter, req *http.Request, ps httpro
 		fmt.Println(resp)
 		if err != nil {
 			fmt.Printf("SignIn: %s\n", err)
+			http.Error(w, "Internal server error", 500)
 		}
 		_, _ = w.Write(resp)
 	} else {
@@ -101,24 +114,19 @@ func (nv *NormalView) Forgot(w http.ResponseWriter, req *http.Request, ps httpro
 		fmt.Printf("Forgot: %s\n", err)
 	}
 
-	dbUser := nv.Datastore.Load(user.Email)
+	dbUser, err := nv.Datastore.Load(user.Email)
+	fmt.Println(dbUser)
+
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	response.Success = true
+	resp, err := json.Marshal(response)
 	if err != nil {
-		fmt.Printf("Forgot: %s\n", err)
+		fmt.Printf("UpdateEmail: %s\n", err)
+		http.Error(w, "Internal server error", 500)
+		return
 	}
-	if err == nil && dbUser.Password == user.Password {
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		response.Success = true
-		resp, err := json.Marshal(response)
-		fmt.Println(resp)
-		if err != nil {
-			fmt.Printf("Forgot: %s\n", err)
-		}
-		_, _ = w.Write(resp)
-	} else {
-		fmt.Printf("Forgot: %s\n", err)
-		http.Error(w, "Invalid email or password", 667)
-	}
+	_, _ = w.Write(resp)
 	return
 }
 
@@ -129,103 +137,88 @@ func (nv *NormalView) UpdateEmail(w http.ResponseWriter, req *http.Request, ps h
 	reqBody, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		fmt.Printf("UpdateEmail: %s\n", err)
+		http.Error(w, "Internal server error", 500)
+		return
 	}
 
 	err = json.Unmarshal(reqBody, &email)
 	if err != nil {
 		fmt.Printf("UpdateEmail: %s\n", err)
+		http.Error(w, "Internal server error", 500)
+		return
 	}
 
-	user := nv.Datastore.Load(email.OldEmail)
-	if user.Name == "" {
-		fmt.Printf("UpdateEmail: %v\n", user)
+	dbUser, err := nv.Datastore.Load(email.OldEmail)
+	if err != nil {
+		fmt.Printf("UpdateEmail: %v\n", dbUser)
+		http.Error(w, "Invalid email", 668)
+		return
 	}
-	err = nv.Datastore.Update("email", email.NewEmail, user.Email)
+
+	update := make(map[string]interface{})
+	update["old"] = email.OldEmail
+	update["new"] = email.NewEmail
+	err = nv.Datastore.Update("email", update)
 	if err != nil {
 		fmt.Printf("UpdateEmail: %s\n", err)
+		http.Error(w, "Invalid email", 668)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	response.Success = true
 	resp, err := json.Marshal(response)
-	fmt.Println(resp)
 	if err != nil {
 		fmt.Printf("UpdateEmail: %s\n", err)
+		http.Error(w, "Internal server error", 500)
+		return
 	}
 	_, _ = w.Write(resp)
 	return
 }
 
 func (nv *NormalView) UpdatePassword(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
-	var user data.User
+	var user User
 	var response Response
 
 	reqBody, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		fmt.Printf("UpdatePassword: %s\n", err)
+		http.Error(w, "Internal server error", 500)
+		return
 	}
 
 	err = json.Unmarshal(reqBody, &user)
 	if err != nil {
 		fmt.Printf("UpdatePassword: %s\n", err)
+		http.Error(w, "Internal server error", 500)
+		return
 	}
 
-	user = nv.Datastore.Load(user.Email)
-	if user.Name == "" {
-		fmt.Printf("UpdatePassword: %v\n", user)
+	if _, err := nv.Datastore.Load(user.Email); err != nil {
+		fmt.Printf("UpdatePassword: %v\n", err)
 		http.Error(w, "Invalid email", 668)
+		return
 	}
-	err = nv.Datastore.Update("password", user.Password, user.Email)
-	if err != nil {
+
+	update := make(map[string]interface{})
+	update["email"] = user.Email
+	update["password"] = user.Password
+	if err = nv.Datastore.Update("password", update); err != nil {
 		fmt.Printf("UpdatePassword: %s\n", err)
-	}
-
-
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	response.Success = true
-	resp, err := json.Marshal(response)
-	fmt.Println(resp)
-	if err != nil {
-		fmt.Printf("UpdatePassword: %s\n", err)
-	}
-	_, _ = w.Write(resp)
-	return
-}
-
-func (nv *NormalView) DeleteProfile(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
-	var user data.User
-	var response Response
-
-	reqBody, err := ioutil.ReadAll(req.Body)
-	if err != nil {
-		fmt.Printf("DeleteProfile: %s\n", err)
-	}
-
-	err = json.Unmarshal(reqBody, &user)
-	if err != nil {
-		fmt.Printf("DeleteProfile: %s\n", err)
-	}
-
-	user = nv.Datastore.Load(user.Email)
-	if user.Name == "" {
-		fmt.Printf("DeleteProfile: %v\n", user)
 		http.Error(w, "Invalid email", 668)
-	}
-
-	err = nv.Datastore.Delete(user.Email)
-	if err != nil {
-		fmt.Printf("DeleteProfile: %s\n", err)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	response.Success = true
 	resp, err := json.Marshal(response)
-	fmt.Println(resp)
 	if err != nil {
-		fmt.Printf("DeleteProfile: %s\n", err)
+		fmt.Printf("UpdatePassword: %s\n", err)
+		http.Error(w, "Internal server error", 500)
+		return
 	}
 	_, _ = w.Write(resp)
 	return
@@ -238,17 +231,24 @@ func (nv *NormalView) UpdatePlugins(w http.ResponseWriter, req *http.Request, ps
 	reqBody, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		fmt.Printf("UpdatePlugins: %s\n", err)
+		http.Error(w, "Internal server error", 500)
+		return
 	}
 
 	err = json.Unmarshal(reqBody, &plugins)
 	if err != nil {
 		fmt.Printf("UpdatePlugins: %s\n", err)
+		http.Error(w, "Internal server error", 500)
+		return
 	}
 
-	err = nv.Datastore.Update("plugins", plugins.Email, plugins.Plugins)
-	if err != nil {
+	update := make(map[string]interface{})
+	update["email"] = plugins.Email
+	update["plugins"] = plugins.Plugins
+	if err := nv.Datastore.Update("plugins", update); err != nil {
 		fmt.Printf("UpdatePlugins: %s\n", err)
 		http.Error(w, "Invalid email", 668)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
@@ -257,6 +257,50 @@ func (nv *NormalView) UpdatePlugins(w http.ResponseWriter, req *http.Request, ps
 	resp, err := json.Marshal(response)
 	if err != nil {
 		fmt.Printf("UpdatePlugins: %s\n", err)
+		http.Error(w, "Internal server error", 500)
+		return
+	}
+	_, _ = w.Write(resp)
+	return
+}
+
+func (nv *NormalView) DeleteProfile(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+	var user User
+	var response Response
+
+	reqBody, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		fmt.Printf("DeleteProfile: %s\n", err)
+		http.Error(w, "Internal server error", 500)
+		return
+	}
+	if err := json.Unmarshal(reqBody, &user); err != nil {
+		fmt.Printf("DeleteProfile: %s\n", err)
+		http.Error(w, "Internal server error", 500)
+		return
+	}
+
+	if _, err := nv.Datastore.Load(user.Email); err != nil {
+		fmt.Printf("DeleteProfile: %v\n", err)
+		http.Error(w, "Invalid email", 668)
+		return
+	}
+
+	if err := nv.Datastore.Delete(user.Email); err != nil {
+		fmt.Printf("DeleteProfile: %s\n", err)
+		http.Error(w, "Invalid email", 668)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	response.Success = true
+	resp, err := json.Marshal(response)
+	fmt.Println(resp)
+	if err != nil {
+		fmt.Printf("DeleteProfile: %s\n", err)
+		http.Error(w, "Internal server error", 500)
+		return
 	}
 	_, _ = w.Write(resp)
 	return
@@ -269,17 +313,22 @@ func (nv *NormalView) Show(w http.ResponseWriter, req *http.Request, ps httprout
 	reqBody, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		fmt.Printf("Show: %s\n", err)
+		http.Error(w, "Internal server error", 500)
+		return
 	}
 
 	err = json.Unmarshal(reqBody, &user)
 	if err != nil {
 		fmt.Printf("Show: %s\n", err)
+		http.Error(w, "Internal server error", 500)
+		return
 	}
 
-	dbUser := nv.Datastore.Load(user.Email)
-	if dbUser.Email == "" {
+	dbUser, err := nv.Datastore.Load(user.Email)
+	if err != nil {
 		fmt.Printf("Show: %v\n", dbUser)
 		http.Error(w, "Invalid email", 668)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
@@ -290,6 +339,8 @@ func (nv *NormalView) Show(w http.ResponseWriter, req *http.Request, ps httprout
 	resp, err := json.Marshal(response)
 	if err != nil {
 		fmt.Printf("Show: %s\n", err)
+		http.Error(w, "Internal server error", 500)
+		return
 	}
 	_, _ = w.Write(resp)
 	return
@@ -302,17 +353,22 @@ func (nv *NormalView) Update(w http.ResponseWriter, req *http.Request, ps httpro
 	reqBody, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		fmt.Printf("Show: %s\n", err)
+		http.Error(w, "Internal server error", 500)
+		return
 	}
 
 	err = json.Unmarshal(reqBody, &user)
 	if err != nil {
 		fmt.Printf("Show: %s\n", err)
+		http.Error(w, "Internal server error", 500)
+		return
 	}
 
-	dbUser := nv.Datastore.Load(user.Email)
-	if dbUser.Email == "" {
+	dbUser, err := nv.Datastore.Load(user.Email)
+	if err != nil {
 		fmt.Printf("Show: %v\n", dbUser)
 		http.Error(w, "Invalid email", 668)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
@@ -323,6 +379,8 @@ func (nv *NormalView) Update(w http.ResponseWriter, req *http.Request, ps httpro
 	resp, err := json.Marshal(response)
 	if err != nil {
 		fmt.Printf("Show: %s\n", err)
+		http.Error(w, "Internal server error", 500)
+		return
 	}
 	_, _ = w.Write(resp)
 	return

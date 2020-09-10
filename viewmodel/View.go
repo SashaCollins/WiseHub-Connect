@@ -8,7 +8,6 @@ package viewmodel
 
 import (
 	"github/SashaCollins/Wisehub-Connect/model/data"
-	_ "github/SashaCollins/Wisehub-Connect/model/data"
 	_ "github/SashaCollins/Wisehub-Connect/model/listener"
 )
 
@@ -25,7 +24,7 @@ type UpdateEmail struct {
 
 type UpdatePlugins struct {
 	Email string `json:"email"`
-	Plugins []data.Plugin `json:"plugins"`
+	Plugins []Plugin `json:"plugins"`
 }
 
 type User struct {
