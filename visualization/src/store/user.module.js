@@ -25,20 +25,17 @@ export const user = {
 	},
 	updatePlugins({ commit }, payload) {
 	  return UserService.updatePlugins(payload).then(onSuccess => {
-	    if (onSuccess.data.success) {
-	      user.plugins = onSuccess.data.plugins;
-		  commit("updateSuccess", user);
-		}
 		return Promise.resolve(onSuccess);
 	  }, onFailure => {
 		return Promise.reject(onFailure);
 	  });
 	},
 	updateEmail({ commit }, payload) {
-	  return UserService.updateEmail(payload).then(onSuccess => {
-	    let updatedUser = user.state.status.user.email = payload.newEmail;
-		commit("updateSuccess",updatedUser);
-		return Promise.resolve(onSuccess);
+	  return UserService.updateEmail(payload).then(
+	  	onSuccess => {
+	  	  user.state.user.email = payload.newEmail;
+	  	  commit("updateSuccess", user);
+	  	  return Promise.resolve(onSuccess);
 	  }, onFailure => {
 		return Promise.reject(onFailure);
 	  });
@@ -54,7 +51,6 @@ export const user = {
 	deleteAccount({ commit }, user) {
 	  return UserService.delete(user).then(onSuccess => {
 		commit("deleteSuccess");
-		user = null;
 		sessionStorage.clear();
 		localStorage.clear();
 		return Promise.resolve(onSuccess);

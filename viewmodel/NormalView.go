@@ -229,11 +229,6 @@ func (nv *NormalView) UpdatePlugins(w http.ResponseWriter, req *http.Request, ps
 	var response Response
 
 	reqBody, err := ioutil.ReadAll(req.Body)
-	if err != nil {
-		fmt.Printf("UpdatePlugins: %s\n", err)
-		http.Error(w, "Internal server error", 500)
-		return
-	}
 
 	err = json.Unmarshal(reqBody, &plugins)
 	if err != nil {
@@ -241,10 +236,12 @@ func (nv *NormalView) UpdatePlugins(w http.ResponseWriter, req *http.Request, ps
 		http.Error(w, "Internal server error", 500)
 		return
 	}
-
 	update := make(map[string]interface{})
 	update["email"] = plugins.Email
-	update["plugins"] = plugins.Plugins
+	fmt.Printf("UpdatePlugins: %v\n", update["email"])
+	fmt.Printf("UpdatePlugins: %v\n", plugins.Plugins)
+	fmt.Printf("UpdatePlugins: %v\n", plugins.Email)
+	update["updatedPlugins"] = plugins.Plugins
 	if err := nv.Datastore.Update("plugins", update); err != nil {
 		fmt.Printf("UpdatePlugins: %s\n", err)
 		http.Error(w, "Invalid email", 668)
@@ -307,47 +304,7 @@ func (nv *NormalView) DeleteProfile(w http.ResponseWriter, req *http.Request, ps
 }
 
 func (nv *NormalView) Show(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
-	var user data.User
-	var response Response
-
-	reqBody, err := ioutil.ReadAll(req.Body)
-	if err != nil {
-		fmt.Printf("Show: %s\n", err)
-		http.Error(w, "Internal server error", 500)
-		return
-	}
-
-	err = json.Unmarshal(reqBody, &user)
-	if err != nil {
-		fmt.Printf("Show: %s\n", err)
-		http.Error(w, "Internal server error", 500)
-		return
-	}
-
-	dbUser, err := nv.Datastore.Load(user.Email)
-	if err != nil {
-		fmt.Printf("Show: %v\n", dbUser)
-		http.Error(w, "Invalid email", 668)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	response.Success = true
-	response.Email = dbUser.Email
-	response.Plugins = dbUser.Plugins
-	resp, err := json.Marshal(response)
-	if err != nil {
-		fmt.Printf("Show: %s\n", err)
-		http.Error(w, "Internal server error", 500)
-		return
-	}
-	_, _ = w.Write(resp)
-	return
-}
-
-func (nv *NormalView) Update(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
-	var user data.User
+	var user User
 	var response Response
 
 	reqBody, err := ioutil.ReadAll(req.Body)

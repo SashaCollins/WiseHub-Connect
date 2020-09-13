@@ -9,6 +9,8 @@ import Impressum from "../components/info/Impressum";
 import LogIn from '../components/auth/LogIn.vue';
 import SignUp from '../components/auth/SignUp.vue';
 import Forgot from '../components/auth/Forgot.vue';
+import Repos from "@/components/hub/Repos";
+import Courses from "@/components/hub/Courses";
 
 Vue.use(Router);
 
@@ -24,6 +26,16 @@ export const router = new Router({
            name: 'faq',
            path: '/faq',
            component: FAQ,
+       },
+       {
+           name: 'repositories',
+           path: '/repositories',
+           component: Repos,
+       },
+       {
+           name: 'dummy',
+           path: '/courses/dummy',
+           component: Courses,
        },
        {
            name: 'profile',

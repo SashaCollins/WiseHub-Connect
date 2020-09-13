@@ -24,21 +24,22 @@ type UpdateEmail struct {
 
 type UpdatePlugins struct {
 	Email string `json:"email"`
-	Plugins []Plugin `json:"plugins"`
+	Plugins []data.Plugin `json:"plugins"`
 }
 
 type User struct {
 	Name     string `json:"name"`
 	Password string `json:"password"`
 	Email    string `json:"email"`
-	Plugins  string `json:"plugins"`
+	Plugins  []data.Plugin `json:"plugins"`
 }
 
 type Plugin struct {
-	Name string `json:"name"`
-	Token string `json:"token"`
-	Description string `json:"description"`
-	Updated bool `json:"updated"`
+	PluginName string `json:"PluginName"`
+	UsernameHost string `json:"UsernameHost"`
+	Token string `json:"Token"`
+	Description string `json:"Description"`
+	Updated bool `json:"Updated"`
 }
 
 type View interface {

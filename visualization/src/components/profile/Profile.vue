@@ -46,7 +46,8 @@
                           readonly
                           class="form-control-plaintext form-control-lg"
                           id="staticEmail"
-                          :value="getUser.email">
+                          :value="getUser.email"
+                          @input="newEmail">
                     </div>
   <!--                  <div class="col-sm-1">-->
   <!--                    <button-->
@@ -83,7 +84,7 @@
           </div>
           <div class="row">
             <div v-for="(item, index) in plugins" :key="index" class="col-lg-4 col-md-6 col-sm-12">
-              <div class="card" @submit.prevent="updatePlugin">
+              <div class="card" @submit.prevent="updatePlugin(item)">
                 <h3 class="text-center">{{ item.PluginName }}</h3>
                 <div class="card-body">
                   <label
@@ -114,7 +115,7 @@
                 </div>
                 <div class="btn-group" role="group">
 <!--                  <button type="button" class="btn btn-primary" disabled>Submit</button>-->
-                  <button @click="item.updated = !item.updated" type="submit" class="btn btn-primary">Update</button>
+                  <button @click="updatePlugin(item)" type="submit" class="btn btn-primary">Update</button>
                 </div>
               </div>
             </div>
@@ -128,12 +129,15 @@
         name: "Profile",
         data() {
           return {
-            updatedPlugin: [],
+            newEmail: '',
+            updatedPlugins: [],
+            //dummy only exists if connection fails
             plugins: [{
               'PluginName': 'Dummy',
               'UsernameHost': 'Test',
               'Token': 'testToken',
               'Description': '',
+              'Updated': false,
             }]
           }
         },
@@ -143,43 +147,56 @@
           }
         },
         methods: {
-          updatePlugin: function() {
+          updatePlugin: function(plugin) {
+            plugin.Updated = true;
+            console.log(plugin);
+            // for (let i = 0; i < this.plugins.length; i++) {
+            //   let plugin = this.plugins[i];
+            //   if (plugin.Updated) {
+            //     this.updatedPlugins.push(plugin);
+            //   }
+            // }
+            this.updatedPlugins.push(plugin);
             this.$store.dispatch('user/updatePlugins', {
               email: this.getUser.email,
-              plugins: this.plugins
+              plugins: this.updatedPlugins
             }).then(
                 (onSuccess) => {
                   console.log("onSuccess in Update")
+                  console.log(onSuccess)
                 },
                 (onError) => {
                   console.log("onError in Update")
+                  console.log(onError)
                 }
             )
+            this.updatedPlugins = [];
           },
           updateEmail: function() {
             this.$store.dispatch('user/updateEmail', {
-              email: this.getUser.email,
-              plugins: this.plugins
+              oldEmail: this.getUser.email,
+              newEmail: this.newEmail
             }).then(
                 (onSuccess) => {
                   console.log("onSuccess in Update")
+                  console.log(onSuccess)
                 },
                 (onError) => {
                   console.log("onError in Update")
+                  console.log(onError)
                 }
             )
 
           },
           updatePassword: function() {
-            this.$store.dispatch('user/updatePassword', {
-              email: this.getUser.email,
-              plugins: this.plugins
-            }).then(
+            this.$store.dispatch('user/updatePassword', this.getUser).then(
                 (onSuccess) => {
                   console.log("onSuccess in Update")
+                  console.log(onSuccess)
                 },
                 (onError) => {
                   console.log("onError in Update")
+                  console.log(onError)
                 }
             )
 
@@ -190,7 +207,7 @@
           this.$store.dispatch('user/fetchProfile', this.getUser).then(
               (onSuccess) => {
                 if (onSuccess.data.success) {
-                  this.plugins = this.getUser.plugins;
+                  this.plugins = onSuccess.data.plugins;
                 }
               },
               (onError) => {
@@ -226,13 +243,6 @@
       content: "";
       display: table;
       clear: both;
-    }
-
-    /* Fake image */
-    .fakeimg {
-      background-color: #aaa;
-      width: 100%;
-      padding: 20px;
     }
 
     .col {

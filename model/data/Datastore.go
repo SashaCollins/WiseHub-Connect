@@ -21,47 +21,17 @@ var defaultPlugins = []Plugin{
 
 type Datastore struct{}
 
-func loadAllPlugins(db *gorm.DB, userID uint) (plugins []Plugin, err error) {
-    fmt.Println("loadAllPlugins \tstart")
-    rows, err := db.Model(&Plugin{}).Where("user_id = ?", userID).Rows()
+func init() {
+    db, err := openDB()
     if err != nil {
-        log.Printf("loadAllPlugins1: %q\n", err)
-        return plugins, err
+        log.Printf("init %q: %v\n", err, db)
+        return
     }
-    defer rows.Close()
-
-    var plugin Plugin
-    for rows.Next() {
-        if err = db.ScanRows(rows, &plugin); err != nil {
-            fmt.Println("error")
-            return plugins, err
-        }
-        plugins = append(plugins, plugin)
-    }
-    fmt.Println("loadAllPlugins \tend")
-    return plugins, nil
+    createTables(db)
 }
 
-func loadAllUsers(db *gorm.DB) (user User, err error) {
-    if result := db.Find(&user); result.Error != nil {
-        log.Printf("loadAllUsers: %q\n", result.Error)
-        return user, result.Error
-    }
-    return user, nil
-}
-
-func loadUserByEmail(db *gorm.DB, email string) (user User, err error) {
-    if result := db.Select("id, name, password, email").Where("email = ?", email).First(&user); result.Error != nil {
-        log.Printf("loadUserByEmail: 1. %q\n", result.Error)
-        return user, result.Error
-    }
-    if count := len(user.Plugins); count == 0 {
-        user.Plugins, err = loadAllPlugins(db, user.ID)
-        if err != nil {
-            return user, err
-        }
-    }
-    return user, nil
+func openDB() (db *gorm.DB, err error) {
+    return gorm.Open(sqlite.Open("wisehub.db"), &gorm.Config{})
 }
 
 func createTables(db *gorm.DB) {
@@ -79,24 +49,74 @@ func createTables(db *gorm.DB) {
     }
 }
 
-func openDB() (db *gorm.DB, err error) {
-    return gorm.Open(sqlite.Open("wisehub.db"), &gorm.Config{})
+
+func loadAllPlugins(db *gorm.DB, userID uint) (plugins []Plugin, err error) {
+    rows, err := db.Model(&Plugin{}).Where("user_id = ?", userID).Rows()
+    if err != nil {
+        log.Printf("loadAllPlugins1: %q\n", err)
+        return plugins, err
+    }
+    defer rows.Close()
+
+    var plugin Plugin
+    for rows.Next() {
+        if err = db.ScanRows(rows, &plugin); err != nil {
+            return plugins, err
+        }
+        plugins = append(plugins, plugin)
+    }
+    return plugins, nil
 }
 
-func init() {
-    db, err := openDB()
-    if err != nil {
-        log.Printf("init %q: %v\n", err, db)
-        return
+func loadAllUsers(db *gorm.DB) (user User, err error) {
+    if result := db.Find(&user); result.Error != nil {
+        log.Printf("loadAllUsers: %q\n", result.Error)
+        return user, result.Error
     }
-    createTables(db)
+    return user, nil
+}
+
+func loadUserByEmail(db *gorm.DB, email string) (user User, err error) {
+    if result := db.Select("id, name, password, email").Where("email = ?", email).First(&user); result.Error != nil {
+        log.Printf("loadUserByEmail: 1. %q\n", result.Error)
+        return user, result.Error
+    }
+    user.Plugins, err = loadAllPlugins(db, user.ID)
+    if err != nil {
+            return user, err
+        }
+    return user, nil
+}
+
+func updatePlugins(db *gorm.DB, userEmail string, updatedPlugins []Plugin) error {
+    var user User
+    if result := db.Select("id").Where("email = ?", userEmail).First(&user); result.Error != nil {
+        log.Printf("updatePlugins: 1. %q\n", result.Error)
+        return result.Error
+    }
+    dbPlugins, err := loadAllPlugins(db, user.ID)
+    if err != nil {
+        log.Printf("updatePlugins: 1. %q\n", err)
+        return err
+    }
+    for iDBP := range dbPlugins {
+        for iUP := range updatedPlugins {
+            if dbPlugins[iDBP].PluginName == updatedPlugins[iUP].PluginName {
+                db.Model(&Plugin{}).Where("user_id = ? AND plugin_name = ?", user.ID, updatedPlugins[iUP].PluginName).Updates(Plugin{
+                    UsernameHost: updatedPlugins[iUP].UsernameHost,
+                    Token: updatedPlugins[iUP].Token,
+                })
+            }
+        }
+
+    }
+    return nil
 }
 
 /* Please note:
 Input either zero, one or two arguments
 zero loads all users from database
 one loads user based on email address
-two loads user based on email and password
  @param email string
  @param password string
 */
@@ -110,10 +130,8 @@ func (ds *Datastore) Load(email ...string) (user User, err error) {
     }
     switch len(email) {
     case 0:
-        fmt.Println("Load \tat 0")
         return loadAllUsers(db)
     case 1:
-        fmt.Println("Load \tat 1")
         return loadUserByEmail(db, email[0])
     default:
         fmt.Printf("too many arguments in function load: %v\n", len(email))
@@ -122,9 +140,7 @@ func (ds *Datastore) Load(email ...string) (user User, err error) {
 }
 
 func (ds *Datastore) Save(name string, password string, email string) error {
-    fmt.Println("Save \tin Save")
     db, err := openDB()
-
     if err != nil {
         log.Printf("Save %q: %v\n", err, db)
         return err
@@ -134,14 +150,13 @@ func (ds *Datastore) Save(name string, password string, email string) error {
         log.Printf("Save %q: %v\n", err, db)
         return err
     } // pass pointer of data to Create
-    fmt.Println("Save \tend Save")
     return nil
 }
-// TODO: Check
+
 func (ds *Datastore) Update(option string, data map[string]interface{}) error {
     fmt.Println("Update \tin Update")
-    fmt.Printf("%s\n", data)
-    fmt.Printf("%s\n", option)
+    fmt.Printf("Data: %s\n", data)
+    fmt.Printf("Options: %s\n", option)
     db, err := openDB()
     if err != nil {
         log.Printf("Update %q: %v\n", err, db)
@@ -149,14 +164,14 @@ func (ds *Datastore) Update(option string, data map[string]interface{}) error {
     }
     switch option {
     case "email":
-        fmt.Println(data["new"].(string))
         db.Model(User{}).Where("email = ?", data["old"]).Updates(User{Email: data["new"].(string)})
     case "password":
-        fmt.Println(data["password"].(string))
         db.Model(User{}).Where("email = ?",  data["email"]).Updates(User{Password: data["password"].(string)})
     case "plugins":
-        fmt.Println(data["plugins"].([]Plugin))
-        db.Model(User{}).Where("email = ?",  data["email"]).Updates(User{Plugins: data["plugins"].([]Plugin)})
+        if err := updatePlugins(db, data["email"].(string), data["updatedPlugins"].([]Plugin)); err != nil {
+            log.Printf("Update %q: %v\n", err, db)
+            return err
+        }
     }
     return nil
 }
@@ -167,7 +182,6 @@ func (ds *Datastore) Delete(email string) error {
         log.Printf("init %q: %v\n", err, db)
         return err
     }
-    fmt.Println(email)
     db.Where("email = ?", email).Delete(&email)
     return nil
 }
