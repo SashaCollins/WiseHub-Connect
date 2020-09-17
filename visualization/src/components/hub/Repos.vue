@@ -22,11 +22,15 @@
               <div class="col" style="background-color: #283230; color: white; border-radius: 3px;">
                 <div class="centered">
                   <label
-                      :for="item.Contributers"
+                      :for="item.Contributors"
                       class="col-md col-form-label">
-                    Contributers:
+                    Contributors:
                   </label>
-                  {{ item.Contributers }}
+                  <ul class="list-group">
+                    <li v-for="item in item.Contributors" :key="item">
+                      {{ item }}
+                    </li>
+                  </ul>
                 </div>
               </div>
               <div class="col offset-1" style="background-color: #283230; color: white; border-radius: 3px;">
@@ -47,31 +51,51 @@
 
 
 <!--      load this part only in 'onItemClick'-->
-      <div class="row">
+      <div class="row" v-if="clicked">
         <div
-            v-for="(dings, index) in plugins"
+            id="accordion"
+            v-for="(item, index) in plugins"
             :key="index"
             class="col-12">
-          <div
-              class="card">
-            <h3
-                class="text-center"
-                style="background-color: #464646; color: white; border-radius: 3px; padding: 15px">
-              {{ dings.PluginName }}
-            </h3>
-            <div class="centered">
-              <label
-                  :for="dings.PluginContent"
-                  class="col-md col-form-label">
-              </label>
-              {{ dings.PluginContent }}
+
+          <div class="card">
+            <div class="card-header" :id="'h' + index">
+              <h5 class="mb-0">
+                <button class="btn btn-info" data-toggle="collapse" :data-target="'#c' + index" aria-expanded="true" :aria-controls="'c' + index">
+                  {{ item.PluginName }}
+                </button>
+              </h5>
+            </div>
+
+            <div :id="'c' + index" class="collapse show" :aria-labelledby="'h' + index" data-parent="#accordion">
+              <div class="card-body">
+                {{ item.PluginContent }}
+              </div>
             </div>
           </div>
         </div>
       </div>
-
-
-    </div>
+<!--        <div-->
+<!--            v-for="(dings, index) in plugins"-->
+<!--            :key="index"-->
+<!--            class="col-12">-->
+<!--          <div-->
+<!--              class="card">-->
+<!--            <h3-->
+<!--                class="text-center"-->
+<!--                style="background-color: #464646; color: white; border-radius: 3px; padding: 15px">-->
+<!--              {{ dings.PluginName }}-->
+<!--            </h3>-->
+<!--            <div class="centered">-->
+<!--              <label-->
+<!--                  :for="dings.PluginContent"-->
+<!--                  class="col-md col-form-label">-->
+<!--              </label>-->
+<!--              {{ dings.PluginContent }}-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+      </div>
 </template>
 
 <script>
@@ -79,14 +103,18 @@
       name: "Repos",
       data() {
         return {
+          clicked: false,
           //dummy only exists if connection fails
           repos: [{
             'RepoName': 'Dummy',
-            'Contributers': 'Hans Wurscht, Axel Schweiss, ...',
+            'Contributors': ['Hans Wurst', 'Axel Schweiß'],
             'Description': 'This Repo is not real fetch data from GR',
           }],
           plugins: [{
-            'PluginName': 'DummyPlugin',
+            'PluginName': 'DummyPlugin1',
+            'PluginContent': 'DummyContent'
+          },{
+            'PluginName': 'DummyPlugin2',
             'PluginContent': 'DummyContent'
           }]
         }
@@ -94,13 +122,28 @@
       computed: {
         loggedIn() {
           return this.$store.state.auth.status.loggedIn;
+        },
+        getUser() {
+          return this.$store.state.user.user;
         }
       },
       methods: {
-        onItemClick(event, item) {
+        onItemClick: function (event, item) {
+          this.clicked = true;
           console.log('onItemClick')
           console.log(event)
           console.log(item)
+        },
+        fetchAllRepos: function() {
+          this.$store.dispatch('user/fetchRepos', this.getUser).then(
+              (onSuccess) => {
+
+          }, (onError) => {
+
+          })
+        },
+        fetchRepo: function(item) {
+
         }
       },
       mounted() {

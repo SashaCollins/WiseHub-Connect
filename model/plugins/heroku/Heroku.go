@@ -1,27 +1,29 @@
-package heroku
+package main
 
 import (
 	"fmt"
 	"github.com/bgentry/heroku-go"
 	"github/SashaCollins/Wisehub-Connect/model/config"
 )
-var client heroku.Client
+
+var herokuClient heroku.Client
+
 func init(){
 	conf := config.GetConfig()
 	email := conf.Heroku.Username
 	apiToken := conf.Heroku.APIToken
-	client = heroku.Client{Username: email, Password: apiToken}
+	herokuClient = heroku.Client{Username: email, Password: apiToken}
 }
-type herokuReader struct {}
 
+type HerokuReader struct {}
 
-func (hr *herokuReader) fetchData(info int) (interface{}, error){
+func (hr *HerokuReader) FetchData(info int) (interface{}, error){
 	switch info {
 	case 1:
 		fmt.Println("\tin fetch")
 		var apps []heroku.App
 		// pass nil for options if you don't need to set any optional params
-		app, err := client.AppCreate(nil)
+		app, err := herokuClient.AppCreate(nil)
 		if err != nil {
 			fmt.Println("\tin fetch error")
 			return nil, err
@@ -42,7 +44,7 @@ func (hr *herokuReader) fetchData(info int) (interface{}, error){
 		opts := heroku.AppCreateOpts{Name: &name, Region: &region}
 
 		// Create an app with options set:
-		app2, err := client.AppCreate(&opts)
+		app2, err := herokuClient.AppCreate(&opts)
 		if err != nil {
 			// if this is a heroku.Error, it will contain details about the error
 			if hkerr, ok := err.(heroku.Error); ok {
@@ -58,7 +60,7 @@ func (hr *herokuReader) fetchData(info int) (interface{}, error){
 		// created app2: name=myapp region=eu
 
 	case 3:
-		apps, err := client.AppList(&heroku.ListRange{Field: "name", Max: 1000})
+		apps, err := herokuClient.AppList(&heroku.ListRange{Field: "name", Max: 1000})
 		if err != nil {
 			// if this is a heroku.Error, it will contain details about the error
 			if hkerr, ok := err.(heroku.Error); ok {
@@ -72,8 +74,6 @@ func (hr *herokuReader) fetchData(info int) (interface{}, error){
 	default:
 		return nil, fmt.Errorf("something went wrong with the info number %s", info)
 	}
-
-
-
-
 }
+
+var Heroku HerokuReader

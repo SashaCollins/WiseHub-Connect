@@ -3,7 +3,6 @@ package main
 
 import (
 	"fmt"
-	//_ "github/SashaCollins/Wisehub-Connect"
 	"github/SashaCollins/Wisehub-Connect/model/data"
 	"github/SashaCollins/Wisehub-Connect/viewmodel"
 )
@@ -45,9 +44,8 @@ func main() {
 
 	normalViewFinished := make(chan bool)
 	nv := viewmodel.NormalView{Datastore: &ds}
-	go nv.Run(normalViewFinished)
+	go nv.Run(9010, normalViewFinished)
 	<- normalViewFinished
-
 
 	fmt.Println("end")
 }

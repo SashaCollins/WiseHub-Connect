@@ -23,6 +23,15 @@ export const user = {
 		return Promise.reject(onFailure);
 	  });
 	},
+	fetchRepos({ commit }, user) {
+	  return UserService.fetchRepos(user).then(onSuccess => {
+	    console.log(onSuccess)
+		return Promise.resolve(onSuccess);
+	  }, onFailure => {
+		console.log(onFailure)
+		return Promise.reject(onFailure);
+	  });
+	},
 	updatePlugins({ commit }, payload) {
 	  return UserService.updatePlugins(payload).then(onSuccess => {
 		return Promise.resolve(onSuccess);

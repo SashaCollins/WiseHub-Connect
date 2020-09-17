@@ -7,44 +7,36 @@ do not edit or delete.
 package viewmodel
 
 import (
+	"github.com/julienschmidt/httprouter"
 	"github/SashaCollins/Wisehub-Connect/model/data"
-	_ "github/SashaCollins/Wisehub-Connect/model/listener"
+	"net/http"
 )
 
 type Response struct{
-	Success bool `json:"success"`
-	Email string `json:"email"`
-	Plugins []data.Plugin `json:"plugins"`
+	Success 		bool                    `json:"success"`
+	Email 			string               	`json:"email"`
+	Plugins 		[]data.Plugin           `json:"plugins"`
+	Organization    []byte					`json:"organization"`
 }
 
-type UpdateEmail struct {
-	OldEmail string `json:"old_email"`
-	NewEmail string `json:"new_email"`
-}
-
-type UpdatePlugins struct {
-	Email string `json:"email"`
-	Plugins []data.Plugin `json:"plugins"`
-}
-
-type User struct {
-	Name     string `json:"name"`
-	Password string `json:"password"`
-	Email    string `json:"email"`
-	Plugins  []data.Plugin `json:"plugins"`
-}
-
-type Plugin struct {
-	PluginName string `json:"PluginName"`
-	UsernameHost string `json:"UsernameHost"`
-	Token string `json:"Token"`
-	Description string `json:"Description"`
-	Updated bool `json:"Updated"`
+type Request struct {
+	Option 			string					`json:"option"`
+	NewEmail 		string 					`json:"new_email"`
+	Email 			string 					`json:"email"`
+	Password 		string 					`json:"password"`
+	Plugins 		[]data.Plugin 			`json:"plugins"`
+	Repository 		string					`json:"repo"`
+	Course 			string			 		`json:"course"`
 }
 
 type View interface {
-	SignUp()
-	SignIn()
-	Show()
-	Update()
+	SignUp(w http.ResponseWriter, req *http.Request, ps httprouter.Params)
+	SignIn(w http.ResponseWriter, req *http.Request, ps httprouter.Params)
+
+	Show(w http.ResponseWriter, req *http.Request, ps httprouter.Params)
+	Update(w http.ResponseWriter, req *http.Request, ps httprouter.Params)
+	Delete(w http.ResponseWriter, req *http.Request, ps httprouter.Params)
+
+	Repositories(w http.ResponseWriter, req *http.Request, ps httprouter.Params)
+	Courses(w http.ResponseWriter, req *http.Request, ps httprouter.Params)
 }

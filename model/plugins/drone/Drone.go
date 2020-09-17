@@ -1,4 +1,4 @@
-package drone
+package main
 
 import (
 	"context"
@@ -8,9 +8,10 @@ import (
 	"golang.org/x/oauth2"
 )
 
-type droneReader struct{}
+type DroneReader struct{}
+
 var (
-	client       drone.Client
+	droneClient  drone.Client
 	currentBuild build
 	currentRepo  repo
 )
@@ -27,19 +28,21 @@ func init() {
 		},
 	)
 	// create the drone client with authenticator
-	client = drone.NewClient(Host, httpClient)
+	droneClient = drone.NewClient(Host, httpClient)
 	// Use client...
 }
 type step struct {
 	Name string
 	Status string
 }
+
 type stage struct {
 	Name string
 	Kind string
 	Status string
 	Steps []step
 }
+
 type build struct {
 	//Name string
 	//Owner string
@@ -48,13 +51,15 @@ type build struct {
 	Time int64
 	Stages []stage
 }
+
 type repo struct {
 	Name   string
 	Owner  string
 	Branch string
 	Build  build
 }
-func (dr *droneReader) jsonBuildToStructBuild(target *build, source drone.Build) *build {
+
+func (dr *DroneReader) jsonBuildToStructBuild(target *build, source drone.Build) *build {
 	target.Branch = source.Ref
 	target.Status = source.Status
 	target.Time = source.Started
@@ -76,16 +81,16 @@ func (dr *droneReader) jsonBuildToStructBuild(target *build, source drone.Build)
 	}
 	return target
 }
-func (dr *droneReader) fetchData(info int) (interface{}, error){
+func (dr *DroneReader) FetchData(info int) (interface{}, error){
 	switch info {
 	case 1:
 		// gets the current user
-		user, err := client.Self()
+		user, err := droneClient.Self()
 		return user, err
 
 	case 2:
 		// gets the named repository information
-		repo, err := client.Repo("WiseHub-Connector", "WiseHub-Project")
+		repo, err := droneClient.Repo("WiseHub-Connector", "WiseHub-Project")
 		if err != nil {
 			return nil, fmt.Errorf("something went wrong with collecting the data")
 		}
@@ -96,7 +101,7 @@ func (dr *droneReader) fetchData(info int) (interface{}, error){
 		return currentRepo, nil
 
 	case 3:
-		buildLast, err := client.BuildLast("WiseHub-Connector", "WiseHub-Project", "master")
+		buildLast, err := droneClient.BuildLast("WiseHub-Connector", "WiseHub-Project", "master")
 		if err != nil {
 			return nil, fmt.Errorf("something went wrong with collecting the data")
 		}
@@ -107,3 +112,4 @@ func (dr *droneReader) fetchData(info int) (interface{}, error){
 	}
 }
 
+var Drone DroneReader

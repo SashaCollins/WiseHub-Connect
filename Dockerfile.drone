@@ -6,6 +6,6 @@ LABEL description="Drone CI - WiseHub-Connect"
 #LABEL
 #LABEL
 #ENV
-COPY model/plugins/drone /Drone
+COPY model/listener/drone /Drone
 RUN
 

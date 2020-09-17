@@ -10,9 +10,9 @@ import "gorm.io/gorm"
 
 type User struct {
 	gorm.Model
-	Name     		string
-	Password 		string
 	Email    		string		`gorm:"not null;unique"`
+	Password 		string
+	Role 			string
 	Plugins  		[]Plugin	`gorm:"foreignKey:UserID"`
 }
 
@@ -27,8 +27,8 @@ type Plugin struct {
 }
 
 type DatastoreI interface {
-	Load(email ...string) (user User, err error)
-	Save(name, password, email string) error
+	Load(email ...string) (user []User, err error)
+	Save(password, email string) error
 	Update(option string, data map[string]interface{}) error
 	Delete(email string) error
 }

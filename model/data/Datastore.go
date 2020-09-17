@@ -49,42 +49,42 @@ func createTables(db *gorm.DB) {
     }
 }
 
-
-func loadAllPlugins(db *gorm.DB, userID uint) (plugins []Plugin, err error) {
-    rows, err := db.Model(&Plugin{}).Where("user_id = ?", userID).Rows()
-    if err != nil {
-        log.Printf("loadAllPlugins1: %q\n", err)
-        return plugins, err
-    }
-    defer rows.Close()
-
-    var plugin Plugin
-    for rows.Next() {
-        if err = db.ScanRows(rows, &plugin); err != nil {
-            return plugins, err
-        }
-        plugins = append(plugins, plugin)
+func loadAllPluginsByUserID(db *gorm.DB, userID uint) (plugins []Plugin, err error) {
+    fmt.Println(userID)
+    if result :=  db.Model(&Plugin{}).Where("user_id = ?", userID).Find(&plugins); result.Error != nil {
+        log.Printf("loadAllUsers: %q\n", result.Error)
+        return plugins, result.Error
     }
     return plugins, nil
 }
 
-func loadAllUsers(db *gorm.DB) (user User, err error) {
-    if result := db.Find(&user); result.Error != nil {
+func loadAllUsers(db *gorm.DB) (users []User, err error) {
+    if result := db.Find(&users); result.Error != nil {
         log.Printf("loadAllUsers: %q\n", result.Error)
-        return user, result.Error
+        return users, result.Error
     }
-    return user, nil
+    for iUser := range users {
+        user := users[iUser]
+        user.Plugins, err = loadAllPluginsByUserID(db, user.ID)
+        if err != nil {
+            log.Printf("loadAllUsers: %q\n", err)
+            user.Plugins = nil
+        }
+    }
+    return users, nil
 }
 
-func loadUserByEmail(db *gorm.DB, email string) (user User, err error) {
-    if result := db.Select("id, name, password, email").Where("email = ?", email).First(&user); result.Error != nil {
+func loadUserByEmail(db *gorm.DB, email string) (user []User, err error) {
+    var tmp User
+    if result := db.Select("id, password, email").Where("email = ?", email).First(&tmp); result.Error != nil {
         log.Printf("loadUserByEmail: 1. %q\n", result.Error)
         return user, result.Error
     }
-    user.Plugins, err = loadAllPlugins(db, user.ID)
+    tmp.Plugins, err = loadAllPluginsByUserID(db, tmp.ID)
     if err != nil {
             return user, err
-        }
+    }
+    user = append(user, tmp)
     return user, nil
 }
 
@@ -94,7 +94,7 @@ func updatePlugins(db *gorm.DB, userEmail string, updatedPlugins []Plugin) error
         log.Printf("updatePlugins: 1. %q\n", result.Error)
         return result.Error
     }
-    dbPlugins, err := loadAllPlugins(db, user.ID)
+    dbPlugins, err := loadAllPluginsByUserID(db, user.ID)
     if err != nil {
         log.Printf("updatePlugins: 1. %q\n", err)
         return err
@@ -108,7 +108,6 @@ func updatePlugins(db *gorm.DB, userEmail string, updatedPlugins []Plugin) error
                 })
             }
         }
-
     }
     return nil
 }
@@ -120,7 +119,7 @@ one loads user based on email address
  @param email string
  @param password string
 */
-func (ds *Datastore) Load(email ...string) (user User, err error) {
+func (ds *Datastore) Load(email ...string) (user []User, err error) {
     // Get any parameters passed to us out of the args variable into "real"
     // variables we created for them.
     db, err := openDB()
@@ -139,13 +138,13 @@ func (ds *Datastore) Load(email ...string) (user User, err error) {
     }
 }
 
-func (ds *Datastore) Save(name string, password string, email string) error {
+func (ds *Datastore) Save(password string, email string) error {
     db, err := openDB()
     if err != nil {
         log.Printf("Save %q: %v\n", err, db)
         return err
     }
-    user := User{Name: name, Password: password, Email: email, Plugins: defaultPlugins}
+    user := User{Email: email, Password: password, Role: "", Plugins: defaultPlugins}
     if result := db.Create(&user); result.Error != nil {
         log.Printf("Save %q: %v\n", err, db)
         return err
@@ -154,9 +153,6 @@ func (ds *Datastore) Save(name string, password string, email string) error {
 }
 
 func (ds *Datastore) Update(option string, data map[string]interface{}) error {
-    fmt.Println("Update \tin Update")
-    fmt.Printf("Data: %s\n", data)
-    fmt.Printf("Options: %s\n", option)
     db, err := openDB()
     if err != nil {
         log.Printf("Update %q: %v\n", err, db)
@@ -172,6 +168,8 @@ func (ds *Datastore) Update(option string, data map[string]interface{}) error {
             log.Printf("Update %q: %v\n", err, db)
             return err
         }
+    case "role":
+        db.Model(User{}).Where("email = ?", data["email"]).Updates(User{Role: data["role"].(string)})
     }
     return nil
 }

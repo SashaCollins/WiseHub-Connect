@@ -73,8 +73,9 @@
                       <button
                           type="button"
                           class="btn btn-primary"
-                          @click="updatePassword">
-                        Change Password
+                          data-toggle="modal"
+                          data-target="#updatePassword">
+                        Change password
                       </button>
                     </div>
                   </div>
@@ -83,7 +84,7 @@
             </div>
           </div>
           <div class="row">
-            <div v-for="(item, index) in plugins" :key="index" class="col-lg-4 col-md-6 col-sm-12">
+            <div v-if="!error" v-for="(item, index) in plugins" :key="index" class="col-lg-4 col-md-6 col-sm-12">
               <div class="card" @submit.prevent="updatePlugin(item)">
                 <h3 class="text-center">{{ item.PluginName }}</h3>
                 <div class="card-body">
@@ -97,7 +98,9 @@
                         type="text"
                         class="form-control"
                         :id="item.UsernameHost"
-                        v-model="item.UsernameHost">
+                        v-model="item.UsernameHost"
+                        :disabled="!disabled"
+                    >
                   </div>
                   <label
                       :for="item.Token"
@@ -110,111 +113,161 @@
                         class="form-control"
                         :id="item.Token"
                         placeholder="*************"
-                        v-model="item.Token">
+                        v-model="item.Token"
+                        :disabled="!disabled"
+                    >
                   </div>
                 </div>
                 <div class="btn-group" role="group">
-<!--                  <button type="button" class="btn btn-primary" disabled>Submit</button>-->
-                  <button @click="updatePlugin(item)" type="submit" class="btn btn-primary">Update</button>
+                  <button @click="updatePlugin(item)" type="submit" class="btn btn-danger" :disabled="!disabled">Submit</button>
+                  <button @click="disabled = !disabled" type="button" class="btn btn-primary">Edit</button>
+                </div>
+              </div>
+            </div>
+            <div v-else v-for="(item, index) in errors" :key="index" class="col-lg-4 col-md-6 col-sm-12">
+              <div class="card">
+                <h3 class="text-center">{{ item.Tag }}</h3>
+                <div class="card-body">
+                  <label
+                      :for="item.Code"
+                      class="col-md">
+                    Status:
+                  </label>
+                  <div class="col-md col-form-label">
+                    <label
+                        :id="item.Code"
+                        class="col-md">
+                      {{ item.Code }}
+                    </label>
+                  </div>
+                  <label
+                      :for="item.Description"
+                      class="col-md col-form-label">
+                    Description:
+                  </label>
+                  <div class="col-md">
+                    <textarea
+                        :id="item.Description"
+                        class="form-control"
+                        disabled
+                    >
+                      {{ item.Description }}
+                    </textarea>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+      <!-- Modal -->
+      <div class="modal fade" id="updatePassword" tabindex="-1" role="dialog" aria-labelledby="updatePasswordTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="updatePasswordTitle">Update password</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <UpdatePassword v-if="getUser"/>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 </template>
 
 <script>
+    import UpdatePassword from "@/components/auth/UpdatePassword";
+
     export default {
         name: "Profile",
-        data() {
-          return {
-            newEmail: '',
-            updatedPlugins: [],
-            //dummy only exists if connection fails
-            plugins: [{
-              'PluginName': 'Dummy',
-              'UsernameHost': 'Test',
-              'Token': 'testToken',
-              'Description': '',
-              'Updated': false,
-            }]
-          }
-        },
-        computed: {
-          getUser() {
-            return this.$store.state.user.user;
-          }
-        },
-        methods: {
-          updatePlugin: function(plugin) {
-            plugin.Updated = true;
-            console.log(plugin);
-            // for (let i = 0; i < this.plugins.length; i++) {
-            //   let plugin = this.plugins[i];
-            //   if (plugin.Updated) {
-            //     this.updatedPlugins.push(plugin);
-            //   }
-            // }
-            this.updatedPlugins.push(plugin);
-            this.$store.dispatch('user/updatePlugins', {
-              email: this.getUser.email,
-              plugins: this.updatedPlugins
-            }).then(
-                (onSuccess) => {
-                  console.log("onSuccess in Update")
-                  console.log(onSuccess)
-                },
-                (onError) => {
-                  console.log("onError in Update")
-                  console.log(onError)
-                }
-            )
-            this.updatedPlugins = [];
-          },
-          updateEmail: function() {
-            this.$store.dispatch('user/updateEmail', {
-              oldEmail: this.getUser.email,
-              newEmail: this.newEmail
-            }).then(
-                (onSuccess) => {
-                  console.log("onSuccess in Update")
-                  console.log(onSuccess)
-                },
-                (onError) => {
-                  console.log("onError in Update")
-                  console.log(onError)
-                }
-            )
-
-          },
-          updatePassword: function() {
-            this.$store.dispatch('user/updatePassword', this.getUser).then(
-                (onSuccess) => {
-                  console.log("onSuccess in Update")
-                  console.log(onSuccess)
-                },
-                (onError) => {
-                  console.log("onError in Update")
-                  console.log(onError)
-                }
-            )
-
-          }
-        },
-        mounted() {
-          console.log(this.getUser);
-          this.$store.dispatch('user/fetchProfile', this.getUser).then(
+      components: {
+        UpdatePassword
+      },
+      data() {
+        return {
+          disabled: false,
+          newEmail: '',
+          updatedPlugins: [],
+          //dummy only exists if connection fails
+          plugins: [{
+            'PluginName': 'Dummy',
+            'UsernameHost': 'Test',
+            'Token': 'testToken',
+            'Description': '',
+            'Updated': false,
+          }],
+          errors: [{
+            'Tag': 'Error - Try again',
+            'Code': '',
+            'Description': ''
+          }],
+          error: false
+        }
+      },
+      computed: {
+        getUser() {
+          return this.$store.state.user.user;
+        }
+      },
+      methods: {
+        updatePlugin: function(plugin) {
+          plugin.Updated = true;
+          this.updatedPlugins.push(plugin);
+          this.$store.dispatch('user/updatePlugins', {
+            email: this.getUser.email,
+            plugins: this.updatedPlugins
+          }).then(
               (onSuccess) => {
-                if (onSuccess.data.success) {
-                  this.plugins = onSuccess.data.plugins;
-                }
+                console.log("onSuccess in Update")
+                console.log(onSuccess)
               },
               (onError) => {
-                this.message = onError.toString() || onError.message;
+                this.error = true;
+                this.errors = [{
+                  'Code': onError.status,
+                  'Description': onError.message || onError.toString()
+                }];
               }
           )
+          this.updatedPlugins = [];
+          this.disabled = false;
         },
+        updateEmail: function() {
+          this.$store.dispatch('user/updateEmail', {
+            oldEmail: this.getUser.email,
+            newEmail: this.newEmail
+          }).then(
+              (onSuccess) => {
+                console.log("onSuccess in Update")
+                console.log(onSuccess)
+              },
+              (onError) => {
+                console.log("onError in Update")
+                console.log(onError)
+              }
+          )
+        }
+      },
+      mounted() {
+        console.log(this.getUser);
+        this.$store.dispatch('user/fetchProfile', this.getUser).then(
+            (onSuccess) => {
+              if (onSuccess.data.success) {
+                this.plugins = onSuccess.data.plugins;
+              }
+            },
+            (onError) => {
+              this.error = true;
+              this.errors = [{
+                'Code': onError.status,
+                'Description': onError.message || onError.toString()
+              }];
+            }
+        );
+      },
     }
 </script>
 
