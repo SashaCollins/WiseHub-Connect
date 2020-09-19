@@ -14,7 +14,7 @@ services:
       - "127.0.0.1:9443:443"
     restart: always
     volumes:
-    - "/var/lib/drone:/dat"
+    - "/var/lib/testing_tools:/dat"
     networks:
       - drone
 
@@ -48,7 +48,7 @@ services:
       - drone
     environment:
       DRONE_RPC_PROTO: http
-      DRONE_RPC_HOST: drone
+      DRONE_RPC_HOST: testing_tools
       DRONE_RPC_SECRET: 2e5e14f277c72fc21541f435f738fa2f
       DRONE_RUNNER_CAPACITY: 2
       DRONE_RUNNER_NAME: drone_runner

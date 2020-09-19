@@ -208,6 +208,9 @@
         }
       },
       computed: {
+        loggedIn() {
+          return this.$store.state.auth.status.loggedIn;
+        },
         getUser() {
           return this.$store.state.user.user;
         }
@@ -231,7 +234,7 @@
                   'Description': onError.message || onError.toString()
                 }];
               }
-          )
+          );
           this.updatedPlugins = [];
           this.disabled = false;
         },
@@ -241,14 +244,14 @@
             newEmail: this.newEmail
           }).then(
               (onSuccess) => {
-                console.log("onSuccess in Update")
-                console.log(onSuccess)
+                console.log("onSuccess in Update");
+                console.log(onSuccess);
               },
               (onError) => {
-                console.log("onError in Update")
-                console.log(onError)
+                console.log("onError in Update");
+                console.log(onError);
               }
-          )
+          );
         }
       },
       mounted() {

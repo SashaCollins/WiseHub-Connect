@@ -4,20 +4,29 @@ import (
 	"fmt"
 	"github.com/bgentry/heroku-go"
 	"github/SashaCollins/Wisehub-Connect/model/config"
+	"github/SashaCollins/Wisehub-Connect/model/plugins/testing_tools"
 )
 
-var herokuClient heroku.Client
+var (
+	herokuClient heroku.Client
+	PluginName string
+)
+
+type Heroku struct {}
 
 func init(){
+	PluginName = "Heroku"
 	conf := config.GetConfig()
 	email := conf.Heroku.Username
 	apiToken := conf.Heroku.APIToken
 	herokuClient = heroku.Client{Username: email, Password: apiToken}
 }
 
-type HerokuReader struct {}
+func NewTestingTools() testing_tools.TestingTools {
+	return &Heroku{}
+}
 
-func (hr *HerokuReader) FetchData(info int) (interface{}, error){
+func (h *Heroku) fetchData(info int) (interface{}, error){
 	switch info {
 	case 1:
 		fmt.Println("\tin fetch")
@@ -46,7 +55,7 @@ func (hr *HerokuReader) FetchData(info int) (interface{}, error){
 		// Create an app with options set:
 		app2, err := herokuClient.AppCreate(&opts)
 		if err != nil {
-			// if this is a heroku.Error, it will contain details about the error
+			// if this is a deployment.Error, it will contain details about the error
 			if hkerr, ok := err.(heroku.Error); ok {
 				return nil, fmt.Errorf("Error id=%s message=%q", hkerr.Id, hkerr)
 			}
@@ -62,7 +71,7 @@ func (hr *HerokuReader) FetchData(info int) (interface{}, error){
 	case 3:
 		apps, err := herokuClient.AppList(&heroku.ListRange{Field: "name", Max: 1000})
 		if err != nil {
-			// if this is a heroku.Error, it will contain details about the error
+			// if this is a deployment.Error, it will contain details about the error
 			if hkerr, ok := err.(heroku.Error); ok {
 				return nil, fmt.Errorf("Error id=%s message=%q", hkerr.Id, hkerr)
 			}
@@ -76,4 +85,12 @@ func (hr *HerokuReader) FetchData(info int) (interface{}, error){
 	}
 }
 
-var Heroku HerokuReader
+func (h *Heroku) GetRepositories() (interface{}, error) {
+
+	return nil, nil
+}
+
+func (h *Heroku) GetBuilds() (interface{}, error) {
+
+	return nil, nil
+}

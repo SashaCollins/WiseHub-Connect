@@ -12,7 +12,7 @@ import (
 
 type AdminView struct {
 	Datastore data.DatastoreI
-	Reader  plugins.Reader
+	PluginReader  plugins.PluginReader
 }
 
 func (av *AdminView) SignUp(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
@@ -283,7 +283,7 @@ func (av *AdminView) Show(w http.ResponseWriter, req *http.Request, ps httproute
 	return
 }
 
-func (av *AdminView) TestAdmin(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+func (av *AdminView) Teams(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 	var user Request
 	var response Response
 
@@ -334,10 +334,6 @@ func (av *AdminView) Repositories(w http.ResponseWriter, req *http.Request, ps h
 		http.Error(w, "Internal server error", 500)
 		return
 	}
-
-	repos := av.Reader.GetOrgaInfo()
-
-	fmt.Println(repos)
 
 
 
@@ -396,7 +392,7 @@ func (av *AdminView) Courses(w http.ResponseWriter, req *http.Request, ps httpro
 func (av *AdminView) Run(port int, finished chan bool) {
 	router := Router{View: av}
 	adminRouter := router.New()
-	adminRouter.POST("/admin/test", av.TestAdmin)
+	//adminRouter.POST("/admin/test", av.TestAdmin)
 	fmt.Printf("Run: %s\n", http.ListenAndServe(fmt.Sprintf(":%d", port), adminRouter))
 	finished <- true
 }

@@ -12,7 +12,7 @@ import (
 
 type NormalView struct {
 	Datastore data.DatastoreI
-	Reader  plugins.Reader
+	PluginReader  plugins.PluginReader
 }
 
 func (nv *NormalView) SignUp(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
@@ -285,7 +285,7 @@ func (nv *NormalView) Show(w http.ResponseWriter, req *http.Request, ps httprout
 	return
 }
 
-func (nv *NormalView) Repositories(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+func (nv *NormalView) Courses(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 	var request Request
 	var response Response
 
@@ -308,16 +308,21 @@ func (nv *NormalView) Repositories(w http.ResponseWriter, req *http.Request, ps 
 		http.Error(w, "Invalid email", 668)
 		return
 	}
-	fmt.Println(dbUser)
 
-	organizations := nv.Reader.GetOrgaInfo()
-	jsonString, err := json.Marshal(organizations)
-	if err != nil {
-		fmt.Printf("Repositories: %v\n", jsonString)
-		http.Error(w, "Internal server error", 500)
+	//if err = nv.PluginReader.LoadAllTestingToolPlugins(); err != nil {
+	//	fmt.Printf("Repositories Testing Tools: %v\n", err)
+	//	http.Error(w, "Internal server error!", 500)
+	//	return
+	//}
+	if err = nv.PluginReader.LoadAllVersionManagementPlugins(); err != nil {
+		fmt.Printf("Repositories Version Management: %v\n", err)
+		http.Error(w, "Internal server error!", 500)
 		return
 	}
-	response.Organization = jsonString
+
+	response.CourseData = nv.PluginReader.GetOrgaInfo()
+	fmt.Println("End Courses in NormalView")
+
 	response.Success = true
 	resp, err := json.Marshal(response)
 	if err != nil {
@@ -329,7 +334,43 @@ func (nv *NormalView) Repositories(w http.ResponseWriter, req *http.Request, ps 
 	return
 }
 
-func (nv *NormalView) Courses(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+func (nv *NormalView) Repositories(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+	var user Request
+	var response Response
+
+	reqBody, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		fmt.Printf("Show: %s\n", err)
+		http.Error(w, "Internal server error", 500)
+		return
+	}
+	err = json.Unmarshal(reqBody, &user)
+	if err != nil {
+		fmt.Printf("Show: %s\n", err)
+		http.Error(w, "Internal server error", 500)
+		return
+	}
+
+
+
+
+
+
+
+
+
+	response.Success = true
+	resp, err := json.Marshal(response)
+	if err != nil {
+		fmt.Printf("Show: %s\n", err)
+		http.Error(w, "Internal server error", 500)
+		return
+	}
+	_, _ = w.Write(resp)
+	return
+}
+
+func (nv *NormalView) Teams(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 	var user Request
 	var response Response
 

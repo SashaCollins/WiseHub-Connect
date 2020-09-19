@@ -19,7 +19,8 @@ func (r *Router) New() (router *httprouter.Router) {
 	router.POST("/user/update/password", r.View.Update)
 	router.POST("/user/update/plugins", r.View.Update)
 	router.POST("/user/repos", r.View.Repositories)
-	router.POST("/user/courses", r.View.Courses)
+	router.POST("/user/all", r.View.Courses)
+	router.POST("/user/teams", r.View.Teams)
 	router.GlobalOPTIONS = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("Access-Control-Request-Method") != "" {
 			// Set CORS headers

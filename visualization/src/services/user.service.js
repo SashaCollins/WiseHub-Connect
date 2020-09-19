@@ -13,15 +13,6 @@ class UserService {
    });
   }
 
-  fetchRepos(user) {
-   return axios.post(API_URL + 'repos', {
-     email: user.email
-   }
-  ).then((response) => {
-     return response;
-   });
-  }
-
   updateEmail(payload) {
     return axios.post(API_URL + 'update/email', {
       option: 'email',
@@ -52,6 +43,34 @@ class UserService {
     return axios.post(API_URL + 'delete', {
       email: user.email
     })
+  }
+
+  fetchRepos(user) {
+    return axios.post(API_URL + 'repos', {
+          email: user.email
+        }
+    ).then((response) => {
+      return response;
+    });
+  }
+
+  fetchCourses(user) {
+    return axios.post(API_URL + 'all', {
+          email: user.email
+        }
+    ).then((response) => {
+      return response;
+    });
+  }
+
+  fetchTeamRepos(payload) {
+    return axios.post(API_URL + 'teams', {
+          email: payload.user.email,
+          organization: payload.organization
+        }
+    ).then((response) => {
+      return response;
+    });
   }
 }
 

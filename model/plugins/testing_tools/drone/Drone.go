@@ -5,17 +5,21 @@ import (
 	"fmt"
 	"github.com/drone/drone-go/drone"
 	"github/SashaCollins/Wisehub-Connect/model/config"
+	"github/SashaCollins/Wisehub-Connect/model/plugins/testing_tools"
 	"golang.org/x/oauth2"
 )
 
-type DroneReader struct{}
+type Drone struct{}
 
 var (
+	PluginName   string
 	droneClient  drone.Client
-	currentBuild build
-	currentRepo  repo
+	currentBuild Build
+	currentRepo  Repo
 )
+
 func init() {
+	PluginName = "Drone"
 	// create an http client with oauth authentication
 	conf := config.GetConfig()
 	Host := conf.DroneCI.Host
@@ -27,51 +31,56 @@ func init() {
 			AccessToken: DroneToken,
 		},
 	)
-	// create the drone client with authenticator
+	// create the testing_tools client with authenticator
 	droneClient = drone.NewClient(Host, httpClient)
 	// Use client...
 }
-type step struct {
+
+func NewTestingTools() testing_tools.TestingTools {
+	return &Drone{}
+}
+
+type Step struct {
 	Name string
 	Status string
 }
 
-type stage struct {
+type Stage struct {
 	Name string
 	Kind string
 	Status string
-	Steps []step
+	Steps []Step
 }
 
-type build struct {
+type Build struct {
 	//Name string
 	//Owner string
 	Branch string
 	Status string
 	Time int64
-	Stages []stage
+	Stages []Stage
 }
 
-type repo struct {
+type Repo struct {
 	Name   string
 	Owner  string
 	Branch string
-	Build  build
+	Build  Build
 }
 
-func (dr *DroneReader) jsonBuildToStructBuild(target *build, source drone.Build) *build {
+func (d *Drone) jsonBuildToStructBuild(target *Build, source drone.Build) *Build {
 	target.Branch = source.Ref
 	target.Status = source.Status
 	target.Time = source.Started
 	if len(source.Stages) > 0 {
 		for _, sourceStage := range source.Stages {
-			var targetStage stage
+			var targetStage Stage
 			targetStage.Name = sourceStage.Name
 			targetStage.Kind = sourceStage.Kind
 			targetStage.Status = sourceStage.Status
 
 			for _, sourceStep := range sourceStage.Steps {
-				var targetStep step
+				var targetStep Step
 				targetStep.Name = sourceStep.Name
 				targetStep.Status = sourceStep.Status
 				targetStage.Steps = append(targetStage.Steps, targetStep)
@@ -81,7 +90,8 @@ func (dr *DroneReader) jsonBuildToStructBuild(target *build, source drone.Build)
 	}
 	return target
 }
-func (dr *DroneReader) FetchData(info int) (interface{}, error){
+
+func (d *Drone) fetchData(info int) (interface{}, error) {
 	switch info {
 	case 1:
 		// gets the current user
@@ -97,7 +107,7 @@ func (dr *DroneReader) FetchData(info int) (interface{}, error){
 		currentRepo.Name = repo.Name
 		currentRepo.Owner = repo.Namespace
 		currentRepo.Branch = repo.Branch
-		currentRepo.Build = *dr.jsonBuildToStructBuild(&currentRepo.Build, repo.Build)
+		currentRepo.Build = *d.jsonBuildToStructBuild(&currentRepo.Build, repo.Build)
 		return currentRepo, nil
 
 	case 3:
@@ -105,11 +115,19 @@ func (dr *DroneReader) FetchData(info int) (interface{}, error){
 		if err != nil {
 			return nil, fmt.Errorf("something went wrong with collecting the data")
 		}
-		currentBuild = *dr.jsonBuildToStructBuild(&currentBuild, *buildLast)
+		currentBuild = *d.jsonBuildToStructBuild(&currentBuild, *buildLast)
 		return currentBuild, nil
 	default:
 		return nil, fmt.Errorf("something went wrong with the info number %s", info)
 	}
 }
 
-var Drone DroneReader
+func (d *Drone) GetRepositories() (interface{}, error) {
+
+	return nil, nil
+}
+
+func (d *Drone) GetBuilds() (interface{}, error) {
+
+	return nil, nil
+}

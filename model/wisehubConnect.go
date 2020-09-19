@@ -30,11 +30,11 @@ func main() {
 	//go gl.StartServer(githubFinished)
 	//fmt.Println("\tgithub running...")
 	//droneFinished := make(chan bool)
-	//dl := drone.DroneListener{}
+	//dl := testing_tools.DroneListener{}
 	//go dl.StartServer(droneFinished)
 	//fmt.Println("\tdrone running...")
 	//herokuFinished := make(chan bool)
-	//hl := heroku.HerokuListener{}
+	//hl := deployment.HerokuListener{}
 	//go hl.StartServer(herokuFinished)
 	//fmt.Println("\theroku running...")
 	//

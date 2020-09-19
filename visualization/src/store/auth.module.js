@@ -2,8 +2,8 @@ import AuthService from '../services/auth.service';
 
 const loggedIn = sessionStorage.getItem('loggedIn');
 const initialState = loggedIn
-    ? { status: {loggedIn: loggedIn}}
-    : { status: {loggedIn: loggedIn}};
+    ? { status: {loggedIn: true}}
+    : { status: {loggedIn: false}};
 
 export const auth = {
     namespaced: true,

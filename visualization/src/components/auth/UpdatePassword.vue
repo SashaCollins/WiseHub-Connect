@@ -39,7 +39,7 @@
 
 <script>
   export default {
-    name: "ResetPassword",
+    name: "UpdatePassword",
     data () {
       return {
         password: '',
@@ -50,6 +50,9 @@
       }
     },
     computed: {
+      loggedIn() {
+        return this.$store.state.auth.status.loggedIn;
+      },
       getUser() {
         return this.$store.state.user.user;
       },
@@ -74,7 +77,7 @@
       }
     },
     mounted() {
-      if (!this.getUser) {
+      if (!this.loggedIn) {
         this.$router.push('/login');
       }
     }

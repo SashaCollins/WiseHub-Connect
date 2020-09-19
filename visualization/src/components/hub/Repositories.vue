@@ -100,7 +100,7 @@
 
 <script>
     export default {
-      name: "Repos",
+      name: "Repositories",
       data() {
         return {
           clicked: false,
@@ -135,7 +135,7 @@
           console.log(item)
         },
         fetchAllRepos: function() {
-          this.$store.dispatch('user/fetchRepos', this.getUser).then(
+          this.$store.dispatch('courses/fetchRepos', this.getUser).then(
               (onSuccess) => {
 
           }, (onError) => {
@@ -148,7 +148,7 @@
       },
       mounted() {
         console.log(this.getUser);
-        this.$store.dispatch('user/fetchRepos', this.getUser).then(
+        this.$store.dispatch('courses/fetchRepos', this.getUser).then(
             (onSuccess) => {
               if (onSuccess.data.success) {
                 // this.plugins = onSuccess.data.plugins;

@@ -23,15 +23,6 @@ export const user = {
 		return Promise.reject(onFailure);
 	  });
 	},
-	fetchRepos({ commit }, user) {
-	  return UserService.fetchRepos(user).then(onSuccess => {
-	    console.log(onSuccess)
-		return Promise.resolve(onSuccess);
-	  }, onFailure => {
-		console.log(onFailure)
-		return Promise.reject(onFailure);
-	  });
-	},
 	updatePlugins({ commit }, payload) {
 	  return UserService.updatePlugins(payload).then(onSuccess => {
 		return Promise.resolve(onSuccess);
@@ -64,6 +55,44 @@ export const user = {
 		localStorage.clear();
 		return Promise.resolve(onSuccess);
 	  }, onFailure => {
+		return Promise.reject(onFailure);
+	  });
+	},
+	fetchRepos({ commit }, user) {
+	  return UserService.fetchRepos(user).then(onSuccess => {
+		console.log(onSuccess)
+		return Promise.resolve(onSuccess);
+	  }, onFailure => {
+		console.log(onFailure)
+		return Promise.reject(onFailure);
+	  });
+	},
+	fetchCourses({ commit }, user) {
+	  return UserService.fetchCourses(user).then(onSuccess => {
+		console.log(onSuccess)
+		user.courses = [];
+		if (onSuccess.data.success) {
+		  for (const [key, value] of Object.entries(onSuccess.data.courses)) {
+			console.log(`${key}: ${value}`);
+			for (let i = 0; i < value.length; i++) {
+			  user.courses.push(value[i]);
+			}
+		  }
+		  commit('fetchSuccess', user);
+		}
+		return Promise.resolve(onSuccess);
+	  }, onFailure => {
+		console.log(onFailure)
+		commit('fetchFailure');
+		return Promise.reject(onFailure);
+	  });
+	},
+	fetchTeamRepos({ commit }, user) {
+	  return UserService.fetchTeamRepos(user).then(onSuccess => {
+		console.log(onSuccess)
+		return Promise.resolve(onSuccess);
+	  }, onFailure => {
+		console.log(onFailure)
 		return Promise.reject(onFailure);
 	  });
 	}

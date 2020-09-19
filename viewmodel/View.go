@@ -13,20 +13,21 @@ import (
 )
 
 type Response struct{
-	Success 		bool                    `json:"success"`
-	Email 			string               	`json:"email"`
-	Plugins 		[]data.Plugin           `json:"plugins"`
-	Organization    []byte					`json:"organization"`
+	Success 		bool                    	`json:"success"`
+	Email 			string               		`json:"email"`
+	Plugins 		[]data.Plugin           	`json:"plugins"`
+	RepoData		map[string]interface{}		`json:"repos"`
+	CourseData		map[string]interface{}		`json:"courses"`
 }
 
 type Request struct {
-	Option 			string					`json:"option"`
-	NewEmail 		string 					`json:"new_email"`
-	Email 			string 					`json:"email"`
-	Password 		string 					`json:"password"`
-	Plugins 		[]data.Plugin 			`json:"plugins"`
-	Repository 		string					`json:"repo"`
-	Course 			string			 		`json:"course"`
+	Option 			string						`json:"option"`
+	NewEmail 		string 						`json:"new_email"`
+	Email 			string 						`json:"email"`
+	Password 		string 						`json:"password"`
+	Plugins 		[]data.Plugin 				`json:"plugins"`
+	Repository 		string						`json:"repo"`
+	Course 			string			 			`json:"course"`
 }
 
 type View interface {
@@ -39,4 +40,5 @@ type View interface {
 
 	Repositories(w http.ResponseWriter, req *http.Request, ps httprouter.Params)
 	Courses(w http.ResponseWriter, req *http.Request, ps httprouter.Params)
+	Teams(w http.ResponseWriter, req *http.Request, ps httprouter.Params)
 }

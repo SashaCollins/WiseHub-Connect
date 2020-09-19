@@ -123,15 +123,9 @@
                 icon: 'fa fa-code fa-fw',
               },
               {
+                href: '/courses',
                 title: 'Courses',
                 icon: 'fa fa-chalkboard-teacher fa-fw',
-                child: [
-                  {
-                    href: '/courses/\'vss\'',
-                    title: '\'VSS\'',
-                    icon: 'fas fa-code-branch fa-fw',
-                  },
-                ]
               },
               {
                 title: 'Settings',
@@ -176,52 +170,43 @@
             selectedTheme: 'wisehub-theme',
             collapsed: false,
             isOnMobile: false,
-
           }
         },
         computed: {
           loggedIn() {
-            return this.$store.state.auth.status.loggedIn
+            return this.$store.state.auth.status.loggedIn;
           }
         },
         mounted () {
-            this.onResize()
-            window.addEventListener('resize', this.onResize)
+            this.onResize();
+            window.addEventListener('resize', this.onResize);
         },
         methods: {
             onToggleCollapse (collapsed) {
-                console.log(collapsed)
-                this.collapsed = collapsed
+                this.collapsed = collapsed;
             },
             onItemClick (event, item) {
-                console.log('onItemClick')
-                console.log(event)
-                console.log(item)
                 if (item.href === '/logout') {
                   this.$store.dispatch("auth/logout").then(
-                      (onSuccess) => {
-                        console.log(onSuccess)
-                        console.log(this.loggedIn)
+                      () => {
                         this.$router.push("/");
                       },
                       (onFailure) => {
-                        console.log(onFailure.response)
                         this.message = onFailure.response.data;
-                        console.log(this.message)
                         this.submitted = false;
                       })
                 }
                 if (item.href !== ''){
-                  this.$router.push(item.href)
+                  this.$router.push(item.href);
                 }
             },
             onResize () {
                 if (window.innerWidth <= 767) {
-                    this.isOnMobile = true
-                    this.collapsed = true
+                    this.isOnMobile = true;
+                    this.collapsed = true;
                 } else {
-                    this.isOnMobile = false
-                    this.collapsed = false
+                    this.isOnMobile = false;
+                    this.collapsed = false;
                 }
             },
         }
