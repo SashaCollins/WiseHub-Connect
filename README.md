@@ -18,3 +18,6 @@ Port | Listener
 8010 | GithubListener
 8011 | DroneListener
 8012 | HerokuListener
+
+# Create Plugins
+- go build -buildmode=plugin -o version_management/github/github.so version_management/github/Github.go 

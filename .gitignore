@@ -22,3 +22,4 @@ bin/
 certbot/
 nginx/
 node_modules/
+venv/
