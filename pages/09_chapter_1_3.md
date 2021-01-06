@@ -1,24 +1,20 @@
 ### Continuous Integration
 
-https://ieeexplore.ieee.org/abstract/document/6802994
-29.12.2020 03:23
 
-Continuous integration (CI) is the practice of automating the integration of code changes from multiple contributors into a single software project. It’s a primary DevOps best practice, allowing developers to frequently merge code changes into a central repository where builds and tests then run. Automated tools are used to assert the new code’s correctness before integration.
+Dem Grundsatz nach ist Continuous Integration (CI) eine Summe von Prinzipien die an den täglichen Arbeitsablauf eines Entwickerteams angepasst sind.
+Ein VCS bildet die Basis des CI Prozesses. Wenn ein Entwickler seinen Code in das Repository Hochlädt, prüft ein automatisches System den geänderten Code mittels vorab definierter Tests, dass das gesamte Programm weiterhin einwandfrei funktioniert. Diese Verifizierung soll Maschinenunabhängig durchgeführt werden, damit sowohl innerhalb der Entwicklung als auch bei der Auslieferung am Ende eine unabhängige und kontinuierliche Funktionalität garantiert ist.(vgl. Web4)
 
-A source code version control system is the crux of the CI process. The version control system is also supplemented with other checks like automated code quality tests, syntax style review tools, and more.  
+Üblicherweise wird CI in Verbindung mit einer Agilen Softwareentwicklung genutzt. Dieses Vorgehen unterstützt schon, sowohl die Einteilung in kleine Aufgaben als auch die Fertigstellung dieser innerhalb eines kurzen Zeitraums. (vgl. Web5)
 
-CI helps to scale up headcount and delivery output of engineering teams. Introducing CI to the aforementioned scenario allows software developers to work independently on features in parallel. When they are ready to merge these features into the end product, they can do so independently and rapidly. CI is a valuable and well-established practice in modern, high performance software engineering organizations.
+CI beinhaltet eine automatisierte Software-Release-Pipeline bestehend aus drei Schritten und umfasst den kompletten Entstehungsprozess, von der Idee bis Freigabe an den Kunden.(vgl. Web5)
 
-CI is generally used alongside an agile software development workflow. An organization will compile list of tasks that comprise a product roadmap. These tasks are then distributed amongst software engineering team members for delivery. Using CI enables these software development tasks to be developed independently and in parallel amongst the assigned developers. Once one of theses tasks is complete, a developer will introduce that new work to the CI system to be integrated with the rest of the project.
+(Foto2)
 
-CI vs Continuous Deployment vs Continuous Delivery (Foto)
-Continuous integration, deployment, and delivery are three phases of an automated software release pipeline, including a DevOps pipeline. These three phases take software from idea to delivery to the end-user. The integration phase is the first step in the process. Continuous integration covers the process of multiple developers attempting to merge their code changes with the master code repository of a project.
+Das Ziel von CI ist die Optimierung des Entwicklungsprozesses. Dadurch ist es  den Teammitgliedern möglich parallel und unabhängig voneinander zu arbeiten und ihre Änderungen nicht nur in das gleiche Repository, sondern auch in den gleichen Branch Hochladen zu können. Die Beteiligten sind dazu angehalten regelmäßig beziehungsweise täglich ihre Änderungen Hochzuladen um den Testlauf durch das Prüfsystem möglichst kurz zu halten. Hinzu kommt das im Falle eines Fehlers, die Korrektur bei kleinen Änderungen wesentlich schneller möglich ist, wie beispielsweise bei einer kompletten neuen Funktionalität.(vgl. Web4)  
 
-Continuous delivery is the next extension of continuous integration. The delivery phase is responsible for packaging an artifact together to be delivered to end-users. This phase runs automated building tools to generate this artifact. This build phase is kept ‘green,’ which means that the artifact should be ready to deploy to users at any given time.
+Der erste Schritt, die **Continuous Integration**, beinhaltet genau diesen Vorgang des Hochladens seitens mehrerer Entwickler und den Versuch ihren Code in das Gesamtprojekt zu integrieren.
 
-Continuous deployment is the final phase of the pipeline. The deployment phase is responsible for automatically launching and distributing the software artifact to end-users. At deployment time, the artifact has successfully passed the integration and delivery phases. Now it is time to automatically deploy or distribute the artifact. This will happen through scripts or tools that automatically move the artifact to public servers or to another mechanism of distribution, like an app store.
+Daraufhin folgt der zweite Schritt, die **Continuous Delivery**, welcher die Funktion des automatischen Systems beschreibt. Die Aufgabe dieses automatischen Systems übernimmt ein so genannter Continuous Integration Server, dessen einzige Aufgabe es ist, ein oder mehrere Repository auf Änderungen zu Überprüfen, gegebenenfalls den Code Auszuchecken und mittels vorab definierter Kommandos den Build-Prozess zu starten. Wie genau ein Build aussieht variiert abhängig von der Verwendeten Programmiersprache und des verwendeten Frameworks.
+Idealerweise besteht ein Build nicht nur aus dem compilieren des Codes, sondern enthält auch diverse Tests um das Programm als ganzes auf korrekte Funktionalität zu prüfen. Das Ziel sollte hierbei immer die höchstmögliche Testabdeckung sein, ohne dabei die dauer eines Builds länder als 10 Minuten werden zu lassen. (vgl. Web4)
 
-https://www.atlassian.com/continuous-delivery/continuous-integration
-29.12.2020 03:32
-
-https://www.redhat.com/de/topics/devops/what-is-ci-cd
+Die dritte und letzte Phase, **Continuous Deployment**, umfasst die automatische Verteilung des zuvor Bereitgestellten Programmes an den Kunden. Dazu kommt es nur, wenn die bisherigen Schritte fehlerfrei durchlaufen wurden. Wurde ein Build nicht fehlerfrei durchlaufen, wird der gesamte Prozess unterbrochen, solange bis der Fehler behoben wurde. Umgesetzt wird die Verteilung an den Endnutzer beispielsweise durch Skripte oder andere Software, die automatisch das Programm auf öffentliche Server, App Stores oder andere Systeme verteilt.(vgl. Web5)

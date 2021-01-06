@@ -4,3 +4,6 @@
 29.12.2020 01:53]
 
 (Web3) [https://www.it-talents.de/blog/it-talents/was-ist-eine-versionsverwaltung 29.12.2020 02:04]
+
+(Foto2) [https://www.redhat.com/de/topics/devops/what-is-ci-cd
+05.01.2021 15:18]
