@@ -2,7 +2,7 @@ package plugins
 
 import (
 	"fmt"
-	"github/SashaCollins/Wisehub-Connect/model/plugins/testing_tools"
+	"github/SashaCollins/Wisehub-Connect/model/plugins/continuous_integration"
 	"github/SashaCollins/Wisehub-Connect/model/plugins/version_management"
 	"log"
 	"os"
@@ -14,7 +14,7 @@ var (
 	testingToolPluginPaths []string
 	versionManagementPluginPaths []string
 	versionManagement map[string]version_management.VersionManagement
-	testingTools map[string]testing_tools.TestingTools
+	continuousIntegration map[string]continuous_integration.ContinuousIntegration
 )
 
 type PluginReader struct {}
@@ -23,7 +23,7 @@ func init() {
 	testingToolPluginPaths = getAllTestingToolPlugins()
 	versionManagementPluginPaths = getAllVersionManagementFiles()
 	versionManagement = make(map[string]version_management.VersionManagement)
-	testingTools = make(map[string]testing_tools.TestingTools)
+	continuousIntegration = make(map[string]continuous_integration.ContinuousIntegration)
 }
 
 func derefString(s *string) string {
@@ -34,7 +34,7 @@ func derefString(s *string) string {
 }
 
 func getAllTestingToolPlugins() (list []string) {
-	if err := filepath.Walk("./plugins/testing_tools", func(path string, info os.FileInfo, err error) error {
+	if err := filepath.Walk("./plugins/continuous_integration", func(path string, info os.FileInfo, err error) error {
 		if info.IsDir() {
 			return nil
 		}
@@ -110,21 +110,23 @@ func (pr *PluginReader) LoadAllVersionManagementPlugins() error {
 	return nil
 }
 
-func (pr *PluginReader) GetOrgaInfo() (info map[string]interface{}) {
-	fmt.Println("Start GetOrgaInfo in PLuginReader")
+func (pr *PluginReader) GetOrgaInfo(credentials map[string]interface{}) (info map[string]interface{}) {
+	fmt.Println("Start GetOrgaInfo in PluginReader")
 	info = make(map[string]interface{})
 	for k, v := range versionManagement {
-		orgaInfo, err := v.GetOrgaInfo()
-		if err != nil {
-			log.Println(err)
-			continue
+		if credential, found := credentials[k]; found {
+			orgaInfo, err := v.GetOrgaInfo(credential)
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+			fmt.Println(orgaInfo)
+			info[k] = orgaInfo
+			return info
 		}
-		fmt.Println(orgaInfo)
-		info[k] = orgaInfo
 	}
-	//fmt.Println(info)
 	fmt.Println("End GetOrgaInfo in PLuginReader")
-	return
+	return nil
 }
 
 func (pr *PluginReader) GetTeamInfo() (info map[string]interface{}) {

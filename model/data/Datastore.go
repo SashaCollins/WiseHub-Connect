@@ -13,12 +13,6 @@ import (
     "log"
 )
 
-var defaultPlugins = []Plugin{
-    {PluginName: "Github", UsernameHost: "", Token: "", Description: "", Updated: false},
-    {PluginName: "Drone CI", UsernameHost: "", Token: "", Description: "", Updated: false},
-    {PluginName: "Heroku", UsernameHost: "", Token: "", Description: "", Updated: false},
-}
-
 type Datastore struct{}
 
 func init() {
@@ -36,22 +30,31 @@ func openDB() (db *gorm.DB, err error) {
 
 func createTables(db *gorm.DB) {
     if check := db.Migrator().HasTable(&User{}); !check {
-        if err := db.Migrator().CreateTable(&User{}); err != nil {
+        //if err := db.Migrator().CreateTable(&User{}); err != nil {
+        //    log.Printf("createTables: 1. %q\n", err)
+        //    return
+        //}
+        if err := db.AutoMigrate(&User{}); err != nil {
             log.Printf("createTables: 1. %q\n", err)
             return
         }
     }
     if check := db.Migrator().HasTable(&Plugin{}); !check {
-        if err := db.Migrator().CreateTable(&Plugin{}); err != nil {
-            log.Printf("createTables: 1. %q\n", err)
-            return
+        //if err := db.Migrator().CreateTable(&Plugin{}); err != nil {
+        //    log.Printf("createTables: 1. %q\n", err)
+        //    return
+        //}
+        if err := db.AutoMigrate(&Plugin{}); err != nil {
+           log.Printf("createTables: 1. %q\n", err)
+           return
         }
     }
 }
 
 func loadAllPluginsByUserID(db *gorm.DB, userID uint) (plugins []Plugin, err error) {
     fmt.Println(userID)
-    if result :=  db.Model(&Plugin{}).Where("user_id = ?", userID).Find(&plugins); result.Error != nil {
+    //Model(&Plugin{})
+    if result :=  db.Where("user_id = ?", userID).Find(&plugins); result.Error != nil {
         log.Printf("loadAllUsers: %q\n", result.Error)
         return plugins, result.Error
     }
@@ -69,6 +72,7 @@ func loadAllUsers(db *gorm.DB) (users []User, err error) {
         if err != nil {
             log.Printf("loadAllUsers: %q\n", err)
             user.Plugins = nil
+            return users, err
         }
     }
     return users, nil
@@ -90,18 +94,29 @@ func loadUserByEmail(db *gorm.DB, email string) (user []User, err error) {
 
 func updatePlugins(db *gorm.DB, userEmail string, updatedPlugins []Plugin) error {
     var user User
-    if result := db.Select("id").Where("email = ?", userEmail).First(&user); result.Error != nil {
+
+    fmt.Println(userEmail)
+    fmt.Println(updatedPlugins)
+
+    if result := db.Where("email = ?", userEmail).First(&user); result.Error != nil {
         log.Printf("updatePlugins: 1. %q\n", result.Error)
         return result.Error
     }
+    fmt.Println("nach result")
+    fmt.Println(user.ID)
+
     dbPlugins, err := loadAllPluginsByUserID(db, user.ID)
     if err != nil {
         log.Printf("updatePlugins: 1. %q\n", err)
         return err
     }
+    fmt.Println("nach loadAllPlugins")
+    fmt.Println(dbPlugins)
+
     for iDBP := range dbPlugins {
         for iUP := range updatedPlugins {
             if dbPlugins[iDBP].PluginName == updatedPlugins[iUP].PluginName {
+                fmt.Println("pluginname is equal")
                 db.Model(&Plugin{}).Where("user_id = ? AND plugin_name = ?", user.ID, updatedPlugins[iUP].PluginName).Updates(Plugin{
                     UsernameHost: updatedPlugins[iUP].UsernameHost,
                     Token: updatedPlugins[iUP].Token,
@@ -144,6 +159,11 @@ func (ds *Datastore) Save(password string, email string) error {
         log.Printf("Save %q: %v\n", err, db)
         return err
     }
+    defaultPlugins := []Plugin{
+        {PluginName: "Github", UsernameHost: "", Token: "", Description: "", Updated: false},
+        {PluginName: "Drone CI", UsernameHost: "", Token: "", Description: "", Updated: false},
+        {PluginName: "Heroku", UsernameHost: "", Token: "", Description: "", Updated: false},
+    }
     user := User{Email: email, Password: password, Role: "", Plugins: defaultPlugins}
     if result := db.Create(&user); result.Error != nil {
         log.Printf("Save %q: %v\n", err, db)
@@ -160,7 +180,7 @@ func (ds *Datastore) Update(option string, data map[string]interface{}) error {
     }
     switch option {
     case "email":
-        db.Model(User{}).Where("email = ?", data["old"]).Updates(User{Email: data["new"].(string)})
+       db.Model(User{}).Where("email = ?", data["old"]).Updates(User{Email: data["new"].(string)})
     case "password":
         db.Model(User{}).Where("email = ?",  data["email"]).Updates(User{Password: data["password"].(string)})
     case "plugins":

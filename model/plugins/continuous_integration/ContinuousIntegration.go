@@ -1,6 +1,6 @@
-package testing_tools
+package continuous_integration
 
-type TestingTools interface{
+type ContinuousIntegration interface{
 	GetRepositories() (interface{}, error)
 	GetBuilds() (interface{}, error)
 }

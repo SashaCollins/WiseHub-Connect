@@ -12,7 +12,7 @@ type PluginReaderI interface {
 	LoadAllVersionManagementPlugins() error
 
 	// Version Management
-	GetOrgaInfo() (info map[string]interface{})
+	GetOrgaInfo(interface{}) (info map[string]interface{})
 	GetTeamInfo() (info map[string]interface{})
 	GetInsightTeamInfo() (info map[string]interface{})
 	GetTeamRepoInfo() (info map[string]interface{})

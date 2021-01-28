@@ -22,6 +22,7 @@ class UserService {
   }
 
   updatePlugins(payload) {
+    window.console.error(payload);
     return axios.post(API_URL + 'update/plugins', {
       option: 'plugins',
       email: payload.email,

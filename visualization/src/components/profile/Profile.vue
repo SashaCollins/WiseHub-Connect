@@ -12,28 +12,6 @@
               <div class="card">
                 <h3 class="text-lg-center">Account</h3>
                 <form>
-<!--                  <div class="row form-group">-->
-<!--                    <label-->
-<!--                        for="staticName"-->
-<!--                        class="col-sm-2 col-form-label-lg">-->
-<!--                      Name:-->
-<!--                    </label>-->
-<!--                    <div class="col-sm">-->
-<!--                      <input-->
-<!--                          type="text"-->
-<!--                          readonly-->
-<!--                          class="form-control-plaintext form-control-lg"-->
-<!--                          id="staticName"-->
-<!--                          value="Heinrich Pumpernickl">-->
-<!--                    </div>-->
-<!--                    <div class="col-sm-1">-->
-<!--                      <button-->
-<!--                          type="button"-->
-<!--                          class="btn btn-outline-primary btn-sm">-->
-<!--                        Edit-->
-<!--                      </button>-->
-<!--                    </div>-->
-<!--                  </div>-->
                   <div class="form-group row" @submit.prevent="updateEmail">
                     <label
                         for="staticEmail"
@@ -216,6 +194,21 @@
         }
       },
       methods: {
+        updateEmail: function() {
+          this.$store.dispatch('user/updateEmail', {
+            oldEmail: this.getUser.email,
+            newEmail: this.newEmail
+          }).then(
+              (onSuccess) => {
+                console.log("onSuccess in Update");
+                console.log(onSuccess);
+              },
+              (onError) => {
+                console.log("onError in Update");
+                console.log(onError);
+              }
+          );
+        },
         updatePlugin: function(plugin) {
           plugin.Updated = true;
           this.updatedPlugins.push(plugin);
@@ -238,21 +231,6 @@
           this.updatedPlugins = [];
           this.disabled = false;
         },
-        updateEmail: function() {
-          this.$store.dispatch('user/updateEmail', {
-            oldEmail: this.getUser.email,
-            newEmail: this.newEmail
-          }).then(
-              (onSuccess) => {
-                console.log("onSuccess in Update");
-                console.log(onSuccess);
-              },
-              (onError) => {
-                console.log("onError in Update");
-                console.log(onError);
-              }
-          );
-        }
       },
       mounted() {
         console.log(this.getUser);

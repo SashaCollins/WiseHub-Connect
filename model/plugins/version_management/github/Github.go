@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/shurcooL/githubv4"
-	"github/SashaCollins/Wisehub-Connect/model/config"
 	"github/SashaCollins/Wisehub-Connect/model/plugins/version_management"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
@@ -63,17 +62,22 @@ var (
 	//}
 )
 
+type Credentials struct {
+	Token string
+	UserName string
+}
+
 func init() {
 	PluginName = "Github"
-	//create an http client with oauth authentication
-	conf := config.GetConfig()
-	GithubToken = conf.GitHub.APIToken
+}
+
+func CreateViewer(credentials interface{}) {
+	GithubToken = credentials.(Credentials).Token
 	src := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: GithubToken},
 	)
 	httpClient := oauth2.NewClient(context.Background(), src)
 	GithubClient = githubv4.NewClient(httpClient)
-	// Use client...
 }
 
 type Commit struct {
@@ -431,7 +435,7 @@ func (g *Github) getRepositoryInfo(repositoryName githubv4.String, ownerLogin gi
 	return &allIssuesAssigned, &allRefs, nil //, &commitCountPerUser, &codeCoverage
 }
 
-func (g *Github) GetOrgaInfo() (interface{}, error) {
+func (g *Github) GetOrgaInfo(credentials interface{}) (interface{}, error) {
 	fmt.Println("Start GetOrga in Github")
 	viewer, err := g.getViewer()
 	if err != nil {

@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import App from './App.vue';
 import VueResource from 'vue-resource';
-import VeeValidate from 'vee-validate';
+import * as VeeValidate from 'vee-validate';
 
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';

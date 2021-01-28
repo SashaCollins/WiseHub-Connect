@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/bgentry/heroku-go"
 	"github/SashaCollins/Wisehub-Connect/model/config"
-	"github/SashaCollins/Wisehub-Connect/model/plugins/testing_tools"
+	"github/SashaCollins/Wisehub-Connect/model/plugins/continuous_integration"
 )
 
 var (
@@ -22,7 +22,7 @@ func init(){
 	herokuClient = heroku.Client{Username: email, Password: apiToken}
 }
 
-func NewTestingTools() testing_tools.TestingTools {
+func NewTestingTools() continuous_integration.ContinuousIntegration {
 	return &Heroku{}
 }
 

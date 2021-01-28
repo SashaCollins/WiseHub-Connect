@@ -15,11 +15,11 @@
 <!--					name="name"-->
 <!--					v-validate="'required|min:3|max:512'"-->
 <!--					v-model="user.name">-->
-			<span
-					v-show="submitted && errors.has('email')"
-					class="alert-danger">
-				{{errors.first('email')}}
-			</span>
+<!--			<span-->
+<!--					v-show="submitted && errors.has('email')"-->
+<!--					class="alert-danger">-->
+<!--				{{errors.first('email')}}-->
+<!--			</span>-->
 			<input
 					type="email"
 			        placeholder="Email"

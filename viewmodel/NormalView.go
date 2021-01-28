@@ -272,6 +272,7 @@ func (nv *NormalView) Show(w http.ResponseWriter, req *http.Request, ps httprout
 		return
 	}
 
+
 	response.Success = true
 	response.Email = dbUser[0].Email
 	response.Plugins = dbUser[0].Plugins
@@ -319,10 +320,23 @@ func (nv *NormalView) Courses(w http.ResponseWriter, req *http.Request, ps httpr
 		http.Error(w, "Internal server error!", 500)
 		return
 	}
+	credentials := make(map[string]interface{})
+	courses := make(map[string]interface{})
+	if len(dbUser) == 0 {
+		for _, user := range dbUser[0].Plugins {
+			credentials[user.PluginName] = user.Token
+		}
+	} else {
+		for _, user := range dbUser {
+			for _, plugin := range user.Plugins {
+				credentials[plugin.PluginName] = plugin.Token
+			}
+		}
+	}
+	courses = nv.PluginReader.GetOrgaInfo(credentials)
 
-	response.CourseData = nv.PluginReader.GetOrgaInfo()
+	response.CourseData = courses
 	fmt.Println("End Courses in NormalView")
-
 	response.Success = true
 	resp, err := json.Marshal(response)
 	if err != nil {

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/drone/drone-go/drone"
 	"github/SashaCollins/Wisehub-Connect/model/config"
-	"github/SashaCollins/Wisehub-Connect/model/plugins/testing_tools"
+	"github/SashaCollins/Wisehub-Connect/model/plugins/continuous_integration"
 	"golang.org/x/oauth2"
 )
 
@@ -36,7 +36,7 @@ func init() {
 	// Use client...
 }
 
-func NewTestingTools() testing_tools.TestingTools {
+func NewTestingTools() continuous_integration.ContinuousIntegration {
 	return &Drone{}
 }
 
