@@ -59,6 +59,7 @@
         name: "App",
         data() {
             let loggedIn = this.loggedIn;
+            let isAdmin = this.isAdmin;
             return {
             menuLoggedOut: [
                 {
@@ -141,6 +142,12 @@
                     title: 'Contact',
                     icon: 'fas fa-bullhorn fa-fw',
                   },
+                  {
+                    href: '/settings/admin',
+                    title: 'Admin',
+                    icon: 'fas fa-bullhorn fa-fw',
+                    hidden: isAdmin
+                  },
                 ]
               },
               {
@@ -175,7 +182,10 @@
         computed: {
           loggedIn() {
             return this.$store.state.auth.status.loggedIn;
-          }
+          },
+          isAdmin() {
+            return this.$store.state.auth.status.loggedIn;
+          },
         },
         mounted () {
             this.onResize();

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/bgentry/heroku-go"
 	"github/SashaCollins/Wisehub-Connect/model/config"
-	"github/SashaCollins/Wisehub-Connect/model/plugins/continuous_integration"
+	"github/SashaCollins/Wisehub-Connect/model/plugins"
 )
 
 var (
@@ -22,7 +22,7 @@ func init(){
 	herokuClient = heroku.Client{Username: email, Password: apiToken}
 }
 
-func NewTestingTools() continuous_integration.ContinuousIntegration {
+func NewPlugin() plugins.PluginI {
 	return &Heroku{}
 }
 
@@ -84,7 +84,25 @@ func (h *Heroku) fetchData(info int) (interface{}, error){
 		return nil, fmt.Errorf("something went wrong with the info number %s", info)
 	}
 }
+func (h *Heroku) NewPlugin() plugins.PluginI {
+	panic("implement me")
+}
 
+func (h *Heroku) GetOrgaInfo(that interface{}) (interface{}, error) {
+	panic("implement me")
+}
+
+func (h *Heroku) GetTeamInfo(string) (interface{}, error) {
+	panic("implement me")
+}
+
+func (h *Heroku) GetInsightTeamInfo(string, string) (interface{}, error) {
+	panic("implement me")
+}
+
+func (h *Heroku) GetTeamRepoInfo(string, string) (interface{}, interface{}, error) {
+	panic("implement me")
+}
 func (h *Heroku) GetRepositories() (interface{}, error) {
 
 	return nil, nil

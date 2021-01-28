@@ -2,8 +2,7 @@ package plugins
 
 import (
 	"fmt"
-	"github/SashaCollins/Wisehub-Connect/model/plugins/continuous_integration"
-	"github/SashaCollins/Wisehub-Connect/model/plugins/version_management"
+	"github/SashaCollins/Wisehub-Connect/model/plugins"
 	"log"
 	"os"
 	"path/filepath"
@@ -11,19 +10,15 @@ import (
 )
 
 var (
-	testingToolPluginPaths []string
-	versionManagementPluginPaths []string
-	versionManagement map[string]version_management.VersionManagement
-	continuousIntegration map[string]continuous_integration.ContinuousIntegration
+	pluginPaths []string
+	pluginMap map[string]plugins.PluginI
 )
 
 type PluginReader struct {}
 
 func init() {
-	testingToolPluginPaths = getAllTestingToolPlugins()
-	versionManagementPluginPaths = getAllVersionManagementFiles()
-	versionManagement = make(map[string]version_management.VersionManagement)
-	continuousIntegration = make(map[string]continuous_integration.ContinuousIntegration)
+	pluginPaths = getAllPlugins()
+	pluginMap = make(map[string]plugins.PluginI)
 }
 
 func derefString(s *string) string {
@@ -33,8 +28,8 @@ func derefString(s *string) string {
 	return ""
 }
 
-func getAllTestingToolPlugins() (list []string) {
-	if err := filepath.Walk("./plugins/continuous_integration", func(path string, info os.FileInfo, err error) error {
+func getAllPlugins() (list []string) {
+	if err := filepath.Walk("./plugins", func(path string, info os.FileInfo, err error) error {
 		if info.IsDir() {
 			return nil
 		}
@@ -48,23 +43,8 @@ func getAllTestingToolPlugins() (list []string) {
 	return list
 }
 
-func getAllVersionManagementFiles() (list []string) {
-	if err := filepath.Walk("./plugins/version_management", func(path string, info os.FileInfo, err error) error {
-		if info.IsDir() {
-			return nil
-		}
-		if filepath.Ext(path) == ".so" {
-			list = append(list, path)
-		}
-		return nil
-	}); err != nil {
-		fmt.Printf("walk error [%v]\n", err)
-	}
-	return list
-}
-
-func (pr *PluginReader) LoadAllTestingToolPlugins() error {
-	for _, p := range testingToolPluginPaths {
+func (pr *PluginReader) LoadAllPlugins() error {
+	for _, p := range pluginPaths {
 		p, err := plugin.Open(p)
 		fmt.Println(p)
 		if err != nil {
@@ -76,36 +56,8 @@ func (pr *PluginReader) LoadAllTestingToolPlugins() error {
 			log.Fatal(err)
 			return err
 		}
-		pInterface, err := p.Lookup("NewTestingTools")
-		if err != nil {
-			log.Fatal(err)
-			return err
-		}
-		newVersionManagement, _ := pInterface.(func() version_management.VersionManagement) // assert the type of the func
-		versionManagement[derefString(pName.(*string))] = newVersionManagement()
-	}
-	return nil
-}
-
-func (pr *PluginReader) LoadAllVersionManagementPlugins() error {
-	for _, p := range versionManagementPluginPaths {
-		p, err := plugin.Open(p)
-		if err != nil {
-			log.Fatal(err)
-			return err
-		}
-		pName, err := p.Lookup("PluginName")
-		if err != nil {
-			log.Fatal(err)
-			return err
-		}
-		pInterface, err := p.Lookup("NewVersionManagement")
-		if err != nil {
-			log.Fatal(err)
-			return err
-		}
-		newVersionManagement, _ := pInterface.(func() version_management.VersionManagement) // assert the type of the func
-		versionManagement[derefString(pName.(*string))] = newVersionManagement()
+		newVersionManagement, _ := pInterface.(func() plugins.PluginReaderI) // assert the type of the func
+		pluginMap[derefString(pName.(*string))] = newVersionManagement()
 	}
 	return nil
 }
@@ -113,7 +65,7 @@ func (pr *PluginReader) LoadAllVersionManagementPlugins() error {
 func (pr *PluginReader) GetOrgaInfo(credentials map[string]interface{}) (info map[string]interface{}) {
 	fmt.Println("Start GetOrgaInfo in PluginReader")
 	info = make(map[string]interface{})
-	for k, v := range versionManagement {
+	for k, v := range pluginMap {
 		if credential, found := credentials[k]; found {
 			orgaInfo, err := v.GetOrgaInfo(credential)
 			if err != nil {

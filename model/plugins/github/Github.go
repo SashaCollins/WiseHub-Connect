@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/shurcooL/githubv4"
-	"github/SashaCollins/Wisehub-Connect/model/plugins/version_management"
+	"github/SashaCollins/Wisehub-Connect/model/plugins"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"os"
@@ -17,14 +17,28 @@ import (
 
 type Github struct {}
 
-func NewVersionManagement() version_management.VersionManagement {
+func (g *Github) NewPlugin() plugins.PluginI {
+	panic("implement me")
+}
+
+func (g *Github) GetRepositories() (interface{}, error) {
+	panic("implement me")
+}
+
+func (g *Github) GetBuilds() (interface{}, error) {
+	panic("implement me")
+}
+
+var github Github
+
+func NewPlugin() plugins.PluginI {
 	return &Github{}
 }
 
 var (
-	PluginName string
-	GithubToken string
-	GithubClient *githubv4.Client
+	PluginName    string
+	GithubToken   string
+	GithubClient  *githubv4.Client
 	CurrentViewer Viewer
 
 	//UserVariables = map[string]interface{}{

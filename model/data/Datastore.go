@@ -164,7 +164,7 @@ func (ds *Datastore) Save(password string, email string) error {
         {PluginName: "Drone CI", UsernameHost: "", Token: "", Description: "", Updated: false},
         {PluginName: "Heroku", UsernameHost: "", Token: "", Description: "", Updated: false},
     }
-    user := User{Email: email, Password: password, Role: "", Plugins: defaultPlugins}
+    user := User{Email: email, Password: password, Role: "normal", Plugins: defaultPlugins}
     if result := db.Create(&user); result.Error != nil {
         log.Printf("Save %q: %v\n", err, db)
         return err

@@ -79,7 +79,7 @@
       name: "LogIn",
       data () {
         return {
-          user: new User( "","", ""),
+          user: new User("", ""),
           submitted: false,
           message: "",
         }

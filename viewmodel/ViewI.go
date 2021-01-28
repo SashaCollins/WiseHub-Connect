@@ -15,6 +15,7 @@ import (
 type Response struct{
 	Success 		bool                    	`json:"success"`
 	Email 			string               		`json:"email"`
+	Admin			bool 						`json:"admin"`
 	Plugins 		[]data.Plugin           	`json:"plugins"`
 	RepoData		map[string]interface{}		`json:"repos"`
 	CourseData		map[string]interface{}		`json:"courses"`
@@ -30,7 +31,7 @@ type Request struct {
 	Course 			string			 			`json:"course"`
 }
 
-type View interface {
+type ViewI interface {
 	SignUp(w http.ResponseWriter, req *http.Request, ps httprouter.Params)
 	SignIn(w http.ResponseWriter, req *http.Request, ps httprouter.Params)
 

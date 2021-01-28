@@ -6,7 +6,7 @@ import (
 )
 
 type Router struct {
-	View View
+	View ViewI
 }
 
 func (r *Router) New() (router *httprouter.Router) {

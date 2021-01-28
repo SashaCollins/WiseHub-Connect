@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/drone/drone-go/drone"
 	"github/SashaCollins/Wisehub-Connect/model/config"
-	"github/SashaCollins/Wisehub-Connect/model/plugins/continuous_integration"
+	"github/SashaCollins/Wisehub-Connect/model/plugins"
 	"golang.org/x/oauth2"
 )
 
@@ -36,7 +36,7 @@ func init() {
 	// Use client...
 }
 
-func NewTestingTools() continuous_integration.ContinuousIntegration {
+func NewPlugin() plugins.PluginI {
 	return &Drone{}
 }
 
@@ -121,7 +121,25 @@ func (d *Drone) fetchData(info int) (interface{}, error) {
 		return nil, fmt.Errorf("something went wrong with the info number %s", info)
 	}
 }
+func (d *Drone) NewPlugin() plugins.PluginI {
+	panic("implement me")
+}
 
+func (d *Drone) GetOrgaInfo(that interface{}) (interface{}, error) {
+	panic("implement me")
+}
+
+func (d *Drone) GetTeamInfo(string) (interface{}, error) {
+	panic("implement me")
+}
+
+func (d *Drone) GetInsightTeamInfo(string, string) (interface{}, error) {
+	panic("implement me")
+}
+
+func (d *Drone) GetTeamRepoInfo(string, string) (interface{}, interface{}, error) {
+	panic("implement me")
+}
 func (d *Drone) GetRepositories() (interface{}, error) {
 
 	return nil, nil
