@@ -7,13 +7,79 @@ import (
 	"github/SashaCollins/Wisehub-Connect/model/data"
 	"github/SashaCollins/Wisehub-Connect/model/plugins"
 	"io/ioutil"
+	"log"
 	"net/http"
+	"os"
+	"path/filepath"
+	"plugin"
+)
+var (
+	pluginPaths []string
+	pluginMap map[string]plugins.PluginI
 )
 
 type AdminView struct {
 	Datastore data.DatastoreI
 	PluginReader  plugins.PluginReader
+	PluginI plugins.PluginI
 }
+
+
+
+func init() {
+	pluginPaths = getAllPlugins()
+	pluginMap = make(map[string]plugins.PluginI)
+
+}
+
+func derefString(s *string) string {
+	if s != nil {
+		return *s
+	}
+	return ""
+}
+
+func getAllPlugins() (list []string) {
+	if err := filepath.Walk("./plugins", func(path string, info os.FileInfo, err error) error {
+		if info.IsDir() {
+			return nil
+		}
+		if filepath.Ext(path) == ".so" {
+			list = append(list, path)
+		}
+		return nil
+	}); err != nil {
+		fmt.Printf("walk error [%v]\n", err)
+	}
+	return list
+}
+
+func (av *AdminView) LoadAllPlugins() error {
+	for _, p := range pluginPaths {
+		p, err := plugin.Open(p)
+		fmt.Println(p)
+		if err != nil {
+			log.Fatal(err)
+			return err
+		}
+		pName, err := p.Lookup("PluginName")
+		if err != nil {
+			log.Fatal(err)
+			return err
+		}
+		pInterface, err := p.Lookup("NewPlugin")
+		if err != nil {
+			log.Fatal(err)
+			return err
+		}
+		newPlugin, _ := pInterface.(func() plugins.PluginI) // assert the type of the func
+		pluginMap[derefString(pName.(*string))] = newPlugin()
+	}
+	return nil
+}
+
+
+
 func (av *AdminView) SignIn(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 	var user Request
 	var response Response

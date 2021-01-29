@@ -12,7 +12,8 @@ import (
 
 type NormalView struct {
 	Datastore data.DatastoreI
-	PluginReader  plugins.PluginReader
+	//PluginReader  plugins.PluginReader
+	Plugin plugins.PluginI
 }
 
 func (nv *NormalView) SignUp(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
