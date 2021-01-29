@@ -7,7 +7,7 @@ do not edit or delete.
 package plugins
 
 type PluginI interface {
-	SubmitCredentials(username string, token string)
+	SubmitCredentials(username, token string)
 
 	// Version Management
 	GetOrgaInfo(interface{}) (interface{}, error)
