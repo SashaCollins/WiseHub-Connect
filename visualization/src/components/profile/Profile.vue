@@ -63,7 +63,7 @@
           </div>
           <div class="row">
             <div v-if="!error" v-for="(item, index) in plugins" :key="index" class="col-lg-4 col-md-6 col-sm-12">
-              <div class="card" @submit.prevent="updatePlugin(item)">
+              <div class="card" @submit.prevent="updateCredentials(item)">
                 <h3 class="text-center">{{ item.PluginName }}</h3>
                 <div class="card-body">
                   <label
@@ -97,7 +97,7 @@
                   </div>
                 </div>
                 <div class="btn-group" role="group">
-                  <button @click="updatePlugin(item)" type="submit" class="btn btn-danger" :disabled="!disabled">Submit</button>
+                  <button @click="updateCredentials(item)" type="submit" class="btn btn-danger" :disabled="!disabled">Submit</button>
                   <button @click="disabled = !disabled" type="button" class="btn btn-primary">Edit</button>
                 </div>
               </div>
@@ -209,12 +209,12 @@
               }
           );
         },
-        updatePlugin: function(plugin) {
+        updateCredentials: function(plugin) {
           plugin.Updated = true;
-          this.updatedPlugins.push(plugin);
+          this.updatedCredentials.push(plugin);
           this.$store.dispatch('user/updatePlugins', {
             email: this.getUser.email,
-            plugins: this.updatedPlugins
+            plugins: this.updatedCredentials
           }).then(
               (onSuccess) => {
                 console.log("onSuccess in Update")
@@ -228,7 +228,7 @@
                 }];
               }
           );
-          this.updatedPlugins = [];
+          this.updatedCredentials = [];
           this.disabled = false;
         },
       },
