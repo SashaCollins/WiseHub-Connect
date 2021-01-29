@@ -13,7 +13,7 @@ var (
 	pluginMap map[string]PluginI
 )
 
-type PluginReader struct {}
+type PluginLoader struct {}
 
 func init() {
 	pluginPaths = getAllPlugins()
@@ -42,7 +42,7 @@ func getAllPlugins() (list []string) {
 	return list
 }
 
-func (pr *PluginReader) LoadAllPlugins() error {
+func (pr *PluginLoader) LoadAllPlugins() error {
 	for _, p := range pluginPaths {
 		p, err := plugin.Open(p)
 		fmt.Println(p)
@@ -66,10 +66,10 @@ func (pr *PluginReader) LoadAllPlugins() error {
 	return nil
 }
 
-func (pr *PluginReader) GetOrgaInfo(pluginName string, credentials map[string]string) (info map[string]interface{}) {
-	fmt.Println("Start GetOrgaInfo in PluginReader")
+func (pr *PluginLoader) GetOrgaInfo(pluginName string, credentials map[string]string) (info map[string]interface{}) {
+	fmt.Println("Start GetOrgaInfo in PluginLoader")
 	info = make(map[string]interface{})
-	credentials[]
+	//credentials[]
 	//for k, v := range pluginMap {
 	//	if credential, found := credentials[k]; found {
 	//		orgaInfo, err := v.GetOrgaInfo(credential)
@@ -86,14 +86,14 @@ func (pr *PluginReader) GetOrgaInfo(pluginName string, credentials map[string]st
 	return nil
 }
 
-func (pr *PluginReader) GetTeamInfo() (info map[string]interface{}) {
+func (pr *PluginLoader) GetTeamInfo() (info map[string]interface{}) {
 	return nil
 }
 
-func (pr *PluginReader) GetInsightTeamInfo() (info map[string]interface{}) {
+func (pr *PluginLoader) GetInsightTeamInfo() (info map[string]interface{}) {
 	return nil
 }
 
-func (pr *PluginReader) GetTeamRepoInfo() (info map[string]interface{}) {
+func (pr *PluginLoader) GetTeamRepoInfo() (info map[string]interface{}) {
 	return nil
 }

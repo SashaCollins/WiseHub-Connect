@@ -168,7 +168,7 @@
         return {
           disabled: false,
           newEmail: '',
-          updatedPlugins: [],
+          updatedCredentials: [],
           //dummy only exists if connection fails
           plugins: [{
             'PluginName': 'Dummy',
@@ -212,7 +212,7 @@
         updateCredentials: function(plugin) {
           plugin.Updated = true;
           this.updatedCredentials.push(plugin);
-          this.$store.dispatch('user/updatePlugins', {
+          this.$store.dispatch('user/updateCredentials', {
             email: this.getUser.email,
             plugins: this.updatedCredentials
           }).then(

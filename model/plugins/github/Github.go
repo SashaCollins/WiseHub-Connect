@@ -29,8 +29,6 @@ func (g *Github) GetBuilds() (interface{}, error) {
 	panic("implement me")
 }
 
-var github Github
-
 func NewPlugin() plugins.PluginI {
 	return &Github{}
 }

@@ -23,6 +23,7 @@ export const user = {
 		return Promise.reject(onFailure);
 	  });
 	},
+
 	updateCredentials({ commit }, payload) {
 	  return UserService.updateCredentials(payload).then(onSuccess => {
 		return Promise.resolve(onSuccess);
