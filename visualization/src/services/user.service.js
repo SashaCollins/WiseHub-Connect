@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const API_USER_URL = 'http://localhost:9010/user/';
-const API_ADMIN_URL = 'http://localhost:9020/admin/';
+const API_DATA_URL = 'http://localhost:9010/data/';
+const API_ADMIN_URL = 'http://localhost:9010/admin/';
 
 class UserService {
 
@@ -73,7 +74,8 @@ class UserService {
   }
 
   fetchCourses(user) {
-    return axios.post(API_USER_URL + 'all', {
+    return axios.post(API_DATA_URL + "all", {
+          option: "",
           email: user.email
         }
     ).then((response) => {
