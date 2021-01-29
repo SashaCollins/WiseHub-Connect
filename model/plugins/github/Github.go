@@ -17,8 +17,8 @@ import (
 
 type Github struct {}
 
-func (g *Github) NewPlugin() plugins.PluginI {
-	panic("implement me")
+func (g *Github) SubmitCredentials(username string, token string) {
+
 }
 
 func (g *Github) GetRepositories() (interface{}, error) {

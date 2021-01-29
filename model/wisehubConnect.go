@@ -47,5 +47,10 @@ func main() {
 	go nv.Run(9010, normalViewFinished)
 	<- normalViewFinished
 
+	adminViewFinished := make(chan bool)
+	av := viewmodel.NormalView{Datastore: &ds}
+	go av.Run(9020, adminViewFinished)
+	<- adminViewFinished
+
 	fmt.Println("end")
 }

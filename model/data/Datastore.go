@@ -80,7 +80,7 @@ func loadAllUsers(db *gorm.DB) (users []User, err error) {
 
 func loadUserByEmail(db *gorm.DB, email string) (user []User, err error) {
     var tmp User
-    if result := db.Select("id, password, email").Where("email = ?", email).First(&tmp); result.Error != nil {
+    if result := db.Where("email = ?", email).First(&tmp); result.Error != nil {
         log.Printf("loadUserByEmail: 1. %q\n", result.Error)
         return user, result.Error
     }
@@ -95,28 +95,20 @@ func loadUserByEmail(db *gorm.DB, email string) (user []User, err error) {
 func updatePlugins(db *gorm.DB, userEmail string, updatedPlugins []Plugin) error {
     var user User
 
-    fmt.Println(userEmail)
-    fmt.Println(updatedPlugins)
-
     if result := db.Where("email = ?", userEmail).First(&user); result.Error != nil {
         log.Printf("updatePlugins: 1. %q\n", result.Error)
         return result.Error
     }
-    fmt.Println("nach result")
-    fmt.Println(user.ID)
 
     dbPlugins, err := loadAllPluginsByUserID(db, user.ID)
     if err != nil {
         log.Printf("updatePlugins: 1. %q\n", err)
         return err
     }
-    fmt.Println("nach loadAllPlugins")
-    fmt.Println(dbPlugins)
 
     for iDBP := range dbPlugins {
         for iUP := range updatedPlugins {
             if dbPlugins[iDBP].PluginName == updatedPlugins[iUP].PluginName {
-                fmt.Println("pluginname is equal")
                 db.Model(&Plugin{}).Where("user_id = ? AND plugin_name = ?", user.ID, updatedPlugins[iUP].PluginName).Updates(Plugin{
                     UsernameHost: updatedPlugins[iUP].UsernameHost,
                     Token: updatedPlugins[iUP].Token,

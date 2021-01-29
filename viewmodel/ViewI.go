@@ -32,14 +32,15 @@ type Request struct {
 }
 
 type ViewI interface {
-	SignUp(w http.ResponseWriter, req *http.Request, ps httprouter.Params)
+	//SignUp(w http.ResponseWriter, req *http.Request, ps httprouter.Params)
 	SignIn(w http.ResponseWriter, req *http.Request, ps httprouter.Params)
 
 	Show(w http.ResponseWriter, req *http.Request, ps httprouter.Params)
-	Update(w http.ResponseWriter, req *http.Request, ps httprouter.Params)
-	Delete(w http.ResponseWriter, req *http.Request, ps httprouter.Params)
 
-	Repositories(w http.ResponseWriter, req *http.Request, ps httprouter.Params)
-	Courses(w http.ResponseWriter, req *http.Request, ps httprouter.Params)
-	Teams(w http.ResponseWriter, req *http.Request, ps httprouter.Params)
+	//Update(w http.ResponseWriter, req *http.Request, ps httprouter.Params)
+	//Delete(w http.ResponseWriter, req *http.Request, ps httprouter.Params)
+	//
+	//Repositories(w http.ResponseWriter, req *http.Request, ps httprouter.Params)
+	//Courses(w http.ResponseWriter, req *http.Request, ps httprouter.Params)
+	//Teams(w http.ResponseWriter, req *http.Request, ps httprouter.Params)
 }

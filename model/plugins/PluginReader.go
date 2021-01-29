@@ -66,21 +66,22 @@ func (pr *PluginReader) LoadAllPlugins() error {
 	return nil
 }
 
-func (pr *PluginReader) GetOrgaInfo(credentials map[string]interface{}) (info map[string]interface{}) {
+func (pr *PluginReader) GetOrgaInfo(pluginName string, credentials map[string]string) (info map[string]interface{}) {
 	fmt.Println("Start GetOrgaInfo in PluginReader")
 	info = make(map[string]interface{})
-	for k, v := range pluginMap {
-		if credential, found := credentials[k]; found {
-			orgaInfo, err := v.GetOrgaInfo(credential)
-			if err != nil {
-				log.Println(err)
-				continue
-			}
-			fmt.Println(orgaInfo)
-			info[k] = orgaInfo
-			return info
-		}
-	}
+	credentials[]
+	//for k, v := range pluginMap {
+	//	if credential, found := credentials[k]; found {
+	//		orgaInfo, err := v.GetOrgaInfo(credential)
+	//		if err != nil {
+	//			log.Println(err)
+	//			continue
+	//		}
+	//		fmt.Println(orgaInfo)
+	//		info[k] = orgaInfo
+	//		return info
+	//	}
+	//}
 	fmt.Println("End GetOrgaInfo in PLuginReader")
 	return nil
 }

@@ -11,7 +11,7 @@
           class="col-lg-6 col-md-12 col-sm-12">
         <div
             class="card"
-            v-on:click="fetchTeamRepos(item)">
+            v-on:click="fetchTeams(item)">
           <h3
               class="text-center"
               style="background-color: #464646; color: white; border-radius: 3px; padding: 15px">
@@ -104,22 +104,19 @@
       data() {
         return {
           clicked: false,
-          /* Courses schema
-          {
+          courses: [{
             'Name': 'Dummy',
             'IsAdmin': false,
             'Login': 'Dummy-Connector',
             'URL': 'https://test.de'
-          }
-           */
-          courses: [],
-          /* Plugins schema
-          {
-            'Name': 'DummyPlugin1',
-            'Content': ['DummyContent']
-          }
-           */
-          plugins: [],
+          }],
+          plugins: [{
+            'PluginName': 'DummyPlugin1',
+            'PluginContent': 'DummyContent'
+          },{
+            'PluginName': 'DummyPlugin2',
+            'PluginContent': 'DummyContent'
+          }],
           message: '',
         }
       },
@@ -132,10 +129,10 @@
         }
       },
       methods: {
-        fetchTeamRepos: function (course) {
+        fetchTeams: function (course) {
           this.clicked = true;
           console.log('onItemClick');
-          this.$store.dispatch('user/fetchTeamRepos', {
+          this.$store.dispatch('user/fetchTeams', {
             user: this.getUser,
             organization: course
           }).then((onSuccess) => {

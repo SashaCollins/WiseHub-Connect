@@ -87,7 +87,7 @@ export const user = {
 		return Promise.reject(onFailure);
 	  });
 	},
-	fetchTeamRepos({ commit }, user) {
+	fetchTeams({ commit }, user) {
 	  return UserService.fetchTeamRepos(user).then(onSuccess => {
 		console.log(onSuccess)
 		return Promise.resolve(onSuccess);

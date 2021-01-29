@@ -303,38 +303,25 @@ func (nv *NormalView) Courses(w http.ResponseWriter, req *http.Request, ps httpr
 		http.Error(w, "Internal server error", 500)
 		return
 	}
-
+	//only 1 user possible
 	dbUser, err := nv.Datastore.Load(request.Email)
 	if err != nil {
 		fmt.Printf("Repositories: %v\n", dbUser)
 		http.Error(w, "Invalid email", 668)
 		return
 	}
-
-	//if err = nv.PluginReader.LoadAllTestingToolPlugins(); err != nil {
-	//	fmt.Printf("Repositories Testing Tools: %v\n", err)
-	//	http.Error(w, "Internal server error!", 500)
-	//	return
-	//}
 	if err = nv.PluginReader.LoadAllPlugins(); err != nil {
 		fmt.Printf("Repositories Version Management: %v\n", err)
 		http.Error(w, "Internal server error!", 500)
 		return
 	}
-	credentials := make(map[string]interface{})
+	credentials := make(map[string]string)
 	courses := make(map[string]interface{})
-	if len(dbUser) == 0 {
-		for _, user := range dbUser[0].Plugins {
-			credentials[user.PluginName] = user.Token
-		}
-	} else {
-		for _, user := range dbUser {
-			for _, plugin := range user.Plugins {
-				credentials[plugin.PluginName] = plugin.Token
-			}
-		}
+	for _, user := range dbUser[0].Plugins {
+		credentials["name"] = user.UsernameHost
+		credentials["token"] = user.Token
 	}
-	courses = nv.PluginReader.GetOrgaInfo(credentials)
+	courses = nv.PluginReader.GetOrgaInfo(user.PluginName, credentials)
 
 	response.CourseData = courses
 	fmt.Println("End Courses in NormalView")
