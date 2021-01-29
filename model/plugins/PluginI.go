@@ -8,15 +8,17 @@ package plugins
 
 type PluginI interface {
 	SubmitCredentials(username string, token string)
+	FetchData() (map[string]interface{}, error)
+
 
 	// Version Management
-	GetOrgaInfo(interface{}) (interface{}, error)
-	GetTeamInfo(string) (interface{}, error)
-	GetInsightTeamInfo(string, string) (interface{}, error)
-	GetTeamRepoInfo(string, string) (interface{}, interface{}, error)
-
+	//GetOrgaInfo(interface{}) (interface{}, error)
+	//GetTeamInfo(string) (interface{}, error)
+	//GetInsightTeamInfo(string, string) (interface{}, error)
+	//GetTeamRepoInfo(string, string) (interface{}, interface{}, error)
+	//GetRepositoryInfo() (interface{}, error)
 	// Testing Tools
-	GetRepositories() (interface{}, error)
-	GetBuilds() (interface{}, error)
+	//GetRepositoryInfo() (interface{}, error)
+	//GetBuilds() (interface{}, error)
 
 }

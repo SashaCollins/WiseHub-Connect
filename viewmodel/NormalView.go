@@ -12,8 +12,7 @@ import (
 
 type NormalView struct {
 	Datastore data.DatastoreI
-	Plugin plugins.PluginI
-	//PluginLoader  plugins.PluginLoader
+	Plugins plugins.PluginI
 }
 
 func (nv *NormalView) SignUp(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
@@ -191,7 +190,7 @@ func (nv *NormalView) Update(w http.ResponseWriter, req *http.Request, ps httpro
 		}
 		_, _ = w.Write(resp)
 		return
-	case "plugins":
+	case "credentials":
 		change := make(map[string]interface{})
 		change["email"] = update.Email
 		change["updatedPlugins"] = update.Plugins
@@ -311,18 +310,15 @@ func (nv *NormalView) Courses(w http.ResponseWriter, req *http.Request, ps httpr
 		http.Error(w, "Invalid email", 668)
 		return
 	}
-	if err = nv.PluginLoader.LoadAllPlugins(); err != nil {
-		fmt.Printf("Repositories Version Management: %v\n", err)
-		http.Error(w, "Internal server error!", 500)
-		return
-	}
 	credentials := make(map[string]string)
 	courses := make(map[string]interface{})
+
 	if len(dbUser) == 1 {
-		for _, userPlugins := range dbUser[0].Plugins {
-			credentials["name"] = userPlugins.UsernameHost
-			credentials["token"] = userPlugins.Token
-			courses = nv.PluginLoader.GetOrgaInfo(userPlugins.PluginName, credentials)
+		for _, userPlugin := range dbUser[0].Plugins {
+			credentials["name"] = userPlugin.UsernameHost
+			credentials["token"] = userPlugin.Token
+			nv.Plugins.SubmitCredentials(userPlugin.UsernameHost, userPlugin.Token)
+			courses, err = nv.Plugins.FetchData()
 		}
 	}
 

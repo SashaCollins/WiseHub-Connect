@@ -20,8 +20,7 @@ var (
 
 type AdminView struct {
 	Datastore data.DatastoreI
-<<<<<<< HEAD
-	PluginReader  plugins.PluginReader
+	PluginReader  plugins.PluginLoader
 	PluginI plugins.PluginI
 }
 
@@ -53,9 +52,7 @@ func getAllPlugins() (list []string) {
 		fmt.Printf("walk error [%v]\n", err)
 	}
 	return list
-=======
-	PluginLoader  plugins.PluginLoader
->>>>>>> b2e13f6459b64687eef36c17e9654b8e26aef0d0
+
 }
 
 func (av *AdminView) LoadAllPlugins() error {
@@ -160,10 +157,21 @@ func (av *AdminView) Show(w http.ResponseWriter, req *http.Request, ps httproute
 	_, _ = w.Write(resp)
 	return
 }
+func (av *AdminView) Delete(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+
+}
+
+func (av *AdminView) Update(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+
+}
 
 func (av *AdminView) Run(port int, finished chan bool) {
 	router := Router{View: av}
 	adminRouter := router.New()
+	adminRouter.POST("/admin/delete/plugins", av.Delete)
+	adminRouter.POST("/admin/update/plugins", av.Update)
 	fmt.Printf("Run: %s\n", http.ListenAndServe(fmt.Sprintf(":%d", port), adminRouter))
 	finished <- true
 }
+
+

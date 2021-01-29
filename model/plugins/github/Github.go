@@ -21,13 +21,10 @@ func (g *Github) SubmitCredentials(username string, token string) {
 
 }
 
-func (g *Github) GetRepositories() (interface{}, error) {
+func (g *Github) FetchData() (map[string]interface{}, error) {
 	panic("implement me")
 }
 
-func (g *Github) GetBuilds() (interface{}, error) {
-	panic("implement me")
-}
 
 func NewPlugin() plugins.PluginI {
 	return &Github{}
@@ -254,6 +251,7 @@ type Viewer struct {
 	}
 }
 
+// so sollte man an die commits eines Repos rankommen können
 //var listRepos(&queryString: String!) struct {
 //	rateLimit{
 //		cost
