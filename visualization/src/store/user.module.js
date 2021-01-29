@@ -23,8 +23,8 @@ export const user = {
 		return Promise.reject(onFailure);
 	  });
 	},
-	updatePlugins({ commit }, payload) {
-	  return UserService.updatePlugins(payload).then(onSuccess => {
+	  updateCredentials({ commit }, payload) {
+	  return UserService.updateCredentials(payload).then(onSuccess => {
 		return Promise.resolve(onSuccess);
 	  }, onFailure => {
 		return Promise.reject(onFailure);

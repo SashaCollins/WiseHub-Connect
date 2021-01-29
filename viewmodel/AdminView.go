@@ -12,7 +12,7 @@ import (
 
 type AdminView struct {
 	Datastore data.DatastoreI
-	PluginReader  plugins.PluginReader
+	PluginLoader  plugins.PluginLoader
 }
 func (av *AdminView) SignIn(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 	var user Request
@@ -93,7 +93,7 @@ func (av *AdminView) Show(w http.ResponseWriter, req *http.Request, ps httproute
 
 func (av *AdminView) Run(port int, finished chan bool) {
 	router := Router{View: av}
-	normalRouter := router.New()
-	fmt.Printf("Run: %s\n", http.ListenAndServe(fmt.Sprintf(":%d", port), normalRouter))
+	adminRouter := router.New()
+	fmt.Printf("Run: %s\n", http.ListenAndServe(fmt.Sprintf(":%d", port), adminRouter))
 	finished <- true
 }

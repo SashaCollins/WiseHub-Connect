@@ -12,7 +12,7 @@ import (
 
 type NormalView struct {
 	Datastore data.DatastoreI
-	PluginReader  plugins.PluginReader
+	PluginLoader  plugins.PluginLoader
 }
 
 func (nv *NormalView) SignUp(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
@@ -310,18 +310,22 @@ func (nv *NormalView) Courses(w http.ResponseWriter, req *http.Request, ps httpr
 		http.Error(w, "Invalid email", 668)
 		return
 	}
-	if err = nv.PluginReader.LoadAllPlugins(); err != nil {
+	if err = nv.PluginLoader.LoadAllPlugins(); err != nil {
 		fmt.Printf("Repositories Version Management: %v\n", err)
 		http.Error(w, "Internal server error!", 500)
 		return
 	}
 	credentials := make(map[string]string)
 	courses := make(map[string]interface{})
-	for _, user := range dbUser[0].Plugins {
-		credentials["name"] = user.UsernameHost
-		credentials["token"] = user.Token
+	if len(dbUser) == 1 {
+		for _, userPlugins := range dbUser[0].Plugins {
+			credentials["name"] = userPlugins.UsernameHost
+			credentials["token"] = userPlugins.Token
+			courses = nv.PluginLoader.GetOrgaInfo(userPlugins.PluginName, credentials)
+		}
 	}
-	courses = nv.PluginReader.GetOrgaInfo(user.PluginName, credentials)
+
+	//courses = nv.PluginLoader.GetOrgaInfo(user.PluginName, credentials)
 
 	response.CourseData = courses
 	fmt.Println("End Courses in NormalView")
@@ -411,6 +415,14 @@ func (nv *NormalView) Teams(w http.ResponseWriter, req *http.Request, ps httprou
 func (nv *NormalView) Run(port int, finished chan bool) {
 	router := Router{View: nv}
 	normalRouter := router.New()
+	normalRouter.POST("/auth/signup", nv.SignUp)
+	normalRouter.POST("/user/delete", nv.Delete)
+	normalRouter.POST("/user/update/email", nv.Update)
+	normalRouter.POST("/user/update/password", nv.Update)
+	normalRouter.POST("/user/update/credentials", nv.Update)
+	normalRouter.POST("/user/repos", nv.Repositories)
+	normalRouter.POST("/user/all", nv.Courses)
+	normalRouter.POST("/user/teams", nv.Teams)
 	fmt.Printf("Run: %s\n", http.ListenAndServe(fmt.Sprintf(":%d", port), normalRouter))
 	finished <- true
 }
