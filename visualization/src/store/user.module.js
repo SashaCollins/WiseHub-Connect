@@ -12,6 +12,22 @@ export const user = {
 	initUser({commit}, user) {
 		commit("initUser", user);
 	},
+	updatePlugins({ commit }, payload) {
+	  return UserService.updatePlugins(payload).then(onSuccess => {
+		return Promise.resolve(onSuccess);
+	  }, onFailure => {
+		return Promise.reject(onFailure);
+	  });
+	},
+	deletePlugins({ commit }, payload) {
+	  return UserService.deletePlugins(payload).then(onSuccess => {
+		commit("deletePluginsSuccess", payload);
+		return Promise.resolve(onSuccess);
+	  }, onFailure => {
+		return Promise.reject(onFailure);
+	  });
+	},
+
 	fetchProfile({ commit }, user) {
 	  return UserService.fetchProfile(user).then(onSuccess => {
 	    if (onSuccess.data.success) {
@@ -23,6 +39,10 @@ export const user = {
 		return Promise.reject(onFailure);
 	  });
 	},
+<<<<<<< HEAD
+=======
+
+>>>>>>> 322e0d97f2e21dd26aded8968f1ba9b2bce80482
 	updateCredentials({ commit }, payload) {
 	  return UserService.updateCredentials(payload).then(onSuccess => {
 		return Promise.resolve(onSuccess);
@@ -109,6 +129,9 @@ export const user = {
 	},
 	deleteSuccess(state) {
 	  state.user = null;
+	},
+	deletePluginsSuccess(state, user) {
+	  state.user = user;
 	}
   },
 }

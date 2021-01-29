@@ -42,15 +42,20 @@ func main() {
 	//<- droneFinished
 	//<- herokuFinished
 
+	adminViewFinished := make(chan bool)
+	av := viewmodel.AdminView{Datastore: &ds}
+	if err := av.LoadAllPlugins(); err != nil {
+		panic("Could not load Plugins")
+	}
+	go av.Run(9020, adminViewFinished)
+	<- adminViewFinished
+
 	normalViewFinished := make(chan bool)
 	nv := viewmodel.NormalView{Datastore: &ds}
 	go nv.Run(9010, normalViewFinished)
 	<- normalViewFinished
 
-	adminViewFinished := make(chan bool)
-	av := viewmodel.NormalView{Datastore: &ds}
-	go av.Run(9020, adminViewFinished)
-	<- adminViewFinished
+
 
 	fmt.Println("end")
 }

@@ -1,11 +1,28 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:9010/user/';
+const API_USER_URL = 'http://localhost:9010/user/';
+const API_ADMIN_URL = 'http://localhost:9020/admin/';
 
 class UserService {
 
+  updatePlugins(payload) {
+    window.console.error(payload);
+    return axios.post(API_ADMIN_URL + 'update/plugins', {
+      option: 'plugins',
+      email: payload.email,
+      plugins: payload.plugins
+    })
+  }
+  deletePlugins(payload) {
+    return axios.post(API_ADMIN_URL + 'delete/plugins', {
+      option: 'plugins',
+      email: payload.email,
+      plugins: payload.plugins
+    })
+  }
+
   fetchProfile(user) {
-   return axios.post(API_URL + 'profile', {
+   return axios.post(API_USER_URL + 'profile', {
      email: user.email
    }
   ).then((response) => {
@@ -14,7 +31,7 @@ class UserService {
   }
 
   updateEmail(payload) {
-    return axios.post(API_URL + 'update/email', {
+    return axios.post(API_USER_URL + 'update/email', {
       option: 'email',
       email: payload.oldEmail,
       new_email: payload.newEmail
@@ -23,8 +40,8 @@ class UserService {
 
   updateCredentials(payload) {
     window.console.error(payload);
-    return axios.post(API_URL + 'update/credentials', {
-      option: 'plugins',
+    return axios.post(API_USER_URL + 'update/credentials', {
+      option: 'credentials',
       email: payload.email,
       plugins: payload.plugins
     })
@@ -33,7 +50,7 @@ class UserService {
   updatePassword(user) {
     let hashedPassword = require('crypto').createHash('sha512')
         .update(user.password).digest('hex');
-    return axios.post(API_URL + 'update/password', {
+    return axios.post(API_USER_URL + 'update/password', {
       option: 'password',
       email: user.email,
       password: hashedPassword
@@ -41,13 +58,13 @@ class UserService {
   }
 
   deleteAccount(user) {
-    return axios.post(API_URL + 'delete', {
+    return axios.post(API_USER_URL + 'delete', {
       email: user.email
     })
   }
 
   fetchRepos(user) {
-    return axios.post(API_URL + 'repos', {
+    return axios.post(API_USER_URL + 'repos', {
           email: user.email
         }
     ).then((response) => {
@@ -56,7 +73,7 @@ class UserService {
   }
 
   fetchCourses(user) {
-    return axios.post(API_URL + 'all', {
+    return axios.post(API_USER_URL + 'all', {
           email: user.email
         }
     ).then((response) => {
@@ -65,7 +82,7 @@ class UserService {
   }
 
   fetchTeamRepos(payload) {
-    return axios.post(API_URL + 'teams', {
+    return axios.post(API_USER_URL + 'teams', {
           email: payload.user.email,
           organization: payload.organization
         }

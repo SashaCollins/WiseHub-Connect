@@ -97,6 +97,7 @@
               this.$store.dispatch("auth/login", this.user).then(
                 (onSuccess) => {
                   console.log(onSuccess)
+                  this.user.admin = onSuccess.data.admin;
                   this.$store.dispatch("user/initUser", this.user);
                   this.$router.push("/repositories");
                 },
