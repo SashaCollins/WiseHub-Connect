@@ -6,7 +6,9 @@ do not edit or delete.
  */
 package data
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
 type User struct {
 	gorm.Model
@@ -28,7 +30,9 @@ type Plugin struct {
 
 type DatastoreI interface {
 	Load(email ...string) (user []User, err error)
-	Save(password, email string) error
+	Create(password, email string) error
 	Update(option string, data map[string]interface{}) error
 	Delete(email string) error
+
+	LoadPlugins() ([]string, error)
 }

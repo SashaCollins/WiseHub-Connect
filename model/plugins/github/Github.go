@@ -15,20 +15,6 @@ import (
 //TODO: save token in file and read from file on startup
 //TODO: error msg if no token
 
-type Github struct {}
-
-func (g *Github) SubmitCredentials(username string, token string) {
-
-}
-
-func (g *Github) FetchData() (map[string]interface{}, error) {
-	panic("implement me")
-}
-
-
-func NewPlugin() plugins.PluginI {
-	return &Github{}
-}
 
 var (
 	PluginName    string
@@ -71,22 +57,44 @@ var (
 	//}
 )
 
-type Credentials struct {
-	Token string
-	UserName string
-}
-
 func init() {
 	PluginName = "Github"
 }
 
-func CreateViewer(credentials interface{}) {
-	GithubToken = credentials.(Credentials).Token
+type Github struct {}
+
+func NewPlugin() plugins.PluginI {
+	return &Github{}
+}
+
+func (g *Github) FetchSomething() error {
+	panic("implement me")
+}
+
+func (g *Github) SubmitCredentials(username, token string) {
 	src := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: GithubToken},
+		&oauth2.Token{AccessToken: token},
 	)
 	httpClient := oauth2.NewClient(context.Background(), src)
 	GithubClient = githubv4.NewClient(httpClient)
+}
+
+func (g *Github) FetchData() (map[string]interface{}, error) {
+	panic("implement me")
+}
+
+func (g *Github) FetchPluginName() string {
+	return getPluginName()
+}
+
+func getPluginName() string {
+	return PluginName
+}
+
+
+type Credentials struct {
+	Token string
+	UserName string
 }
 
 type Commit struct {

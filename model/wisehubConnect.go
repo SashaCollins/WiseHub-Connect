@@ -15,7 +15,7 @@ import (
 //}
 func main() {
 	fmt.Println("start")
-	ds := data.Datastore{}
+	//ds := data.Datastore{}
 	//err := ds.Save("name092","pw092","email092")
 	//if err != nil {
 	//	fmt.Printf("\tmain: %s\n", err)
@@ -42,20 +42,26 @@ func main() {
 	//<- droneFinished
 	//<- herokuFinished
 
-	adminViewFinished := make(chan bool)
-	av := viewmodel.AdminView{Datastore: &ds}
-	if err := av.LoadAllPlugins(); err != nil {
-		panic("Could not load Plugins")
-	}
-	go av.Run(9020, adminViewFinished)
-	<- adminViewFinished
-
-	normalViewFinished := make(chan bool)
-	nv := viewmodel.NormalView{Datastore: &ds}
-	go nv.Run(9010, normalViewFinished)
-	<- normalViewFinished
+	ds := data.Datastore{}
+	routerFinished := make(chan bool)
+	router := viewmodel.Router{Datastore: &ds}
+	router.Run(9010, routerFinished)
+	<- routerFinished
 
 
+
+	//personalViewFinished := make(chan bool)
+	//av := viewmodel.PersonalView{Datastore: &ds}
+	//if err := av.LoadAllPlugins(); err != nil {
+	//	panic("Could not load Plugins")
+	//}
+	//go av.Run(9020, personalViewFinished)
+	//<- personalViewFinished
+
+	//generalViewFinished := make(chan bool)
+	//nv := viewmodel.GeneralView{Datastore: &ds}
+	//go nv.Run(9010, generalViewFinished)
+	//<- generalViewFinished
 
 	fmt.Println("end")
 }

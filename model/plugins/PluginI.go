@@ -6,10 +6,16 @@ do not edit or delete.
 */
 package plugins
 
-type PluginI interface {
-	SubmitCredentials(username string, token string)
-	FetchData() (map[string]interface{}, error)
+type Credentials struct {
+	UserNameHost string
+	Token string
+}
 
+type PluginI interface {
+	SubmitCredentials(username, token string)
+	FetchData() (map[string]interface{}, error)
+	FetchSomething() error
+	FetchPluginName() string
 
 	// Version Management
 	//GetOrgaInfo(interface{}) (interface{}, error)

@@ -145,7 +145,7 @@ func (ds *Datastore) Load(email ...string) (user []User, err error) {
     }
 }
 
-func (ds *Datastore) Save(password string, email string) error {
+func (ds *Datastore) Create(password string, email string) error {
     db, err := openDB()
     if err != nil {
         log.Printf("Save %q: %v\n", err, db)
