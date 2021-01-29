@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/drone/drone-go/drone"
-	"github/SashaCollins/Wisehub-Connect/model/config"
 	"github/SashaCollins/Wisehub-Connect/model/plugins"
 	"golang.org/x/oauth2"
 )
@@ -21,7 +20,6 @@ var (
 func init() {
 	PluginName = "Drone"
 	// create an http client with oauth authentication
-	conf := config.GetConfig()
 	Host := conf.DroneCI.Host
 	DroneToken := conf.DroneCI.APIToken
 	oauthConfig := new(oauth2.Config)

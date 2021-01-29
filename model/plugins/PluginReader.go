@@ -2,7 +2,6 @@ package plugins
 
 import (
 	"fmt"
-	"github/SashaCollins/Wisehub-Connect/model/plugins"
 	"log"
 	"os"
 	"path/filepath"
@@ -11,14 +10,14 @@ import (
 
 var (
 	pluginPaths []string
-	pluginMap map[string]plugins.PluginI
+	pluginMap map[string]PluginI
 )
 
 type PluginReader struct {}
 
 func init() {
 	pluginPaths = getAllPlugins()
-	pluginMap = make(map[string]plugins.PluginI)
+	pluginMap = make(map[string]PluginI)
 }
 
 func derefString(s *string) string {
@@ -56,8 +55,13 @@ func (pr *PluginReader) LoadAllPlugins() error {
 			log.Fatal(err)
 			return err
 		}
-		newVersionManagement, _ := pInterface.(func() plugins.PluginReaderI) // assert the type of the func
-		pluginMap[derefString(pName.(*string))] = newVersionManagement()
+		pInterface, err := p.Lookup("NewPlugin")
+		if err != nil {
+			log.Fatal(err)
+			return err
+		}
+		newPlugin, _ := pInterface.(func() PluginI) // assert the type of the func
+		pluginMap[derefString(pName.(*string))] = newPlugin()
 	}
 	return nil
 }

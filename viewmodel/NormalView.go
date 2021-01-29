@@ -83,6 +83,7 @@ func (nv *NormalView) SignIn(w http.ResponseWriter, req *http.Request, ps httpro
 	}
 	if dbUser[0].Password == user.Password {
 		response.Success = true
+		response.Admin = dbUser[0].Admin
 		resp, err := json.Marshal(response)
 		if err != nil {
 			fmt.Printf("SignIn: %s\n", err)
@@ -315,7 +316,7 @@ func (nv *NormalView) Courses(w http.ResponseWriter, req *http.Request, ps httpr
 	//	http.Error(w, "Internal server error!", 500)
 	//	return
 	//}
-	if err = nv.PluginReader.LoadAllVersionManagementPlugins(); err != nil {
+	if err = nv.PluginReader.LoadAllPlugins(); err != nil {
 		fmt.Printf("Repositories Version Management: %v\n", err)
 		http.Error(w, "Internal server error!", 500)
 		return

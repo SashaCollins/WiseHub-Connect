@@ -2,28 +2,31 @@ package main
 
 import (
 	"fmt"
-	"github.com/bgentry/heroku-go"
-	"github/SashaCollins/Wisehub-Connect/model/config"
+	heroku "github.com/heroku/heroku-go/v5"
 	"github/SashaCollins/Wisehub-Connect/model/plugins"
 )
 
 var (
-	herokuClient heroku.Client
+	usaername string
+	password string
 	PluginName string
+	herokuClient *heroku.Service
 )
 
 type Heroku struct {}
 
 func init(){
 	PluginName = "Heroku"
-	conf := config.GetConfig()
-	email := conf.Heroku.Username
-	apiToken := conf.Heroku.APIToken
-	herokuClient = heroku.Client{Username: email, Password: apiToken}
 }
 
-func NewPlugin() plugins.PluginI {
+func NewTestingTools() plugins.PluginI {
 	return &Heroku{}
+}
+
+func (h *Heroku) UpdateCredentials(credentials map[string]string) {
+	heroku.DefaultTransport.Username = credentials["username"]
+	heroku.DefaultTransport.Password = credentials["token"]
+	herokuClient = heroku.NewService(heroku.DefaultClient)
 }
 
 func (h *Heroku) fetchData(info int) (interface{}, error){
@@ -32,7 +35,7 @@ func (h *Heroku) fetchData(info int) (interface{}, error){
 		fmt.Println("\tin fetch")
 		var apps []heroku.App
 		// pass nil for options if you don't need to set any optional params
-		app, err := herokuClient.AppCreate(nil)
+		app, err := herokuClient.InvoiceInfo()
 		if err != nil {
 			fmt.Println("\tin fetch error")
 			return nil, err
@@ -84,25 +87,7 @@ func (h *Heroku) fetchData(info int) (interface{}, error){
 		return nil, fmt.Errorf("something went wrong with the info number %s", info)
 	}
 }
-func (h *Heroku) NewPlugin() plugins.PluginI {
-	panic("implement me")
-}
 
-func (h *Heroku) GetOrgaInfo(that interface{}) (interface{}, error) {
-	panic("implement me")
-}
-
-func (h *Heroku) GetTeamInfo(string) (interface{}, error) {
-	panic("implement me")
-}
-
-func (h *Heroku) GetInsightTeamInfo(string, string) (interface{}, error) {
-	panic("implement me")
-}
-
-func (h *Heroku) GetTeamRepoInfo(string, string) (interface{}, interface{}, error) {
-	panic("implement me")
-}
 func (h *Heroku) GetRepositories() (interface{}, error) {
 
 	return nil, nil
@@ -111,4 +96,20 @@ func (h *Heroku) GetRepositories() (interface{}, error) {
 func (h *Heroku) GetBuilds() (interface{}, error) {
 
 	return nil, nil
+}
+
+func (h *Heroku) GetOrgaInfo(i interface{}) (interface{}, error) {
+	panic("implement me")
+}
+
+func (h *Heroku) GetTeamInfo(orgaName string) (interface{}, error) {
+	panic("implement me")
+}
+
+func (h *Heroku) GetInsightTeamInfo(orgaName, teamName string) (interface{}, error) {
+	panic("implement me")
+}
+
+func (h *Heroku) GetTeamRepoInfo(repoName, repoOwner string) (interface{}, interface{}, error) {
+	panic("implement me")
 }

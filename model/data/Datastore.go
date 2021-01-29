@@ -164,7 +164,7 @@ func (ds *Datastore) Save(password string, email string) error {
         {PluginName: "Drone CI", UsernameHost: "", Token: "", Description: "", Updated: false},
         {PluginName: "Heroku", UsernameHost: "", Token: "", Description: "", Updated: false},
     }
-    user := User{Email: email, Password: password, Role: "normal", Plugins: defaultPlugins}
+    user := User{Email: email, Password: password, Admin: false, Plugins: defaultPlugins}
     if result := db.Create(&user); result.Error != nil {
         log.Printf("Save %q: %v\n", err, db)
         return err
@@ -188,8 +188,8 @@ func (ds *Datastore) Update(option string, data map[string]interface{}) error {
             log.Printf("Update %q: %v\n", err, db)
             return err
         }
-    case "role":
-        db.Model(User{}).Where("email = ?", data["email"]).Updates(User{Role: data["role"].(string)})
+    case "admin":
+        db.Model(User{}).Where("email = ?", data["email"]).Updates(User{Admin: data["admin"].(bool)})
     }
     return nil
 }

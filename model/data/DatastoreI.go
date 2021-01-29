@@ -12,7 +12,7 @@ type User struct {
 	gorm.Model
 	Email    		string		`gorm:"not null;unique"`
 	Password 		string
-	Role 			string
+	Admin 			bool
 	Plugins  		[]Plugin	`gorm:"foreignKey:UserID"`
 }
 
