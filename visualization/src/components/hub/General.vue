@@ -13,42 +13,20 @@
           <h3
               class="text-center"
               style="background-color: #464646; color: white; border-radius: 3px; padding: 15px">
-            {{ item.OrgaName }}
+            {{ item.Name }}
           </h3>
 
             <div
-                v-for="(item, index) in teams"
+                v-for="(item, index) in courses['Teams']"
                 :key="index"
                 class="col-lg-6 col-md-12 col-sm-12">
               <div class="card">
-                <h3 class="text-center">{{ item.TeamName }}</h3>
-          <!--            <div class="card-body" style="padding: 0; margin: 0;">-->
-          <div class="row" style="padding-left: 30px; padding-bottom: 10px;">
-            <div class="col" style="background-color: #283230; color: white; border-radius: 3px;">
-              <div class="centered">
-                <label
-                    :for="item.Contributors"
-                    class="col-md col-form-label">
-                  Contributors:
-                </label>
-                <ul class="list-group">
-                  <li v-for="item in item.Contributors" :key="item">
-                    {{ item }}
-                  </li>
-                </ul>
+                <h3 class="text-center">{{ item.Name }}</h3>
+                <div class="card-body">
+
+                </div>
               </div>
             </div>
-            <div class="col offset-1" style="background-color: #283230; color: white; border-radius: 3px;">
-              <div class="centered">
-                <label
-                    :for="item.Description"
-                    class="col-md col-form-label">
-                  Description:
-                </label>
-                {{ item.Description }}
-              </div>
-            </div>
-          </div>
 
         </div>
       </div>
@@ -113,7 +91,7 @@
           courses: [{
             'Name': 'Dummy',
             'Teams': [{
-                'Name': 'Dummy',
+                'Name': 'DummyTeam',
                 'Members': [{
                   'Name': 'dummyMember',
                 }],

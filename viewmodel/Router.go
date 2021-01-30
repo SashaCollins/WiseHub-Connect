@@ -25,8 +25,7 @@ type Response struct{
 	Email 			string               		`json:"email"`
 	Admin			bool 						`json:"admin"`
 	Plugins 		[]data.Plugin           	`json:"plugins"`
-	RepoData		map[string]interface{}		`json:"repos"`
-	CourseData		map[string]interface{}		`json:"courses"`
+	Data			[]string						`json:"data"`
 }
 
 type Request struct {
@@ -281,6 +280,10 @@ func (r *Router) Update(w http.ResponseWriter, req *http.Request, ps httprouter.
 			http.Error(w, "Invalid email", 668)
 			return
 		}
+
+		credentials := r.LoadPluginCredentials(update.Email)
+		r.View.SetCredentials(credentials)
+
 		response.Success = true
 		resp, err := json.Marshal(response)
 		if err != nil {
@@ -341,6 +344,17 @@ func (r *Router) Show(w http.ResponseWriter, req *http.Request, ps httprouter.Pa
 	}
 	fmt.Println(pluginData)
 
+	response.Success = true
+	response.Data = pluginData
+	resp, err := json.Marshal(response)
+	if err != nil {
+		fmt.Printf("Show: %s\n", err)
+		http.Error(w, "Internal server error", 500)
+		return
+	}
+	_, _ = w.Write(resp)
+	return
+
 	//fmt.Println(PluginMap)
 	//if len(dbUser) == 1 {
 	//	for pName, pStruct := range PluginMap {
@@ -355,16 +369,7 @@ func (r *Router) Show(w http.ResponseWriter, req *http.Request, ps httprouter.Pa
 
 	//var view ViewI = NewGeneralView()
 
-	response.Success = true
 
-	resp, err := json.Marshal(response)
-	if err != nil {
-		fmt.Printf("Show: %s\n", err)
-		http.Error(w, "Internal server error", 500)
-		return
-	}
-	_, _ = w.Write(resp)
-	return
 }
 
 //func (gv *GeneralView) Delete(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {

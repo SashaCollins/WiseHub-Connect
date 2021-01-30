@@ -18,7 +18,7 @@
               {{ item.RepoName }}
             </h3>
 <!--            <div class="card-body" style="padding: 0; margin: 0;">-->
-              <div class="row" style="padding-left: 30px; padding-bottom: 10px;">
+            <div class="row" style="padding-left: 30px; padding-bottom: 10px;">
               <div class="col" style="background-color: #283230; color: white; border-radius: 3px;">
                 <div class="centered">
                   <label
@@ -43,7 +43,7 @@
                   {{ item.Description }}
                 </div>
               </div>
-              </div>
+            </div>
           </div>
 
         </div>
@@ -95,7 +95,7 @@
 <!--            </div>-->
 <!--          </div>-->
 <!--        </div>-->
-      </div>
+    </div>
 </template>
 
 <script>
