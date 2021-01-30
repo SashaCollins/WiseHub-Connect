@@ -1,7 +1,6 @@
 package viewmodel
 
 import (
-	"fmt"
 	"github/SashaCollins/Wisehub-Connect/model/plugins"
 	"log"
 )
@@ -18,7 +17,8 @@ type GeneralView struct {
 //	return ggv
 //}
 
-func (gv *GeneralView) GetData() ([]byte, error) {
+func (gv *GeneralView) GetData() (map[string]string, error) {
+	response := make(map[string]string)
 	for pName, pValue := range gv.Credentials {
 		extension := gv.Plugin[pName]
 		if extension == nil {
@@ -28,10 +28,11 @@ func (gv *GeneralView) GetData() ([]byte, error) {
 		data, err := extension.FetchData()
 		if err != nil {
 			log.Fatal("Data could not be fetched!")
+			return nil, err
 		}
-		fmt.Println(data)
+		response
 	}
-	return nil, nil
+	return response, nil
 }
 
 func (gv *GeneralView) SetPlugins(plugin map[string]plugins.PluginI) {

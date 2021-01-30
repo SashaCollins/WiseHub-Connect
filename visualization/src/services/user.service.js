@@ -75,7 +75,7 @@ class UserService {
 
   fetchCourses(user) {
     return axios.post(API_DATA_URL + "all", {
-          option: "",
+          option: "general",
           email: user.email
         }
     ).then((response) => {

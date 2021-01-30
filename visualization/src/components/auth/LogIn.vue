@@ -99,7 +99,7 @@
                   console.log(onSuccess)
                   this.user.admin = onSuccess.data.admin;
                   this.$store.dispatch("user/initUser", this.user);
-                  this.$router.push("/repositories");
+                  this.$router.push("/");
                 },
                 (onFailure) => {
                   console.log(onFailure.response)

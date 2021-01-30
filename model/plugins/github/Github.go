@@ -78,17 +78,17 @@ func (g *Github) SubmitCredentials(username, token string) {
 	GithubClient = githubv4.NewClient(httpClient)
 }
 
-func (g *Github) FetchData() (map[string]interface{}, error) {
+func (g *Github) FetchData() (string, error) {
 	fmt.Println("start FetchData in Github")
 	allOrgas, err := g.GetOrgaInfo()
 	if err != nil {
 		fmt.Println("\tQuery viewer failed with:")
-		return nil, err
+		return "Github", err
 	}
 	for _, orga := range allOrgas.([]Organization) {
 		fmt.Println(orga)
 	}
-	return nil, nil
+	return "Github", nil
 }
 
 func (g *Github) FetchPluginName() string {
