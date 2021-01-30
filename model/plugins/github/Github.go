@@ -18,7 +18,6 @@ import (
 
 var (
 	PluginName    string
-	GithubToken   string
 	GithubClient  *githubv4.Client
 	CurrentViewer Viewer
 
@@ -80,7 +79,16 @@ func (g *Github) SubmitCredentials(username, token string) {
 }
 
 func (g *Github) FetchData() (map[string]interface{}, error) {
-	panic("implement me")
+	fmt.Println("start FetchData in Github")
+	allOrgas, err := g.GetOrgaInfo()
+	if err != nil {
+		fmt.Println("\tQuery viewer failed with:")
+		return nil, err
+	}
+	for _, orga := range allOrgas.([]Organization) {
+		fmt.Println(orga)
+	}
+	return nil, nil
 }
 
 func (g *Github) FetchPluginName() string {
@@ -453,7 +461,7 @@ func (g *Github) getRepositoryInfo(repositoryName githubv4.String, ownerLogin gi
 	return &allIssuesAssigned, &allRefs, nil //, &commitCountPerUser, &codeCoverage
 }
 
-func (g *Github) GetOrgaInfo(credentials interface{}) (interface{}, error) {
+func (g *Github) GetOrgaInfo() (interface{}, error) {
 	fmt.Println("Start GetOrga in Github")
 	viewer, err := g.getViewer()
 	if err != nil {

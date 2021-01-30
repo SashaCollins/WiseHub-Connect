@@ -281,6 +281,10 @@ func (r *Router) Update(w http.ResponseWriter, req *http.Request, ps httprouter.
 			http.Error(w, "Invalid email", 668)
 			return
 		}
+
+		credentials := r.LoadPluginCredentials(update.Email)
+		r.View.SetCredentials(credentials)
+
 		response.Success = true
 		resp, err := json.Marshal(response)
 		if err != nil {

@@ -3,6 +3,7 @@ package viewmodel
 import (
 	"fmt"
 	"github/SashaCollins/Wisehub-Connect/model/plugins"
+	"log"
 )
 
 type GeneralView struct {
@@ -18,9 +19,17 @@ type GeneralView struct {
 //}
 
 func (gv *GeneralView) GetData() ([]byte, error) {
-	for k, v := range gv.Plugin {
-		fmt.Println(k)
-		fmt.Println(v)
+	for pName, pValue := range gv.Credentials {
+		extension := gv.Plugin[pName]
+		if extension == nil {
+			continue
+		}
+		extension.SubmitCredentials(pValue.UserNameHost, pValue.Token)
+		data, err := extension.FetchData()
+		if err != nil {
+			log.Fatal("Data could not be fetched!")
+		}
+		fmt.Println(data)
 	}
 	return nil, nil
 }
