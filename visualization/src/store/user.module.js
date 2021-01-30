@@ -39,10 +39,7 @@ export const user = {
 		return Promise.reject(onFailure);
 	  });
 	},
-<<<<<<< HEAD
-=======
 
->>>>>>> 322e0d97f2e21dd26aded8968f1ba9b2bce80482
 	updateCredentials({ commit }, payload) {
 	  return UserService.updateCredentials(payload).then(onSuccess => {
 		return Promise.resolve(onSuccess);
@@ -87,8 +84,8 @@ export const user = {
 		return Promise.reject(onFailure);
 	  });
 	},
-	fetchCourses({ commit }, user) {
-	  return UserService.fetchCourses(user).then(onSuccess => {
+	fetchData({ commit }, payload) {
+	  return UserService.fetchData(payload).then(onSuccess => {
 		console.log(onSuccess)
 		user.courses = [];
 		if (onSuccess.data.success) {

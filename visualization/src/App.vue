@@ -119,13 +119,13 @@
                 icon: 'far fa-comments fa-fw',
               },
               {
-                href:'/repositories',
-                title: 'Repositories',
+                href:'/template',
+                title: 'Template',
                 icon: 'fa fa-code fa-fw',
               },
               {
-                href: '/courses',
-                title: 'Courses',
+                href: '/general',
+                title: 'General',
                 icon: 'fa fa-chalkboard-teacher fa-fw',
               },
               {

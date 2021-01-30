@@ -73,10 +73,10 @@ class UserService {
     });
   }
 
-  fetchCourses(user) {
+  fetchData(payload) {
     return axios.post(API_DATA_URL + "all", {
-          option: "",
-          email: user.email
+          option: payload.option,
+          email: payload.user.email
         }
     ).then((response) => {
       return response;

@@ -21,40 +21,6 @@ var (
 	GithubToken   string
 	GithubClient  *githubv4.Client
 	CurrentViewer Viewer
-
-	//UserVariables = map[string]interface{}{
-	//	"login": (*githubv4.String)(nil), //githubv4.String("SashaCollins"),
-	//	"organizationFirst": githubv4.NewInt(1),
-	//	"organizationAfter": (*githubv4.String)(nil),
-	//}
-	//OrgaVariables = map[string]interface{}{
-	//	"login": (*githubv4.String)(nil), //githubv4.String("SashaCollins"),
-	//	"teamFirst": githubv4.NewInt(100),
-	//	"teamAfter": (*githubv4.String)(nil),
-	//}
-	//TeamVariables = map[string]interface{}{
-	//	"login": (*githubv4.String)(nil), //githubv4.String("SashaCollins"),
-	//	"teamName": (*githubv4.String)(nil), //githubv4.String("A-Team"),
-	//	"teamMembersFirst": githubv4.NewInt(1),
-	//	"teamMembersAfter": (*githubv4.String)(nil),
-	//	"repositoryFirst": githubv4.NewInt(1),
-	//	"repositoryAfter": (*githubv4.String)(nil),
-	//}
-	//RepoVariables = map[string]interface{}{
-	//	"login": (*githubv4.String)(nil), //githubv4.String("SashaCollins"),
-	//	"repositoryName": (*githubv4.String)(nil), //githubv4.String("project-Tide"),
-	//	"assignee": (*githubv4.String)(nil), //githubv4.String("SashaCollins"),
-	//	"issueState": githubv4.IssueStateOpen,
-	//	"issueFirst": githubv4.NewInt(1),
-	//	"issueAfter": (*githubv4.String)(nil),
-	//	//"refName": githubv4.String("commit"),
-	//	"prefix": githubv4.String("refs/heads/"),
-	//	//"target": githubv4.String("Commit"),
-	//	"refFirst": githubv4.NewInt(10),
-	//	"refAfter": (*githubv4.String)(nil),
-	//	"targetFirst": githubv4.NewInt(10),
-	//	"orderBy": githubv4.RefOrder{githubv4.RefOrderFieldTagCommitDate,githubv4.OrderDirectionDesc },
-	//}
 )
 
 func init() {
@@ -66,55 +32,32 @@ type Github struct {}
 func NewPlugin() plugins.PluginI {
 	return &Github{}
 }
-
-func (g *Github) FetchSomething() error {
-	panic("implement me")
-}
-
-func (g *Github) SubmitCredentials(username, token string) {
-	src := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: token},
-	)
-	httpClient := oauth2.NewClient(context.Background(), src)
-	GithubClient = githubv4.NewClient(httpClient)
-}
-
-func (g *Github) FetchData() (map[string]interface{}, error) {
-	panic("implement me")
-}
-
-func (g *Github) FetchPluginName() string {
-	return getPluginName()
-}
-
 func getPluginName() string {
 	return PluginName
 }
 
+//type Commit struct {
+//	Author    ShortUser
+//	Committer ShortUser
+//}
 
 type Credentials struct {
-	Token string
 	UserName string
-}
-
-type Commit struct {
-	Author    ShortUser
-	Committer ShortUser
+	Token string
 }
 
 type Issue struct {
 	Number			githubv4.Int
 	Title			githubv4.String
-	Body           githubv4.String
-	State			githubv4.IssueState
-	ViewerCanUpdate githubv4.Boolean
+	//Body           githubv4.String
+	//State			githubv4.IssueState
+	//ViewerCanUpdate githubv4.Boolean
 }
 
 type Organization struct {
-	Name 	githubv4.String
 	Login githubv4.String
-	URL			githubv4.URI
-	ViewerCanAdminister githubv4.Boolean
+	//URL			githubv4.URI
+	//ViewerCanAdminister githubv4.Boolean
 }
 
 type OrganizationTeams struct {
@@ -154,21 +97,21 @@ type Repository struct {
 }
 
 //Branch
-type Ref struct {
-	Name githubv4.String
-	Prefix githubv4.String
-
-	Target struct {
-		AbbreviatedOid githubv4.String
-		ID githubv4.GitObjectID
-		//History struct {
-		//	TotalCount githubv4.Int
-		//}`graphql:"history(first:0)"`
-	}`graphql:"... on Commit"`
-}
+//type Ref struct {
+//	Name githubv4.String
+//	Prefix githubv4.String
+//
+//	Target struct {
+//		AbbreviatedOid githubv4.String
+//		ID githubv4.GitObjectID
+//		//History struct {
+//		//	TotalCount githubv4.Int
+//		//}`graphql:"history(first:0)"`
+//	}`graphql:"... on Commit"`
+//}
 	//`graphql:"target(first:$targetFirst)"`
 
-
+// so sollte man an die commits eines Repos rankommen können
 	//`graphql:"... on Commit"`
 	//repository(owner: "bertrandmartel", name: "callflow-workshop") {
 	//	refs(refPrefix: "refs/heads/", orderBy: {direction: DESC, field: TAG_COMMIT_DATE}, first: 100) {
@@ -186,20 +129,20 @@ type Ref struct {
 
 type RepositoryInfo struct {
 	Repository struct {
-		Owner       ShortUser
-		CreatedAt   githubv4.DateTime
-		Description githubv4.String
-		IsPrivate   githubv4.Boolean
+		//Owner       ShortUser
+		//CreatedAt   githubv4.DateTime
+		//Description githubv4.String
+		//IsPrivate   githubv4.Boolean
 		Issues      struct {
 			TotalCount githubv4.Int
 			Nodes      []Issue
 			PageInfo   PageInfo
 		}`graphql:"issues(first:$issueFirst,after:$issueAfter,filterBy:{assignee:$assignee},states:[$issueState])"` //,states:$issueState
-		Refs struct {
-			TotalCount githubv4.Int //number of branches
-			Nodes      []Ref
-			PageInfo   PageInfo
-		}`graphql:"refs(refPrefix:$prefix,first:$refFirst,after:$refAfter,orderBy:$orderBy)"`
+		//Refs struct {
+		//	TotalCount githubv4.Int //number of branches
+		//	Nodes      []Ref
+		//	PageInfo   PageInfo
+		//}`graphql:"refs(refPrefix:$prefix,first:$refFirst,after:$refAfter,orderBy:$orderBy)"`
 	} `graphql:"repository(owner:$login,name:$repositoryName)"`
 }
 
@@ -217,10 +160,7 @@ type Team struct {
 	Organization struct{
 		Team struct {
 			Name githubv4.String
-			CombinedSlug githubv4.String
-			Description         githubv4.String
-			Privacy             githubv4.TeamPrivacy
-			ViewerCanAdminister githubv4.Boolean
+			//ViewerCanAdminister githubv4.Boolean
 			Members struct {
 				TotalCount githubv4.Int
 				Nodes      []ShortUser
@@ -259,40 +199,110 @@ type Viewer struct {
 	}
 }
 
-// so sollte man an die commits eines Repos rankommen können
-//var listRepos(&queryString: String!) struct {
-//	rateLimit{
-//		cost
-//		remaining
-//		resetAt
-//	}
-//	search(query: &queryString, type:REPOSITORY, first:20){
-//		repositoryCount
-//		pageInfo{
-//			endCursor
-//			startCursor
-//		}
-//		edges{
-//			node{
-//				... on Repository{
-//					id
-//					name
-//					createdAt
-//					description
-//					isArchived
-//					isPrivate
-//					url
-//					owner{}
-//
-//					defaultBranchRef{
-//						target{
-//							... on Commit{
-//								history(first:10){
-//									totalCount
-//									edges{
-//										node{
-//											... on Commit{
-//												committedDate
+
+
+func (g *Github) SubmitCredentials(username, token string) {
+	src := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: token},
+	)
+	httpClient := oauth2.NewClient(context.Background(), src)
+	GithubClient = githubv4.NewClient(httpClient)
+}
+/*
+courses: [{
+            'Name': 'Dummy',
+            'Teams': [{
+                'Name': 'Dummy',
+                'Members': [{
+                  'Name': 'dummyMember',
+                }],
+                'Repositories': [{
+                  'Name': '',
+                  'URL': '',
+                  'Issues': [{
+                    'Name': '',
+                    'Titel': '',
+                  }],
+                }],
+              }],
+          }],
+ */
+type Response struct {
+	Organization struct{
+		Login githubv4.String
+		Team []struct {
+			Name githubv4.String
+			Members []struct {
+				Login     githubv4.String
+			}
+			Repositories []struct {
+				Name  githubv4.String
+				URL   githubv4.URI
+				Issues []struct {
+					Number			githubv4.Int
+					Title			githubv4.String
+				}
+			}
+		}
+	}
+}
+func (g *Github) FetchData() ([]Response, error) {
+	var response []Response
+
+	viewer, err := g.getViewer()
+	if err != nil {
+		fmt.Println("error:", err)
+		return nil, err
+	}
+	allOrgas, err := g.getOrganizations(viewer.Viewer.Login)
+	if err != nil {
+		fmt.Println("error:", err)
+		return nil, err
+	}
+	for i, orga := range allOrgas {
+		response[i].Organization.Login = orga.Login
+		allTeams, err := g.getTeamsPerOrganization((githubv4.String)(orga.Login))
+		if err != nil {
+			fmt.Println("error:", err)
+			return nil, err
+		}
+		for j, team := range *allTeams {
+			response[i].Organization.Team[j].Name = team.Slug
+			allTeamMembersAndRepos, err := g.getTeamMembersAndRepositories((githubv4.String)(orga.Login), (githubv4.String)(team.Slug))
+			if err != nil {
+				fmt.Println("error:", err)
+				return nil, err
+			}
+			for k, member := range allTeamMembersAndRepos.Organization.Team.Members.Nodes {
+				response[i].Organization.Team[j].Members[k].Login = member.Login
+			}
+			for k, repo := range allTeamMembersAndRepos.Organization.Team.Repositories.Nodes {
+				response[i].Organization.Team[j].Repositories[k].Name = repo.Name
+				response[i].Organization.Team[j].Repositories[k].URL = repo.URL
+
+				allIssuesAssigned, err := g.getRepositoryInfo((githubv4.String)(repo.Name), (githubv4.String)(repo.Owner.Login))
+				if err != nil {
+					fmt.Println("error:", err)
+					return nil, err
+				}
+				for l, issue := range *allIssuesAssigned {
+					response[i].Organization.Team[j].Repositories[k].Issues[l].Number = issue.Number
+					response[i].Organization.Team[j].Repositories[k].Issues[l].Title = issue.Title
+
+				}
+			}
+
+		}
+		return reponse, nil
+	}
+
+}
+
+func (g *Github) FetchPluginName() string {
+	return getPluginName()
+}
+
+
 
 func (g *Github) printJSON(v interface{}) {
 	w := json.NewEncoder(os.Stdout)
@@ -414,11 +424,11 @@ func (g *Github) getTeamMembersAndRepositories(organizationLogin githubv4.String
 	return &allTeamMembersAndRepos, nil
 }
 
-func (g *Github) getRepositoryInfo(repositoryName githubv4.String, ownerLogin githubv4.String, assignee githubv4.String) (*[]Issue, *[]Ref, error) {
+func (g *Github) getRepositoryInfo(repositoryName githubv4.String, ownerLogin githubv4.String) (*[]Issue, error) {
 	//fmt.Println("in GetRepositoryInfo")
 	var repositoryInfo RepositoryInfo
 	var allIssuesAssigned []Issue
-	var allRefs []Ref
+
 	variables := map[string]interface{} {
 		"login": (*githubv4.String)(nil), //githubv4.String("SashaCollins"),
 		"repositoryName": (*githubv4.String)(nil), //githubv4.String("project-Tide"),
@@ -426,31 +436,23 @@ func (g *Github) getRepositoryInfo(repositoryName githubv4.String, ownerLogin gi
 		"issueState": githubv4.IssueStateOpen,
 		"issueFirst": githubv4.NewInt(1),
 		"issueAfter": (*githubv4.String)(nil),
-		//"refName": githubv4.String("commit"),
-		"prefix": githubv4.String("refs/heads/"),
-		//"target": githubv4.String("Commit"),
-		"refFirst": githubv4.NewInt(10),
-		"refAfter": (*githubv4.String)(nil),
-		"targetFirst": githubv4.NewInt(10),
-		"orderBy": githubv4.RefOrder{githubv4.RefOrderFieldTagCommitDate,githubv4.OrderDirectionDesc },
 	}
 	variables["repositoryName"] = repositoryName
 	variables["login"] = ownerLogin
-	variables["assignee"] = assignee
+	variables["assignee"] = ownerLogin
 	for {
 		err := GithubClient.Query(context.Background(), &repositoryInfo, variables)
 		if err != nil {
 			fmt.Println("\t\tQuery repository failed with:")
-			return nil, nil, err
+			return nil, err
 		}
 		allIssuesAssigned = append(allIssuesAssigned, repositoryInfo.Repository.Issues.Nodes...)
-		allRefs = append(allRefs, repositoryInfo.Repository.Refs.Nodes...)
 		if !repositoryInfo.Repository.Issues.PageInfo.HasNextPage {
 			break
 		}
 		variables["issueAfter"] = githubv4.NewString(repositoryInfo.Repository.Issues.PageInfo.EndCursor)
 	}
-	return &allIssuesAssigned, &allRefs, nil //, &commitCountPerUser, &codeCoverage
+	return &allIssuesAssigned, nil //, &commitCountPerUser, &codeCoverage
 }
 
 func (g *Github) GetOrgaInfo(credentials interface{}) (interface{}, error) {
@@ -488,16 +490,16 @@ func (g *Github) GetInsightTeamInfo(orgaName, teamName string) (interface{}, err
 	return allTeamMembersAndRepos, nil
 }
 
-func (g *Github) GetTeamRepoInfo(repoName, repoOwner string) (interface{}, interface{}, error) {
+func (g *Github) GetTeamRepoInfo(repoName, repoOwner string) (interface{}, error) {
 	viewer, err := g.getViewer()
 	if err != nil {
 		fmt.Println("error:", err)
-		return nil, nil, err
+		return nil, err
 	}
-	allIssuesAssigned, allCommits, err := g.getRepositoryInfo((githubv4.String)(repoName), (githubv4.String)(repoOwner), viewer.Viewer.Login)
+	allIssuesAssigned, err := g.getRepositoryInfo((githubv4.String)(repoName), (githubv4.String)(repoOwner))
 	if err != nil {
 		fmt.Println("error:", err)
-		return nil, nil, err
+		return nil, err
 	}
-	return allIssuesAssigned, allCommits, nil
+	return allIssuesAssigned, nil
 }

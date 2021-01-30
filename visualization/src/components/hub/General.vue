@@ -9,14 +9,19 @@
           v-for="(item, index) in courses"
           :key="index"
           class="col-lg-6 col-md-12 col-sm-12">
-        <div
-            class="card"
-            v-on:click="fetchTeams(item)">
+        <div class="card">
           <h3
               class="text-center"
               style="background-color: #464646; color: white; border-radius: 3px; padding: 15px">
-            {{ item.Name }}
+            {{ item.OrgaName }}
           </h3>
+
+            <div
+                v-for="(item, index) in teams"
+                :key="index"
+                class="col-lg-6 col-md-12 col-sm-12">
+              <div class="card">
+                <h3 class="text-center">{{ item.TeamName }}</h3>
           <!--            <div class="card-body" style="padding: 0; margin: 0;">-->
           <div class="row" style="padding-left: 30px; padding-bottom: 10px;">
             <div class="col" style="background-color: #283230; color: white; border-radius: 3px;">
@@ -44,8 +49,8 @@
               </div>
             </div>
           </div>
-        </div>
 
+        </div>
       </div>
     </div>
 
@@ -102,14 +107,27 @@
     export default {
       name: "Courses",
       data() {
+        let teams;
         return {
           clicked: false,
           courses: [{
             'Name': 'Dummy',
-            'IsAdmin': false,
-            'Login': 'Dummy-Connector',
-            'URL': 'https://test.de'
+            'Teams': [{
+                'Name': 'Dummy',
+                'Members': [{
+                  'Name': 'dummyMember',
+                }],
+                'Repositories': [{
+                  'Name': '',
+                  'URL': '',
+                  'Issues': [{
+                    'Name': '',
+                    'Titel': '',
+                  }],
+                }],
+              }],
           }],
+
           plugins: [{
             'PluginName': 'DummyPlugin1',
             'PluginContent': 'DummyContent'
@@ -129,21 +147,24 @@
         }
       },
       methods: {
-        fetchTeams: function (course) {
+        onItemClick (event, item) {
           this.clicked = true;
-          console.log('onItemClick');
-          this.$store.dispatch('user/fetchTeams', {
-            user: this.getUser,
-            organization: course
-          }).then((onSuccess) => {
-            this.plugins = onSuccess.data.plugins;
-          }, (onError) => {
-            this.message = onError.toString() || onError.message;
-          });
+          // console.log('onItemClick');
+          // this.$store.dispatch('user/fetchTeams', {
+          //   user: this.getUser,
+          //   organization: course
+          // }).then((onSuccess) => {
+          //   this.plugins = onSuccess.data.plugins;
+          // }, (onError) => {
+          //   this.message = onError.toString() || onError.message;
+          // });
         }
       },
       mounted() {
-        this.$store.dispatch('user/fetchCourses', this.getUser).then(
+        this.$store.dispatch('user/fetchData', {
+          option: "general",
+          user: this.getUser,
+        }).then(
             (onSuccess) => {
               if (onSuccess.data.success) {
                 if (onSuccess.data.courses) {
