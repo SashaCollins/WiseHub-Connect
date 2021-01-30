@@ -61,6 +61,7 @@
               </div>
             </div>
           </div>
+
           <div class="row">
             <div v-if="!error" v-for="(item, index) in plugins" :key="index" class="col-lg-4 col-md-6 col-sm-12">
               <div class="card" @submit.prevent="updateCredentials(item)">

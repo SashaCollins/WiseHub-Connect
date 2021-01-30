@@ -9,7 +9,7 @@ package viewmodel
 import "github/SashaCollins/Wisehub-Connect/model/plugins"
 
 type ViewI interface {
-	GetData() ([]string, error)
+	GetData() (map[string]string, error)
 	SetPlugins(map[string]plugins.PluginI)
 	SetCredentials(map[string]plugins.Credentials)
 }

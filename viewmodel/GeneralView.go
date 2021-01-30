@@ -1,6 +1,7 @@
 package viewmodel
 
 import (
+	"fmt"
 	"github/SashaCollins/Wisehub-Connect/model/plugins"
 	"log"
 )
@@ -30,7 +31,8 @@ func (gv *GeneralView) GetData() (map[string]string, error) {
 			log.Fatal("Data could not be fetched!")
 			return nil, err
 		}
-		response
+		fmt.Println(data)
+		response[extension.FetchPluginName()] = data
 	}
 	return response, nil
 }

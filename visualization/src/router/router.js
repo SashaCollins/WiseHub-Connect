@@ -9,8 +9,8 @@ import Impressum from "../components/info/Impressum";
 import LogIn from '../components/auth/LogIn.vue';
 import SignUp from '../components/auth/SignUp.vue';
 import Forgot from '../components/auth/Forgot.vue';
-import Repositories from "@/components/hub/Repositories";
-import Courses from "@/components/hub/Courses";
+import Template from "../components/hub/Template";
+import General from "../components/hub/General";
 
 Vue.use(Router);
 
@@ -28,14 +28,14 @@ export const router = new Router({
            component: FAQ,
        },
        {
-           name: 'repositories',
-           path: '/repositories',
-           component: Repositories,
+           name: 'template',
+           path: '/template',
+           component: Template,
        },
        {
-           name: 'courses',
-           path: '/courses',
-           component: Courses,
+           name: 'general',
+           path: '/general',
+           component: General,
        },
        {
            name: 'profile',

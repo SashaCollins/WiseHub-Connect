@@ -14,7 +14,6 @@ type Credentials struct {
 type PluginI interface {
 	SubmitCredentials(username, token string)
 	FetchData() (string, error)
-	FetchSomething() error
 	FetchPluginName() string
 
 	// Version Management

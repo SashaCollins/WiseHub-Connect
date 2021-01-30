@@ -84,8 +84,8 @@ export const user = {
 		return Promise.reject(onFailure);
 	  });
 	},
-	fetchCourses({ commit }, user) {
-	  return UserService.fetchCourses(user).then(onSuccess => {
+	fetchData({ commit }, payload) {
+	  return UserService.fetchData(payload).then(onSuccess => {
 		console.log(onSuccess)
 		user.courses = [];
 		if (onSuccess.data.success) {
