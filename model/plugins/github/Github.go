@@ -32,38 +32,6 @@ func NewPlugin() plugins.PluginI {
 	return &Github{}
 }
 
-<<<<<<< HEAD
-func (g *Github) FetchSomething() error {
-	panic("implement me")
-}
-
-func (g *Github) SubmitCredentials(username, token string) {
-	src := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: token},
-	)
-	httpClient := oauth2.NewClient(context.Background(), src)
-	GithubClient = githubv4.NewClient(httpClient)
-}
-
-func (g *Github) FetchData() (string, error) {
-	fmt.Println("start FetchData in Github")
-	allOrgas, err := g.GetOrgaInfo()
-	if err != nil {
-		fmt.Println("\tQuery viewer failed with:")
-		return "Github", err
-	}
-	for _, orga := range allOrgas.([]Organization) {
-		fmt.Println(orga)
-	}
-	return "Github", nil
-}
-
-func (g *Github) FetchPluginName() string {
-	return getPluginName()
-}
-
-=======
->>>>>>> 48fdb78945eb6ed4f020a306d2c098485ca081d1
 func getPluginName() string {
 	return PluginName
 }
