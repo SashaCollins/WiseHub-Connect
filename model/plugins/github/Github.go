@@ -199,36 +199,33 @@ type Viewer struct {
 	}
 }
 
-func (g *Github) SubmitCredentials(username, token string) {
-	src := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: token},
-	)
-	httpClient := oauth2.NewClient(context.Background(), src)
-	GithubClient = githubv4.NewClient(httpClient)
-}
 
+
+type RTeams struct{
+	Name githubv4.String `json:"orga_name"`
+	Members []RMembers `json:"member"`
+	Repositories []RRepositories `json:"repository"`
+}
+type RMembers struct {
+	Login     githubv4.String `json:"orga_name"`
+}
+type RRepositories struct {
+	Name  githubv4.String `json:"repo_name"`
+	URL   githubv4.URI `json:"repo_url"`
+	Issues []RIssues `json:"issue"`
+}
+type RIssues struct {
+	Number			githubv4.Int `json:"issue_number"`
+	Title			githubv4.String `json:"issue_title"`
+}
 type Response struct {
 	Organization struct{
 		Login githubv4.String `json:"orga_name"`
-		Teams []struct {
-			Name githubv4.String `json:"orga_name"`
-			Members []struct {
-				Login     githubv4.String `json:"orga_name"`
-			} `json:"member"`
-			Repositories []struct {
-				Name  githubv4.String `json:"repo_name"`
-				URL   githubv4.URI `json:"repo_url"`
-				Issues []struct {
-					Number			githubv4.Int `json:"issue_number"`
-					Title			githubv4.String `json:"issue_title"`
-				} `json:"issue"`
-			} `json:"repository"`
-		} `json:"team"`
+		Teams []RTeams `json:"team"`
 	} `json:"organization"`
 }
 func (g *Github) FetchData() (string, error) {
 	var response []Response
-	var resp Response
 
 	viewer, err := g.getViewer()
 	if err != nil {
@@ -240,44 +237,61 @@ func (g *Github) FetchData() (string, error) {
 		fmt.Println("error:", err)
 		return "", err
 	}
-	for _, orga := range allOrgas {
+	for _, orga := range *allOrgas {
+		var resp Response
 		resp.Organization.Login = orga.Login
 		allTeams, err := g.getTeamsPerOrganization((githubv4.String)(orga.Login))
 		if err != nil {
 			fmt.Println("error:", err)
 			return "", err
 		}
-		for j, team := range *allTeams {
-			resp.Organization.Teams[j].Name = team.Slug
+		for _, team := range *allTeams {
+			var rt RTeams
+			rt.Name = team.Slug
+			//resp.Organization.Teams = append(resp.Organization.Teams, )
+			//resp.Organization.Teams[j].Name = team.Slug
 			allTeamMembersAndRepos, err := g.getTeamMembersAndRepositories((githubv4.String)(orga.Login), (githubv4.String)(team.Slug))
 			if err != nil {
 				fmt.Println("error:", err)
 				return "", err
 			}
-			for k, member := range allTeamMembersAndRepos.Organization.Team.Members.Nodes {
-				resp.Organization.Teams[j].Members[k].Login = member.Login
+			for _, member := range allTeamMembersAndRepos.Organization.Team.Members.Nodes {
+				var rm RMembers
+				rm.Login = member.Login
+				rt.Members = append(rt.Members, rm)
 			}
-			for k, repo := range allTeamMembersAndRepos.Organization.Team.Repositories.Nodes {
-				resp.Organization.Teams[j].Repositories[k].Name = repo.Name
-				resp.Organization.Teams[j].Repositories[k].URL = repo.URL
+			for _, repo := range allTeamMembersAndRepos.Organization.Team.Repositories.Nodes {
+				var rr RRepositories
+				rr.Name = repo.Name
+				rr.URL = repo.URL
 
 				allIssuesAssigned, err := g.getRepositoryInfo((githubv4.String)(repo.Name), (githubv4.String)(repo.Owner.Login))
 				if err != nil {
 					fmt.Println("error:", err)
 					return "", err
 				}
-				for l, issue := range *allIssuesAssigned {
-					resp.Organization.Teams[j].Repositories[k].Issues[l].Number = issue.Number
-					resp.Organization.Teams[j].Repositories[k].Issues[l].Title = issue.Title
+				for _, issue := range *allIssuesAssigned {
+					var ri RIssues
+					ri.Number = issue.Number
+					ri.Title = issue.Title
+					rr.Issues = append(rr.Issues, ri)
 				}
+				rt.Repositories = append(rt.Repositories, rr)
 			}
+			resp.Organization.Teams = append(resp.Organization.Teams, rt)
 		}
 		response = append(response, resp)
 	}
 	r, _ := json.Marshal(response)
 	return string(r), nil
 }
-
+func (g *Github) SubmitCredentials(username, token string) {
+	src := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: token},
+	)
+	httpClient := oauth2.NewClient(context.Background(), src)
+	GithubClient = githubv4.NewClient(httpClient)
+}
 func (g *Github) FetchPluginName() string {
 	return getPluginName()
 }
@@ -302,8 +316,9 @@ func (g *Github) getViewer() (*Viewer, error) {
 	return &CurrentViewer, nil
 }
 
-func (g *Github) getOrganizations(ownerLogin githubv4.String) (allOrganizations []Organization, err error) {
+func (g *Github) getOrganizations(ownerLogin githubv4.String) (*[]Organization, error) {
 	//fmt.Println("in GetOrganizations")
+	var allOrganizations []Organization
 	var user User
 	variables := map[string]interface{} {
 		"login": (*githubv4.String)(nil), //githubv4.String("SashaCollins"),
@@ -323,7 +338,7 @@ func (g *Github) getOrganizations(ownerLogin githubv4.String) (allOrganizations 
 		}
 		variables["organizationAfter"] = githubv4.NewString(user.User.Organizations.PageInfo.EndCursor)
 	}
-	return allOrganizations, nil
+	return &allOrganizations, nil
 }
 
 func (g *Github) getTeamsPerOrganization(organizationLogin githubv4.String) (*[]ShortTeam, error) {

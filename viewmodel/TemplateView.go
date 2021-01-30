@@ -145,7 +145,6 @@ func (pv *PersonalView) SignIn(w http.ResponseWriter, req *http.Request, ps http
 	}
 	if dbUser[0].Password == user.Password {
 		response.Success = true
-		response.Admin = dbUser[0].Admin
 		resp, err := json.Marshal(response)
 		if err != nil {
 			fmt.Printf("SignIn: %s\n", err)

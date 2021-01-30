@@ -15,20 +15,40 @@
               style="background-color: #464646; color: white; border-radius: 3px; padding: 15px">
             {{ item.Name }}
           </h3>
+        </div>
+        <br>
+        <br>
+        <br>
+        <br>
+        <div class="card">
+          <h3
+              class="text-center"
+              style="background-color: #464646; color: white; border-radius: 3px; padding: 15px">
+            TeamName
+          </h3>
+        <div class="card-columns">
+          <div
+              v-for="(item, index) in plugins"
+              :key="index"
+              class="col-lg-6 col-md-12 col-sm-12">
 
-            <div
-                v-for="(item, index) in courses['Teams']"
-                :key="index"
-                class="col-lg-6 col-md-12 col-sm-12">
-              <div class="card">
-                <h3 class="text-center">{{ item.Name }}</h3>
-                <div class="card-body">
-
-                </div>
+            <div class="card bg-white">
+              <div class="card-header" :id="'h' + index">
+                <h5 class="mb-0">
+                  {{item.PluginName}}
+                </h5>
+              </div>
+              <div class="card-body text-center">
+                <p class="card-text">{{item.PluginContent}}</p>
               </div>
             </div>
 
+
+
+          </div>
         </div>
+        </div>
+
       </div>
     </div>
 
@@ -85,7 +105,6 @@
     export default {
       name: "Courses",
       data() {
-        let teams;
         return {
           clicked: false,
           courses: [{
@@ -145,10 +164,13 @@
         }).then(
             (onSuccess) => {
               if (onSuccess.data.success) {
-                if (onSuccess.data.courses) {
-                  for (const [key, value] of Object.entries(onSuccess.data.courses)) {
-                    console.log(`${key}: ${value}`);
-                    this.courses = value;
+                if (onSuccess.data.allData) {
+                  for (const [key, value] of Object.entries(onSuccess.data.allData)) {
+                    // console.log(`${key}: ${value}`);
+                    this.plugins['PluginName'] = key
+                    this.plugins['PluginContent'] = JSON.parse(String(value))
+                    // console.log("this is the plugins")
+                    // console.log(this.plugins)
                   }
                 }
               }

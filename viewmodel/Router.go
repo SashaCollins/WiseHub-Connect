@@ -23,9 +23,9 @@ var (
 type Response struct{
 	Success 		bool                    	`json:"success"`
 	Email 			string               		`json:"email"`
-	Admin			bool 						`json:"admin"`
+	//Admin			bool 						`json:"admin"`
 	Plugins 		[]data.Plugin           	`json:"plugins"`
-	Data			[]string						`json:"data"`
+	Data			map[string]string			`json:"response_data"`
 }
 
 type Request struct {
@@ -127,7 +127,6 @@ func (r *Router) SignIn(w http.ResponseWriter, req *http.Request, ps httprouter.
 	}
 	if dbUser[0].Password == user.Password {
 		response.Success = true
-		response.Admin = dbUser[0].Admin
 		resp, err := json.Marshal(response)
 		if err != nil {
 			fmt.Printf("SignIn: %s\n", err)

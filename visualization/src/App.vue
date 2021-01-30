@@ -142,12 +142,6 @@
                     title: 'Contact',
                     icon: 'fas fa-bullhorn fa-fw',
                   },
-                  {
-                    href: '/settings/admin',
-                    title: 'Admin',
-                    icon: 'fas fa-bullhorn fa-fw',
-                    hidden: isAdmin
-                  },
                 ]
               },
               {

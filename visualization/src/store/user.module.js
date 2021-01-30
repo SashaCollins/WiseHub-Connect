@@ -12,22 +12,6 @@ export const user = {
 	initUser({commit}, user) {
 		commit("initUser", user);
 	},
-	updatePlugins({ commit }, payload) {
-	  return UserService.updatePlugins(payload).then(onSuccess => {
-		return Promise.resolve(onSuccess);
-	  }, onFailure => {
-		return Promise.reject(onFailure);
-	  });
-	},
-	deletePlugins({ commit }, payload) {
-	  return UserService.deletePlugins(payload).then(onSuccess => {
-		commit("deletePluginsSuccess", payload);
-		return Promise.resolve(onSuccess);
-	  }, onFailure => {
-		return Promise.reject(onFailure);
-	  });
-	},
-
 	fetchProfile({ commit }, user) {
 	  return UserService.fetchProfile(user).then(onSuccess => {
 	    if (onSuccess.data.success) {
@@ -39,7 +23,6 @@ export const user = {
 		return Promise.reject(onFailure);
 	  });
 	},
-
 	updateCredentials({ commit }, payload) {
 	  return UserService.updateCredentials(payload).then(onSuccess => {
 		return Promise.resolve(onSuccess);
@@ -75,24 +58,15 @@ export const user = {
 		return Promise.reject(onFailure);
 	  });
 	},
-	fetchRepos({ commit }, user) {
-	  return UserService.fetchRepos(user).then(onSuccess => {
-		console.log(onSuccess)
-		return Promise.resolve(onSuccess);
-	  }, onFailure => {
-		console.log(onFailure)
-		return Promise.reject(onFailure);
-	  });
-	},
 	fetchData({ commit }, payload) {
 	  return UserService.fetchData(payload).then(onSuccess => {
 		console.log(onSuccess)
-		user.courses = [];
+		user.allData = [];
 		if (onSuccess.data.success) {
-		  for (const [key, value] of Object.entries(onSuccess.data.courses)) {
-			console.log(`${key}: ${value}`);
+		  for (const [key, value] of Object.entries(onSuccess.data.allData)) {
+			// console.log(`${key}: ${value}`);
 			for (let i = 0; i < value.length; i++) {
-			  user.courses.push(value[i]);
+			  user.allData.push(value[i]);
 			}
 		  }
 		  commit('fetchSuccess', user);
@@ -104,15 +78,6 @@ export const user = {
 		return Promise.reject(onFailure);
 	  });
 	},
-	fetchTeams({ commit }, user) {
-	  return UserService.fetchTeamRepos(user).then(onSuccess => {
-		console.log(onSuccess)
-		return Promise.resolve(onSuccess);
-	  }, onFailure => {
-		console.log(onFailure)
-		return Promise.reject(onFailure);
-	  });
-	}
   },
   mutations: {
 	initUser(state, user) {
