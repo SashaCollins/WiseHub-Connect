@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/drone/drone-go/drone"
 	"github/SashaCollins/Wisehub-Connect/model/plugins"
@@ -51,10 +52,11 @@ func (d *Drone) SubmitCredentials(host, token string) {
 	droneClient = drone.NewClient(host, httpClient)
 }
 
-func (d *Drone) FetchData() (interface{}, error) {
+func (d *Drone) FetchData() (string, error) {
 	fmt.Println("in Drone CI FetchData")
+	response := make(map[string]string)
 	var tmp Response
-	var response []Response
+	var resp []Response
 	repos, err := droneClient.RepoList()
 	if err != nil {
 		log.Fatal("Data could not be fetched!")
@@ -65,10 +67,10 @@ func (d *Drone) FetchData() (interface{}, error) {
 		build, _ := droneClient.BuildLast(repo.Namespace, repo.Name, repo.Branch)
 		tmp.Repository.Build.Number = build.Number
 		tmp.Repository.Build.Status = build.Status
-		response = append(response, tmp)
+		resp = append(resp, tmp)
 	}
-	fmt.Println(response)
-	return response, err
+	r, _ := json.Marshal(response)
+	return string(r), err
 }
 
 func (d *Drone) FetchPluginName() string {

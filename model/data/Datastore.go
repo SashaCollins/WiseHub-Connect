@@ -175,7 +175,7 @@ func (ds *Datastore) Update(option string, data map[string]interface{}) error {
        db.Model(User{}).Where("email = ?", data["old"]).Updates(User{Email: data["new"].(string)})
     case "password":
         db.Model(User{}).Where("email = ?",  data["email"]).Updates(User{Password: data["password"].(string)})
-    case "plugins":
+    case "credentials":
         if err := updatePlugins(db, data["email"].(string), data["updatedPlugins"].([]Plugin)); err != nil {
             log.Printf("Update %q: %v\n", err, db)
             return err

@@ -26,6 +26,7 @@ type Response struct{
 	//Admin			bool 						`json:"admin"`
 	Plugins 		[]data.Plugin           	`json:"plugins"`
 	Data			map[string]string			`json:"response_data"`
+
 }
 
 type Request struct {
@@ -279,10 +280,6 @@ func (r *Router) Update(w http.ResponseWriter, req *http.Request, ps httprouter.
 			http.Error(w, "Invalid email", 668)
 			return
 		}
-
-		credentials := r.LoadPluginCredentials(update.Email)
-		r.View.SetCredentials(credentials)
-
 		response.Success = true
 		resp, err := json.Marshal(response)
 		if err != nil {
@@ -367,8 +364,6 @@ func (r *Router) Show(w http.ResponseWriter, req *http.Request, ps httprouter.Pa
 	//}
 
 	//var view ViewI = NewGeneralView()
-
-
 }
 
 //func (gv *GeneralView) Delete(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
