@@ -1,7 +1,6 @@
 package viewmodel
 
 import (
-	"fmt"
 	"github/SashaCollins/Wisehub-Connect/model/plugins"
 	"log"
 )
@@ -10,13 +9,6 @@ type GeneralView struct {
 	Plugin map[string]plugins.PluginI
 	Credentials map[string]plugins.Credentials
 }
-
-//func NewGeneralView () *GeneralView {
-//	gv := &AbstractView{}
-//	ggv := &GeneralView{plugin, gv}
-//	gv.ViewI = ggv
-//	return ggv
-//}
 
 func (gv *GeneralView) GetData() (map[string]string, error) {
 	response := make(map[string]string)
@@ -31,7 +23,6 @@ func (gv *GeneralView) GetData() (map[string]string, error) {
 			log.Fatal("Data could not be fetched!")
 			return nil, err
 		}
-		fmt.Println(data)
 		response[extension.FetchPluginName()] = data
 	}
 	return response, nil
@@ -44,8 +35,6 @@ func (gv *GeneralView) SetPlugins(plugin map[string]plugins.PluginI) {
 func (gv *GeneralView) SetCredentials(credentials map[string]plugins.Credentials) {
 	gv.Credentials = credentials
 }
-
-
 
 //func (gv *GeneralView) Courses(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 //	var request Request

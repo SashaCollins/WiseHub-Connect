@@ -30,20 +30,12 @@ func openDB() (db *gorm.DB, err error) {
 
 func createTables(db *gorm.DB) {
     if check := db.Migrator().HasTable(&User{}); !check {
-        //if err := db.Migrator().CreateTable(&User{}); err != nil {
-        //    log.Printf("createTables: 1. %q\n", err)
-        //    return
-        //}
         if err := db.AutoMigrate(&User{}); err != nil {
             log.Printf("createTables: 1. %q\n", err)
             return
         }
     }
     if check := db.Migrator().HasTable(&Plugin{}); !check {
-        //if err := db.Migrator().CreateTable(&Plugin{}); err != nil {
-        //    log.Printf("createTables: 1. %q\n", err)
-        //    return
-        //}
         if err := db.AutoMigrate(&Plugin{}); err != nil {
            log.Printf("createTables: 1. %q\n", err)
            return
@@ -53,7 +45,6 @@ func createTables(db *gorm.DB) {
 
 func loadAllPluginsByUserID(db *gorm.DB, userID uint) (plugins []Plugin, err error) {
     fmt.Println(userID)
-    //Model(&Plugin{})
     if result :=  db.Where("user_id = ?", userID).Find(&plugins); result.Error != nil {
         log.Printf("loadAllUsers: %q\n", result.Error)
         return plugins, result.Error

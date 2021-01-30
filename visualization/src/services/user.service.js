@@ -75,13 +75,8 @@ class UserService {
 
   fetchData(payload) {
     return axios.post(API_DATA_URL + "all", {
-<<<<<<< HEAD
-          option: "general",
-          email: user.email
-=======
           option: payload.option,
           email: payload.user.email
->>>>>>> 48fdb78945eb6ed4f020a306d2c098485ca081d1
         }
     ).then((response) => {
       return response;

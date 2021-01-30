@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/drone/drone-go/drone"
 	"github/SashaCollins/Wisehub-Connect/model/plugins"
 	"golang.org/x/oauth2"
@@ -53,13 +52,12 @@ func (d *Drone) SubmitCredentials(host, token string) {
 }
 
 func (d *Drone) FetchData() (string, error) {
-	fmt.Println("in Drone CI FetchData")
-	response := make(map[string]string)
 	var tmp Response
 	var resp []Response
 	repos, err := droneClient.RepoList()
 	if err != nil {
 		log.Fatal("Data could not be fetched!")
+		return "", err
 	}
 	for _, repo := range repos {
 		tmp.Repository.Name = repo.Name
@@ -69,7 +67,7 @@ func (d *Drone) FetchData() (string, error) {
 		tmp.Repository.Build.Status = build.Status
 		resp = append(resp, tmp)
 	}
-	r, _ := json.Marshal(response)
+	r, _ := json.Marshal(resp)
 	return string(r), err
 }
 
@@ -80,57 +78,3 @@ func (d *Drone) FetchPluginName() string {
 func getPluginName() string {
 	return PluginName
 }
-
-//func (d *Drone) jsonBuildToStructBuild(target *Build, source drone.Build) *Build {
-//	target.Branch = source.Ref
-//	target.Status = source.Status
-//	target.Time = source.Started
-//	if len(source.Stages) > 0 {
-//		for _, sourceStage := range source.Stages {
-//			var targetStage Stage
-//			targetStage.Name = sourceStage.Name
-//			targetStage.Kind = sourceStage.Kind
-//			targetStage.Status = sourceStage.Status
-//
-//			for _, sourceStep := range sourceStage.Steps {
-//				var targetStep Step
-//				targetStep.Name = sourceStep.Name
-//				targetStep.Status = sourceStep.Status
-//				targetStage.Steps = append(targetStage.Steps, targetStep)
-//			}
-//			target.Stages = append(target.Stages, targetStage)
-//		}
-//	}
-//	return target
-//}
-
-//func (d *Drone) fetchData(info int) (interface{}, error) {
-//	switch info {
-//	case 1:
-//		// gets the current user
-//		user, err := droneClient.Self()
-//		return user, err
-//
-//	case 2:
-//		// gets the named repository information
-//		repo, err := droneClient.Repo("WiseHub-Connector", "WiseHub-Project")
-//		if err != nil {
-//			return nil, fmt.Errorf("something went wrong with collecting the data")
-//		}
-//		currentRepo.Name = repo.Name
-//		currentRepo.Owner = repo.Namespace
-//		currentRepo.Branch = repo.Branch
-//		currentRepo.Build = *d.jsonBuildToStructBuild(&currentRepo.Build, repo.Build)
-//		return currentRepo, nil
-//
-//	case 3:
-//		buildLast, err := droneClient.BuildLast("WiseHub-Connector", "WiseHub-Project", "master")
-//		if err != nil {
-//			return nil, fmt.Errorf("something went wrong with collecting the data")
-//		}
-//		currentBuild = *d.jsonBuildToStructBuild(&currentBuild, *buildLast)
-//		return currentBuild, nil
-//	default:
-//		return nil, fmt.Errorf("something went wrong with the info number %s", info)
-//	}
-//}

@@ -248,7 +248,7 @@ func (g *Github) FetchData() (string, error) {
 			return "", err
 		}
 		for j, team := range *allTeams {
-			resp.Organization.Teams[j].Name = team.Slug
+			resp.Organization.Teams = append(resp.Organization.Teams, resp.Organization.Teams{Name: team.Slug})
 			allTeamMembersAndRepos, err := g.getTeamMembersAndRepositories((githubv4.String)(orga.Login), (githubv4.String)(team.Slug))
 			if err != nil {
 				fmt.Println("error:", err)

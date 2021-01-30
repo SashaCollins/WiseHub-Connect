@@ -331,14 +331,12 @@ func (r *Router) Show(w http.ResponseWriter, req *http.Request, ps httprouter.Pa
 	}
 	r.View.SetPlugins(PluginMap)
 	r.View.SetCredentials(credentials)
-	fmt.Println(r.View)
 	pluginData, err := r.View.GetData()
 	if err != nil {
 		fmt.Printf("Show: %v\n", dbUser)
 		http.Error(w, "Invalid data", 668)
 		return
 	}
-	fmt.Println(pluginData)
 
 	response.Success = true
 	response.Data = pluginData
@@ -350,20 +348,6 @@ func (r *Router) Show(w http.ResponseWriter, req *http.Request, ps httprouter.Pa
 	}
 	_, _ = w.Write(resp)
 	return
-
-	//fmt.Println(PluginMap)
-	//if len(dbUser) == 1 {
-	//	for pName, pStruct := range PluginMap {
-	//		fmt.Println(pName)
-	//		fmt.Println(pStruct)
-	//		//credentials["name"] = userPlugin.UsernameHost
-	//		//credentials["token"] = userPlugin.Token
-	//		//r.Plugins.SubmitCredentials(userPlugin.UsernameHost, userPlugin.Token)
-	//		//courses, err = gv.Plugins.FetchData()}
-	//	}
-	//}
-
-	//var view ViewI = NewGeneralView()
 }
 
 //func (gv *GeneralView) Delete(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {

@@ -64,35 +64,3 @@ func (pr *PluginLoader) LoadAllPlugins() (map[string]plugins.PluginI, error) {
 	}
 	return pluginMap, nil
 }
-
-//func (pr *PluginLoader) GetOrgaInfo(pluginName string, credentials map[string]string) (info map[string]interface{}) {
-//	fmt.Println("Start GetOrgaInfo in PluginLoader")
-//	info = make(map[string]interface{})
-//	//credentials[]
-//	//for k, v := range pluginMap {
-//	//	if credential, found := credentials[k]; found {
-//	//		orgaInfo, err := v.GetOrgaInfo(credential)
-//	//		if err != nil {
-//	//			log.Println(err)
-//	//			continue
-//	//		}
-//	//		fmt.Println(orgaInfo)
-//	//		info[k] = orgaInfo
-//	//		return info
-//	//	}
-//	//}
-//	fmt.Println("End GetOrgaInfo in PLuginReader")
-//	return nil
-//}
-//
-//func (pr *PluginLoader) GetTeamInfo() (info map[string]interface{}) {
-//	return nil
-//}
-//
-//func (pr *PluginLoader) GetInsightTeamInfo() (info map[string]interface{}) {
-//	return nil
-//}
-//
-//func (pr *PluginLoader) GetTeamRepoInfo() (info map[string]interface{}) {
-//	return nil
-//}
