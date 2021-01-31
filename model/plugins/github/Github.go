@@ -1,13 +1,12 @@
-// credit - go-graphql hello world example
 package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/shurcooL/githubv4"
 	"github/SashaCollins/Wisehub-Connect/model/plugins"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
+	"log"
 	"os"
 )
 
@@ -229,12 +228,12 @@ func (g *Github) FetchData() (string, error) {
 
 	viewer, err := g.getViewer()
 	if err != nil {
-		fmt.Println("error:", err)
+		log.Println(err)
 		return "", err
 	}
 	allOrgas, err := g.getOrganizations(viewer.Viewer.Login)
 	if err != nil {
-		fmt.Println("error:", err)
+		log.Println(err)
 		return "", err
 	}
 	for _, orga := range *allOrgas {
@@ -242,7 +241,7 @@ func (g *Github) FetchData() (string, error) {
 		resp.Organization.Login = orga.Login
 		allTeams, err := g.getTeamsPerOrganization((githubv4.String)(orga.Login))
 		if err != nil {
-			fmt.Println("error:", err)
+			log.Println(err)
 			return "", err
 		}
 		for _, team := range *allTeams {
@@ -252,7 +251,7 @@ func (g *Github) FetchData() (string, error) {
 			//resp.Organization.Teams[j].Name = team.Slug
 			allTeamMembersAndRepos, err := g.getTeamMembersAndRepositories((githubv4.String)(orga.Login), (githubv4.String)(team.Slug))
 			if err != nil {
-				fmt.Println("error:", err)
+				log.Println(err)
 				return "", err
 			}
 			for _, member := range allTeamMembersAndRepos.Organization.Team.Members.Nodes {
@@ -267,7 +266,7 @@ func (g *Github) FetchData() (string, error) {
 
 				allIssuesAssigned, err := g.getRepositoryInfo((githubv4.String)(repo.Name), (githubv4.String)(repo.Owner.Login))
 				if err != nil {
-					fmt.Println("error:", err)
+					log.Println(err)
 					return "", err
 				}
 				for _, issue := range *allIssuesAssigned {
@@ -310,14 +309,13 @@ func (g *Github) printJSON(v interface{}) {
 func (g *Github) getViewer() (*Viewer, error) {
 	err := GithubClient.Query(context.Background(), &CurrentViewer, nil)
 	if err != nil {
-		fmt.Println("\tQuery viewer failed with:")
+		log.Println(err)
 		return nil, err
 	}
 	return &CurrentViewer, nil
 }
 
 func (g *Github) getOrganizations(ownerLogin githubv4.String) (*[]Organization, error) {
-	//fmt.Println("in GetOrganizations")
 	var allOrganizations []Organization
 	var user User
 	variables := map[string]interface{} {
@@ -329,7 +327,7 @@ func (g *Github) getOrganizations(ownerLogin githubv4.String) (*[]Organization, 
 	for {
 		err := GithubClient.Query(context.Background(), &user, variables)
 		if err != nil {
-			fmt.Println("\tQuery user in line 1 failed with")
+			log.Println(err)
 			return nil, err
 		}
 		allOrganizations = append(allOrganizations, user.User.Organizations.Nodes...)
@@ -342,11 +340,10 @@ func (g *Github) getOrganizations(ownerLogin githubv4.String) (*[]Organization, 
 }
 
 func (g *Github) getTeamsPerOrganization(organizationLogin githubv4.String) (*[]ShortTeam, error) {
-	//fmt.Println("in GetTeamsPerOrganization")
 	var organizationTeams OrganizationTeams
 	var allTeams []ShortTeam
 	variables := map[string]interface{} {
-		"login": (*githubv4.String)(nil), //githubv4.String("SashaCollins"),
+		"login": (*githubv4.String)(nil),
 		"teamFirst": githubv4.NewInt(100),
 		"teamAfter": (*githubv4.String)(nil),
 	}
@@ -354,7 +351,7 @@ func (g *Github) getTeamsPerOrganization(organizationLogin githubv4.String) (*[]
 	for {
 		err := GithubClient.Query(context.Background(), &organizationTeams, variables)
 		if err != nil {
-			fmt.Println("\t\tQuery orga in line 1 failed with")
+			log.Println(err)
 			return nil, err
 		}
 		allTeams = append(allTeams, organizationTeams.Organization.Teams.Nodes...)
@@ -368,12 +365,11 @@ func (g *Github) getTeamsPerOrganization(organizationLogin githubv4.String) (*[]
 }
 
 func (g *Github) getTeamMembersAndRepositories(organizationLogin githubv4.String, teamName githubv4.String) (*Team, error){
-	//fmt.Println("in GetTeamMembersAndRepositories")
 	var team Team
 	allTeamMembersAndRepos := Team{}
 	variables := map[string]interface{} {
-		"login": (*githubv4.String)(nil), //githubv4.String("SashaCollins"),
-		"teamName": (*githubv4.String)(nil), //githubv4.String("A-Team"),
+		"login": (*githubv4.String)(nil),
+		"teamName": (*githubv4.String)(nil),
 		"teamMembersFirst": githubv4.NewInt(1),
 		"teamMembersAfter": (*githubv4.String)(nil),
 		"repositoryFirst": githubv4.NewInt(1),
@@ -381,12 +377,11 @@ func (g *Github) getTeamMembersAndRepositories(organizationLogin githubv4.String
 	}
 	variables["login"] = organizationLogin
 	variables["teamName"] = teamName
-	//fmt.Println("\t\tin Team")
 	firstLoop := true
 	for {
 		err := GithubClient.Query(context.Background(), &team, variables)
 		if err != nil {
-			fmt.Println("\t\tQuery team in line 1 failed with")
+			log.Println(err)
 			return nil, err
 		}
 		if firstLoop {
@@ -403,15 +398,12 @@ func (g *Github) getTeamMembersAndRepositories(organizationLogin githubv4.String
 			}
 		}
 		if !team.Organization.Team.Repositories.PageInfo.HasNextPage && !team.Organization.Team.Members.PageInfo.HasNextPage {
-			//fmt.Println("\t\tnobody has next page")
 			break
 		}
 		if team.Organization.Team.Members.PageInfo.HasNextPage {
-			//fmt.Println("\t\tmembers have next")
 			variables["teamMembersAfter"] = githubv4.NewString(team.Organization.Team.Members.PageInfo.EndCursor)
 		}
 		if team.Organization.Team.Repositories.PageInfo.HasNextPage {
-			//fmt.Println("\t\t repos have next")
 			variables["repositoryAfter"] = githubv4.NewString(team.Organization.Team.Repositories.PageInfo.EndCursor)
 		}
 	}
@@ -419,14 +411,13 @@ func (g *Github) getTeamMembersAndRepositories(organizationLogin githubv4.String
 }
 
 func (g *Github) getRepositoryInfo(repositoryName githubv4.String, ownerLogin githubv4.String) (*[]Issue, error) {
-	//fmt.Println("in GetRepositoryInfo")
 	var repositoryInfo RepositoryInfo
 	var allIssuesAssigned []Issue
 
 	variables := map[string]interface{} {
-		"login": (*githubv4.String)(nil), //githubv4.String("SashaCollins"),
-		"repositoryName": (*githubv4.String)(nil), //githubv4.String("project-Tide"),
-		"assignee": (*githubv4.String)(nil), //githubv4.String("SashaCollins"),
+		"login": (*githubv4.String)(nil),
+		"repositoryName": (*githubv4.String)(nil),
+		"assignee": (*githubv4.String)(nil),
 		"issueState": githubv4.IssueStateOpen,
 		"issueFirst": githubv4.NewInt(1),
 		"issueAfter": (*githubv4.String)(nil),
@@ -437,7 +428,7 @@ func (g *Github) getRepositoryInfo(repositoryName githubv4.String, ownerLogin gi
 	for {
 		err := GithubClient.Query(context.Background(), &repositoryInfo, variables)
 		if err != nil {
-			fmt.Println("\t\tQuery repository failed with:")
+			log.Println(err)
 			return nil, err
 		}
 		allIssuesAssigned = append(allIssuesAssigned, repositoryInfo.Repository.Issues.Nodes...)
@@ -446,7 +437,7 @@ func (g *Github) getRepositoryInfo(repositoryName githubv4.String, ownerLogin gi
 		}
 		variables["issueAfter"] = githubv4.NewString(repositoryInfo.Repository.Issues.PageInfo.EndCursor)
 	}
-	return &allIssuesAssigned, nil //, &commitCountPerUser, &codeCoverage
+	return &allIssuesAssigned, nil
 }
 
 //func (g *Github) GetOrgaInfo() (interface{}, error) {

@@ -23,7 +23,6 @@ var (
 type Response struct{
 	Success 		bool                    	`json:"success"`
 	Email 			string               		`json:"email"`
-	//Admin			bool 						`json:"admin"`
 	Plugins 		[]data.Plugin           	`json:"plugins"`
 	Data			map[string]string			`json:"response_data"`
 
@@ -43,17 +42,17 @@ func (r *Router) ReloadPlugins() map[string]plugins.PluginI {
 	var loader PluginLoader
 	pluginMap, err := loader.LoadAllPlugins()
 	if err != nil {
-		log.Fatal("Could not load plugins!")
+		log.Println("Could not load plugins!")
 	}
 	return pluginMap
 }
 
 func (r *Router) LoadPluginCredentials(userEmail string) map[string]plugins.Credentials {
-	credentialMap := make(map[string]plugins.Credentials)
 	dbUser, err := r.Datastore.Load(userEmail)
 	if err != nil {
-		log.Fatal("User not found!")
+		log.Println("User not found!")
 	}
+	credentialMap := make(map[string]plugins.Credentials)
 	for _, v := range dbUser[0].Plugins {
 		credentialMap[v.PluginName] = plugins.Credentials{UserNameHost: v.UsernameHost, Token: v.Token}
 	}
@@ -61,18 +60,16 @@ func (r *Router) LoadPluginCredentials(userEmail string) map[string]plugins.Cred
 }
 
 func (r *Router) SignUp(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
-	var user Request
-	var response Response
-
 	reqBody, err := ioutil.ReadAll(req.Body)
 	if err != nil {
-		fmt.Printf("SignUp: %s\n", err)
+		log.Println(err)
 		http.Error(w, "Internal server error", 500)
 	}
 
+	var user Request
 	err = json.Unmarshal(reqBody, &user)
 	if err != nil {
-		fmt.Printf("SignUp: %s\n", err)
+		log.Println(err)
 		http.Error(w, "Internal server error", 500)
 	}
 
@@ -80,15 +77,16 @@ func (r *Router) SignUp(w http.ResponseWriter, req *http.Request, ps httprouter.
 	if len(dbUser) == 0 {
 		err = r.Datastore.Create(user.Password, user.Email)
 		if err != nil {
-			fmt.Println("3: User already exists!")
+			log.Println(err)
 			http.Error(w, "User already exists!", 666)
 			return
 		}
 
+		var response Response
 		response.Success = true
 		resp, err := json.Marshal(response)
 		if err != nil {
-			fmt.Printf("SignUp: %s\n", err)
+			log.Println(err)
 			http.Error(w, "Internal server error", 500)
 			return
 		}
@@ -96,81 +94,81 @@ func (r *Router) SignUp(w http.ResponseWriter, req *http.Request, ps httprouter.
 		return
 	}
 	if dbUser[0].Email != "" || dbUser[0].Email == user.Email {
-		fmt.Printf("SignUp: %s\n", err)
+		log.Println(err)
 		http.Error(w, "User already exists!", 666)
 		return
 	}
 }
 
 func (r *Router) SignIn(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
-	var user Request
-	var response Response
-
 	reqBody, err := ioutil.ReadAll(req.Body)
 	if err != nil {
-		fmt.Printf("SignIn: %s\n", err)
+		log.Println(err)
 		http.Error(w, "Internal server error", 500)
 		return
 	}
 
+	var user Request
 	err = json.Unmarshal(reqBody, &user)
 	if err != nil {
-		fmt.Printf("SignIn: %s\n", err)
+		log.Println(err)
 		http.Error(w, "Internal server error", 500)
 		return
 	}
 
 	dbUser, err := r.Datastore.Load(user.Email)
 	if err != nil {
-		fmt.Printf("SignIn: %v\n", dbUser)
+		log.Println(err)
 		http.Error(w, "Invalid email or password", 667)
 		return
 	}
+
+	var response Response
 	if dbUser[0].Password == user.Password {
 		response.Success = true
 		resp, err := json.Marshal(response)
 		if err != nil {
-			fmt.Printf("SignIn: %s\n", err)
+			log.Println(err)
 			http.Error(w, "Internal server error", 500)
 		}
 		_, _ = w.Write(resp)
 	} else {
-		fmt.Printf("SignIn: %s\n", err)
+		log.Println(err)
 		http.Error(w, "Invalid email or password", 667)
 	}
 	return
 }
 
 func (r *Router) Profile(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
-	var request Request
-	var response Response
-
 	reqBody, err := ioutil.ReadAll(req.Body)
 	if err != nil {
-		fmt.Printf("Profile: %s\n", err)
+		log.Println(err)
 		http.Error(w, "Internal server error", 500)
 		return
 	}
+
+	var request Request
 	err = json.Unmarshal(reqBody, &request)
 	if err != nil {
-		fmt.Printf("Profile: %s\n", err)
+		log.Println(err)
 		http.Error(w, "Internal server error", 500)
 		return
 	}
 
 	dbUser, err := r.Datastore.Load(request.Email)
 	if err != nil {
-		fmt.Printf("Profile: %v\n", dbUser)
+		log.Println(err)
 		http.Error(w, "Invalid email", 668)
 		return
 	}
 
+	var response Response
 	response.Success = true
 	response.Email = dbUser[0].Email
 	response.Plugins = dbUser[0].Plugins
 	resp, err := json.Marshal(response)
 	if err != nil {
-		fmt.Printf("Profile: %s\n", err)
+		log.Println(err)
 		http.Error(w, "Internal server error", 500)
 		return
 	}
@@ -179,25 +177,24 @@ func (r *Router) Profile(w http.ResponseWriter, req *http.Request, ps httprouter
 }
 
 func (r *Router) Forgot(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
-	var user Request
-	var response Response
-
 	reqBody, err := ioutil.ReadAll(req.Body)
 	if err != nil {
-		fmt.Printf("Forgot: %s\n", err)
+		log.Println(err)
 	}
 
+	var user Request
 	err = json.Unmarshal(reqBody, &user)
 	if err != nil {
-		fmt.Printf("Forgot: %s\n", err)
+		log.Println(err)
 	}
 
+	var response Response
 	dbUser, err := r.Datastore.Load(user.Email)
 	fmt.Println(dbUser)
 	response.Success = true
 	resp, err := json.Marshal(response)
 	if err != nil {
-		fmt.Printf("UpdateEmail: %s\n", err)
+		log.Println(err)
 		http.Error(w, "Internal server error", 500)
 		return
 	}
@@ -206,28 +203,27 @@ func (r *Router) Forgot(w http.ResponseWriter, req *http.Request, ps httprouter.
 }
 
 func (r *Router) Update(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
-	var update Request
-	var response Response
-
 	reqBody, err := ioutil.ReadAll(req.Body)
 	if err != nil {
-		fmt.Printf("Update: %s\n", err)
+		log.Println(err)
 		http.Error(w, "Internal server error", 500)
 		return
 	}
 
+	var update Request
 	err = json.Unmarshal(reqBody, &update)
 	if err != nil {
-		fmt.Printf("Update: %s\n", err)
+		log.Println(err)
 		http.Error(w, "Internal server error", 500)
 		return
 	}
 
+	var response Response
 	switch update.Option {
 	case "email":
-		dbUser, err := r.Datastore.Load(update.Email)
+		_, err := r.Datastore.Load(update.Email)
 		if err != nil {
-			fmt.Printf("Update: %v\n", dbUser)
+			log.Println(err)
 			http.Error(w, "Invalid email", 668)
 			return
 		}
@@ -235,22 +231,13 @@ func (r *Router) Update(w http.ResponseWriter, req *http.Request, ps httprouter.
 		change["old"] = update.Email
 		change["new"] = update.NewEmail
 		if err = r.Datastore.Update(update.Option, change); err != nil {
-			fmt.Printf("Update: %s\n", err)
+			log.Println(err)
 			http.Error(w, "Invalid email", 668)
 			return
 		}
-		response.Success = true
-		resp, err := json.Marshal(response)
-		if err != nil {
-			fmt.Printf("Update: %s\n", err)
-			http.Error(w, "Internal server error", 500)
-			return
-		}
-		_, _ = w.Write(resp)
-		return
 	case "password":
 		if _, err := r.Datastore.Load(update.Email); err != nil {
-			fmt.Printf("UpdatePassword: %v\n", err)
+			log.Println(err)
 			http.Error(w, "Invalid email", 668)
 			return
 		}
@@ -258,62 +245,52 @@ func (r *Router) Update(w http.ResponseWriter, req *http.Request, ps httprouter.
 		change["email"] = update.Email
 		change["password"] = update.Password
 		if err = r.Datastore.Update(update.Option, change); err != nil {
-			fmt.Printf("UpdatePassword: %s\n", err)
+			log.Println(err)
 			http.Error(w, "Invalid email", 668)
 			return
 		}
-		response.Success = true
-		resp, err := json.Marshal(response)
-		if err != nil {
-			fmt.Printf("UpdatePassword: %s\n", err)
-			http.Error(w, "Internal server error", 500)
-			return
-		}
-		_, _ = w.Write(resp)
-		return
 	case "credentials":
 		change := make(map[string]interface{})
 		change["email"] = update.Email
 		change["updatedPlugins"] = update.Plugins
 		if err := r.Datastore.Update(update.Option, change); err != nil {
-			fmt.Printf("UpdatePlugins: %s\n", err)
+			log.Println(err)
 			http.Error(w, "Invalid email", 668)
 			return
 		}
-		response.Success = true
-		resp, err := json.Marshal(response)
-		if err != nil {
-			fmt.Printf("UpdatePlugins: %s\n", err)
-			http.Error(w, "Internal server error", 500)
-			return
-		}
-		_, _ = w.Write(resp)
-		return
 	default:
+		log.Println("Thanks for the fish!")
 	}
+	response.Success = true
+	resp, err := json.Marshal(response)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "Internal server error", 500)
+		return
+	}
+	_, _ = w.Write(resp)
+	return
 }
 
 func (r *Router) Show(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
-	var request Request
-	var response Response
-
 	reqBody, err := ioutil.ReadAll(req.Body)
 	if err != nil {
-		fmt.Printf("Show: %s\n", err)
+		log.Println(err)
 		http.Error(w, "Internal server error", 500)
 		return
 	}
 
+	var request Request
 	err = json.Unmarshal(reqBody, &request)
 	if err != nil {
-		fmt.Printf("Show: %s\n", err)
+		log.Println(err)
 		http.Error(w, "Internal server error", 500)
 		return
 	}
 
 	dbUser, err := r.Datastore.Load(request.Email)
 	if err != nil {
-		fmt.Printf("Show: %v\n", dbUser)
+		log.Println(err)
 		http.Error(w, "Invalid email", 668)
 		return
 	}
@@ -333,16 +310,17 @@ func (r *Router) Show(w http.ResponseWriter, req *http.Request, ps httprouter.Pa
 	r.View.SetCredentials(credentials)
 	pluginData, err := r.View.GetData()
 	if err != nil {
-		fmt.Printf("Show: %v\n", dbUser)
+		log.Println(err)
 		http.Error(w, "Invalid data", 668)
 		return
 	}
 
+	var response Response
 	response.Success = true
 	response.Data = pluginData
 	resp, err := json.Marshal(response)
 	if err != nil {
-		fmt.Printf("Show: %s\n", err)
+		log.Println(err)
 		http.Error(w, "Internal server error", 500)
 		return
 	}

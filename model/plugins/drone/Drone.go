@@ -36,10 +36,6 @@ func NewPlugin() plugins.PluginI {
 	return &Drone{}
 }
 
-func (d *Drone) FetchSomething() error {
-	panic("implement me")
-}
-
 func (d *Drone) SubmitCredentials(host, token string) {
 	oauthConfig := new(oauth2.Config)
 	httpClient := oauthConfig.Client(
@@ -52,13 +48,13 @@ func (d *Drone) SubmitCredentials(host, token string) {
 }
 
 func (d *Drone) FetchData() (string, error) {
-	var tmp Response
-	var resp []Response
 	repos, err := droneClient.RepoList()
 	if err != nil {
-		log.Fatal("Data could not be fetched!")
+		log.Println("Data could not be fetched!")
 		return "", err
 	}
+	var tmp Response
+	var resp []Response
 	for _, repo := range repos {
 		tmp.Repository.Name = repo.Name
 		tmp.Repository.Branch = repo.Branch
