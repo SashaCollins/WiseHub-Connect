@@ -170,18 +170,8 @@
           newEmail: '',
           updatedCredentials: [],
           //dummy only exists if connection fails
-          plugins: [{
-            'PluginName': 'Dummy',
-            'UsernameHost': 'Test',
-            'Token': 'testToken',
-            'Description': '',
-            'Updated': false,
-          }],
-          errors: [{
-            'Tag': 'Error - Try again',
-            'Code': '',
-            'Description': ''
-          }],
+          plugins: [],
+          errors: [],
           error: false
         }
       },
@@ -200,12 +190,17 @@
             newEmail: this.newEmail
           }).then(
               (onSuccess) => {
-                console.log("onSuccess in Update");
-                console.log(onSuccess);
+                if (onSuccess.data.success) {
+                  this.message = "Update successfully!";
+                }
               },
               (onError) => {
-                console.log("onError in Update");
-                console.log(onError);
+                this.error = true;
+                this.errors = [{
+                  'Tag': 'Error - Try again',
+                  'Code': onError.status,
+                  'Description': onError.message || onError.toString()
+                }];
               }
           );
         },
@@ -217,12 +212,14 @@
             plugins: this.updatedCredentials
           }).then(
               (onSuccess) => {
-                console.log("onSuccess in Update")
-                console.log(onSuccess)
+                if (onSuccess.data.success) {
+                  this.message = "Update successfully!";
+                }
               },
               (onError) => {
                 this.error = true;
                 this.errors = [{
+                  'Tag': 'Error - Try again',
                   'Code': onError.status,
                   'Description': onError.message || onError.toString()
                 }];
@@ -233,7 +230,6 @@
         },
       },
       mounted() {
-        console.log(this.getUser);
         this.$store.dispatch('user/fetchProfile', this.getUser).then(
             (onSuccess) => {
               if (onSuccess.data.success) {
@@ -243,6 +239,7 @@
             (onError) => {
               this.error = true;
               this.errors = [{
+                'Tag': 'Error - Try again',
                 'Code': onError.status,
                 'Description': onError.message || onError.toString()
               }];

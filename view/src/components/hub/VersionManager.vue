@@ -56,15 +56,6 @@
       data() {
         return {
           clicked: false,
-          // versionManager: [],
-          //
-          // plugins: [{
-          //   'PluginName': '',
-          //   'PluginContent': ''
-          // },{
-          //   'PluginName': '',
-          //   'PluginContent': ''
-          // }],
           message: '',
           loading: false,
         }

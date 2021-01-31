@@ -18,6 +18,7 @@
                 <div class="card bg-white text-center">
                   <Github v-bind:github="team"></Github>
                   <DroneCI v-bind:drone="getRepo('Drone CI', repo.repoName)"></DroneCI>
+<!--                  <Template v-bind:template="getRepo('TemplateName', repo.repoName)"></Template>-->
                 </div>
               </div>
             </div>
@@ -32,7 +33,7 @@
 <script>
 import Github from "@/components/plugins/Github";
 import DroneCI from "@/components/plugins/DroneCI";
-import Heroku from "@/components/plugins/Heroku";
+// import Template from "@/components/plugins/Template";
 
 export default {
   name: "VersionManagerCards",
@@ -40,7 +41,7 @@ export default {
   components: {
     Github,
     DroneCI,
-    Heroku,
+    // Template,
   },
   computed: {
     loggedIn() {
@@ -69,11 +70,7 @@ export default {
         if (pluginName === plugin.pluginName) {
           for (let j = 0; j < plugin.pluginData.length; j++) {
             let data = plugin.pluginData[j];
-            console.log(data);
-            console.error(repoName === data.repo.repoName)
             if (repoName.trim() === data.repo.repoName.trim()) {
-              console.error(repoName);
-              console.error(data);
               return data;
             }
           }
@@ -81,27 +78,6 @@ export default {
       }
     }
   },
-  // data() {
-  //   return {
-  //     github: [{
-  //       'Name': '',
-  //       'Teams': [{
-  //         'Name': '',
-  //         'Members': [{
-  //           'Name': '',
-  //         }],
-  //         'Repositories': [{
-  //           'Name': '',
-  //           'URL': '',
-  //           'Issues': [{
-  //             'Name': '',
-  //             'Titel': '',
-  //           }],
-  //         }],
-  //       }],
-  //     }],
-  //   }
-  // },
 }
 </script>
 

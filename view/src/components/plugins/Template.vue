@@ -1,15 +1,15 @@
 <template>
-  <div class="container">
+  <div class="container-fluid">
     <div class="row">
-      {{ heroku }}
+      {{ template }}
     </div>
   </div>
 </template>
 
 <script>
 export default {
-  name: "Heroku",
-  props: ["heroku"],
+  name: "Template",
+  props: ["template"],
 }
 </script>
 

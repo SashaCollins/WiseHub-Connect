@@ -17,7 +17,6 @@ class AuthService {
                     sessionStorage.setItem('loggedIn', response.data.success);
                     // browser session storage for user module
                     sessionStorage.setItem('user', JSON.stringify(user));
-                    console.log(sessionStorage.getItem("user"));
                 }
             }
             return response;

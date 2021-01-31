@@ -21,7 +21,6 @@ class UserService {
     })
   }
   updateCredentials(payload) {
-    window.console.error(payload);
     return axios.post(API_USER_URL + 'update/credentials', {
       option: 'credentials',
       email: payload.email,

@@ -59,7 +59,6 @@
         name: "App",
         data() {
             let loggedIn = this.loggedIn;
-            let isAdmin = this.isAdmin;
             return {
             menuLoggedOut: [
                 {
@@ -119,12 +118,12 @@
                 icon: 'far fa-comments fa-fw',
               },
               {
-                href:'/template',
+                href:'/view/template',
                 title: 'Template',
                 icon: 'fa fa-code fa-fw',
               },
               {
-                href: '/general',
+                href: '/view/manager',
                 title: 'General',
                 icon: 'fa fa-chalkboard-teacher fa-fw',
               },

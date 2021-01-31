@@ -7,7 +7,7 @@
 					<div class="vl">
 						<span class="vl-innertext">or</span>
 					</div>
-<!--TODO-->cd 
+<!--          TODO-->
 					<div class="col">
 						<a href="https://github.com/login/oauth/authorize?scope=user:email&client_id=aec4d6e8accd119a47ab"
 						   class="github btn">
@@ -62,6 +62,7 @@
 					<div class="col">
 						<router-link to="/signup" style="color:white" class="btn">Sign up</router-link>
 					</div>
+<!--          TODO-->
 					<div class="col">
 						<router-link to="/forgot" style="color:white" class="btn">Forgot password?</router-link>
 					</div>
@@ -96,20 +97,16 @@
             if (isValid) {
               this.$store.dispatch("auth/login", this.user).then(
                 (onSuccess) => {
-                  console.log(onSuccess)
                   this.user.admin = onSuccess.data.admin;
                   this.$store.dispatch("user/initUser", this.user);
                   this.$router.push("/");
                 },
                 (onFailure) => {
-                  console.log(onFailure.response)
                   this.message = (onFailure.response && onFailure.response.data) || onFailure.message || onFailure.toString();
-                  console.log(this.message)
                   this.submitted = false;
                 })
             }
           })
-          console.log(this.user);
         },
       },
       mounted() {

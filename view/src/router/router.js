@@ -10,7 +10,7 @@ import LogIn from '../components/auth/LogIn.vue';
 import SignUp from '../components/auth/SignUp.vue';
 import Forgot from '../components/auth/Forgot.vue';
 import Template from "../components/hub/Template";
-import General from "../components/hub/VersionManager";
+import VersionManager from "../components/hub/VersionManager";
 
 Vue.use(Router);
 
@@ -29,13 +29,13 @@ export const router = new Router({
        },
        {
            name: 'template',
-           path: '/template',
+           path: '/view/template',
            component: Template,
        },
        {
-           name: 'general',
-           path: '/general',
-           component: General,
+           name: 'manager',
+           path: '/view/manager',
+           component: VersionManager,
        },
        {
            name: 'profile',

@@ -69,13 +69,11 @@ export const user = {
 						payload.user.plugins.push(plugin);
 					}
 				}
-				console.error(payload.user.plugins);
 			}
 		  commit('fetchSuccess', payload.user);
 		}
 		return Promise.resolve(onSuccess);
 	  }, onFailure => {
-		console.log(onFailure)
 		return Promise.reject(onFailure);
 	  });
 	},
