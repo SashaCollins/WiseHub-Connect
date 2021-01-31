@@ -20,8 +20,8 @@ func (gv *GeneralView) GetData() (map[string]string, error) {
 		extension.SubmitCredentials(pValue.UserNameHost, pValue.Token)
 		data, err := extension.FetchData()
 		if err != nil {
-			log.Fatal("Data could not be fetched!")
-			return nil, err
+			log.Println("Data could not be fetched!")
+			continue
 		}
 		response[extension.FetchPluginName()] = data
 	}

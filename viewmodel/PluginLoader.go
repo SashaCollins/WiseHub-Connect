@@ -1,7 +1,6 @@
 package viewmodel
 
 import (
-	"fmt"
 	"github/SashaCollins/Wisehub-Connect/model/plugins"
 	"log"
 	"os"
@@ -36,7 +35,7 @@ func getAllPlugins() (list []string) {
 		}
 		return nil
 	}); err != nil {
-		fmt.Printf("walk error [%v]\n", err)
+		log.Printf("walk error [%v]\n", err)
 	}
 	return list
 }
@@ -46,17 +45,17 @@ func (pr *PluginLoader) LoadAllPlugins() (map[string]plugins.PluginI, error) {
 	for _, p := range pluginPaths {
 		p, err := plugin.Open(p)
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err)
 			return nil, err
 		}
 		pName, err := p.Lookup("PluginName")
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err)
 			return nil, err
 		}
 		pInterface, err := p.Lookup("NewPlugin")
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err)
 			return nil, err
 		}
 		newPlugin, _ := pInterface.(func() plugins.PluginI) // assert the type of the func

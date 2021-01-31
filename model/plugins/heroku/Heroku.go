@@ -18,7 +18,7 @@ func init() {
 
 type Heroku struct {}
 
-func (h *Heroku) SubmitCredentials(username, token string) {
+func (h *Heroku) SubmitCredentials(_, token string) {
 	heroku.DefaultTransport.BearerToken = token
 	HerokuClient = heroku.NewService(heroku.DefaultClient)
 }
