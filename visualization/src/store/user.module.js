@@ -60,10 +60,9 @@ export const user = {
 	},
 	fetchData({ commit }, payload) {
 	  return UserService.fetchData(payload).then(onSuccess => {
-		console.log(onSuccess)
 		user.allData = [];
 		if (onSuccess.data.success) {
-		  for (const [key, value] of Object.entries(onSuccess.data.allData)) {
+		  for (const [key, value] of Object.entries(onSuccess.data.response_data)) {
 			// console.log(`${key}: ${value}`);
 			for (let i = 0; i < value.length; i++) {
 			  user.allData.push(value[i]);
@@ -73,8 +72,6 @@ export const user = {
 		}
 		return Promise.resolve(onSuccess);
 	  }, onFailure => {
-		console.log(onFailure)
-		commit('fetchFailure');
 		return Promise.reject(onFailure);
 	  });
 	},

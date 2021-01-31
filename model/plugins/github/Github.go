@@ -415,7 +415,6 @@ func (g *Github) getTeamMembersAndRepositories(organizationLogin githubv4.String
 			variables["repositoryAfter"] = githubv4.NewString(team.Organization.Team.Repositories.PageInfo.EndCursor)
 		}
 	}
-	g.printJSON(allTeamMembersAndRepos)
 	return &allTeamMembersAndRepos, nil
 }
 

@@ -4,80 +4,83 @@
       <h2>WiseHub-Courses</h2>
     </div>
 
-    <div class="row">
+
+
+    <div v-if="!message" class="row">
       <div
-          v-for="(item, index) in courses"
+          v-for="(item, index) in plugins"
           :key="index"
-          class="col-lg-6 col-md-12 col-sm-12">
+          class="col-lg-12 col-md-12 col-sm-12">
         <div class="card">
           <h3
               class="text-center"
               style="background-color: #464646; color: white; border-radius: 3px; padding: 15px">
-            {{ item.Name }}
+            {{ item.PluginName }}
           </h3>
         </div>
         <br>
-        <br>
-        <br>
-        <br>
-        <div class="card">
-          <h3
-              class="text-center"
-              style="background-color: #464646; color: white; border-radius: 3px; padding: 15px">
-            TeamName
-          </h3>
-        <div class="card-columns">
-          <div
-              v-for="(item, index) in plugins"
-              :key="index"
-              class="col-lg-6 col-md-12 col-sm-12">
+        <div class="col-lg-6">
+          <div class="card">
+            <h5
+                class="text-center"
+                style="background-color: #464646; color: white; border-radius: 3px; padding: 10px">
 
-            <div class="card bg-white">
-              <div class="card-header" :id="'h' + index">
-                <h5 class="mb-0">
-                  {{item.PluginName}}
-                </h5>
-              </div>
-              <div class="card-body text-center">
-                <p class="card-text">{{item.PluginContent}}</p>
+            </h5>
+            <div class="card-columns">
+              <div
+                  v-for="(item, index) in plugins"
+                  :key="index">
+                <div class="card bg-white">
+                  <div class="card-header" >
+                    {{ item.PluginName }}
+                  </div>
+                  <div class="card-body text-center">
+                    <p class="card-text">{{ item.PluginContent }}</p>
+                  </div>
+                </div>
+
+
+
               </div>
             </div>
-
-
-
           </div>
-        </div>
         </div>
 
       </div>
+    </div>
+
+    <div v-else>
+      {{ this.message }}
     </div>
 
 
     <!--      load this part only in 'onItemClick'-->
-    <div class="row" v-if="clicked">
-      <div
-          id="accordion"
-          v-for="(item, index) in plugins"
-          :key="index"
-          class="col-12">
+<!--    <div class="row" v-if="clicked">-->
+<!--      <div-->
+<!--          id="accordion"-->
+<!--          v-for="(item, index) in plugins"-->
+<!--          :key="index"-->
+<!--          class="col-12">-->
 
-        <div class="card">
-          <div class="card-header" :id="'h' + index">
-            <h5 class="mb-0">
-              <button class="btn btn-info" data-toggle="collapse" :data-target="'#c' + index" aria-expanded="true" :aria-controls="'c' + index">
-                {{ item.PluginName }}
-              </button>
-            </h5>
-          </div>
+<!--        <div class="card">-->
+<!--          <div class="card-header" :id="'h' + index">-->
+<!--            <h5 class="mb-0">-->
+<!--              <button class="btn btn-info" data-toggle="collapse" :data-target="'#c' + index" aria-expanded="true" :aria-controls="'c' + index">-->
+<!--                {{ item.PluginName }}-->
+<!--              </button>-->
+<!--            </h5>-->
+<!--          </div>-->
 
-          <div :id="'c' + index" class="collapse show" :aria-labelledby="'h' + index" data-parent="#accordion">
-            <div class="card-body">
-              {{ item.PluginContent }}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+<!--          <div :id="'c' + index" class="collapse show" :aria-labelledby="'h' + index" data-parent="#accordion">-->
+<!--            <div class="card-body">-->
+<!--              {{ item.PluginContent }}-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+
+
     <!--        <div-->
     <!--            v-for="(dings, index) in plugins"-->
     <!--            :key="index"-->
@@ -104,15 +107,16 @@
 <script>
     export default {
       name: "Courses",
+
       data() {
         return {
           clicked: false,
           courses: [{
-            'Name': 'Dummy',
+            'Name': '',
             'Teams': [{
-                'Name': 'DummyTeam',
+                'Name': '',
                 'Members': [{
-                  'Name': 'dummyMember',
+                  'Name': '',
                 }],
                 'Repositories': [{
                   'Name': '',
@@ -126,11 +130,11 @@
           }],
 
           plugins: [{
-            'PluginName': 'DummyPlugin1',
-            'PluginContent': 'DummyContent'
+            'PluginName': '',
+            'PluginContent': ''
           },{
-            'PluginName': 'DummyPlugin2',
-            'PluginContent': 'DummyContent'
+            'PluginName': '',
+            'PluginContent': ''
           }],
           message: '',
         }
@@ -164,14 +168,14 @@
         }).then(
             (onSuccess) => {
               if (onSuccess.data.success) {
-                if (onSuccess.data.allData) {
-                  for (const [key, value] of Object.entries(onSuccess.data.allData)) {
-                    // console.log(`${key}: ${value}`);
+                if (onSuccess.data.response_data) {
+                  for (const [key, value] of Object.entries(onSuccess.data.response_data)) {
                     this.plugins['PluginName'] = key
                     this.plugins['PluginContent'] = JSON.parse(String(value))
-                    // console.log("this is the plugins")
-                    // console.log(this.plugins)
+                    console.log(this.plugins['PluginName']);
+                    console.log(this.plugins['PluginContent']);
                   }
+                  this.$forceUpdate()
                 }
               }
             },
