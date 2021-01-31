@@ -24,7 +24,7 @@ type Response struct{
 	Success 		bool                    	`json:"success"`
 	Email 			string               		`json:"email"`
 	Plugins 		[]data.Plugin           	`json:"plugins"`
-	Data			map[string]string			`json:"response_data"`
+	Data			map[string]string			`json:"pluginData"`
 
 }
 
@@ -166,6 +166,7 @@ func (r *Router) Profile(w http.ResponseWriter, req *http.Request, ps httprouter
 	response.Success = true
 	response.Email = dbUser[0].Email
 	response.Plugins = dbUser[0].Plugins
+	fmt.Println(response.Plugins)
 	resp, err := json.Marshal(response)
 	if err != nil {
 		log.Println(err)

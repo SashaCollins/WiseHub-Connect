@@ -131,7 +131,7 @@ func (ds *Datastore) Load(email ...string) (user []User, err error) {
     case 1:
         return loadUserByEmail(db, email[0])
     default:
-        fmt.Printf("too many arguments in function load: %v\n", len(email))
+        log.Printf("too many arguments in function load: %v\n", len(email))
         return user, nil
     }
 }

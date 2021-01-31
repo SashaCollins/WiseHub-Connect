@@ -5,6 +5,7 @@ import (
 	"fmt"
 	heroku "github.com/heroku/heroku-go/v5"
 	"github/SashaCollins/Wisehub-Connect/model/plugins"
+	"log"
 )
 
 var (
@@ -18,23 +19,24 @@ func init() {
 
 type Heroku struct {}
 
+type Response struct{
+	Addon struct {
+
+	}
+}
+
 func (h *Heroku) SubmitCredentials(_, token string) {
 	heroku.DefaultTransport.BearerToken = token
 	HerokuClient = heroku.NewService(heroku.DefaultClient)
 }
 
 func (h *Heroku) FetchData() (string, error) {
-	account, err := HerokuClient.AccountInfo(context.TODO())
+	//var response Response
+	addon, err := h.getAddonList()
 	if err != nil {
-		fmt.Println("\tin fetch error")
-		return "", err
+		log.Println(err)
 	}
-	fmt.Print(account)
-	addon, err := HerokuClient.AddOnList(context.TODO(), nil)
-	if err != nil {
-		fmt.Println("\tin fetch error")
-		return "", err
-	}
+
 	fmt.Println(addon)
 	return "", nil
 }
@@ -53,4 +55,17 @@ func init(){
 
 func NewPlugin() plugins.PluginI {
 	return &Heroku{}
+}
+
+func (h *Heroku) getAddonList() (heroku.AddOnListResult, error){
+	addon, err := HerokuClient.AddOnList(context.TODO(), &heroku.ListRange{Field: "name", Max: 1000})
+	if err != nil {
+		fmt.Println("\tin fetch error")
+		return nil, err
+	}
+	return addon, nil
+}
+
+func (h *Heroku) get() {
+
 }

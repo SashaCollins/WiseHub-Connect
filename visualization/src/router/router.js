@@ -10,7 +10,7 @@ import LogIn from '../components/auth/LogIn.vue';
 import SignUp from '../components/auth/SignUp.vue';
 import Forgot from '../components/auth/Forgot.vue';
 import Template from "../components/hub/Template";
-import General from "../components/hub/General";
+import General from "../components/hub/VersionManager";
 
 Vue.use(Router);
 

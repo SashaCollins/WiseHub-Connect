@@ -19,11 +19,11 @@ var (
 
 type Response struct {
 	Repository struct {
-		Name string `json:"repo_name"`
-		Branch string `json:"repo_branch"`
+		Name string `json:"repoName"`
+		Branch string `json:"repoBranch"`
 		Build struct {
-			Number int64 `json:"build_number"`
-			Status string `json:"build_status"`
+			Number int64 `json:"buildNumber"`
+			Status string `json:"buildStatus"`
 		} `json:"build"`
 	} `json:"repo"`
 }

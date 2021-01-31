@@ -201,26 +201,26 @@ type Viewer struct {
 
 
 type RTeams struct{
-	Name githubv4.String `json:"orga_name"`
-	Members []RMembers `json:"member"`
-	Repositories []RRepositories `json:"repository"`
+	Name githubv4.String `json:"teamName"`
+	Members []RMembers `json:"members"`
+	Repositories []RRepositories `json:"repositories"`
 }
 type RMembers struct {
-	Login     githubv4.String `json:"orga_name"`
+	Login     githubv4.String `json:"memberName"`
 }
 type RRepositories struct {
-	Name  githubv4.String `json:"repo_name"`
-	URL   githubv4.URI `json:"repo_url"`
-	Issues []RIssues `json:"issue"`
+	Name  githubv4.String `json:"repoName"`
+	URL   githubv4.URI `json:"repoUrl"`
+	Issues []RIssues `json:"issues"`
 }
 type RIssues struct {
-	Number			githubv4.Int `json:"issue_number"`
-	Title			githubv4.String `json:"issue_title"`
+	Number			githubv4.Int `json:"issueNumber"`
+	Title			githubv4.String `json:"issueTitle"`
 }
 type Response struct {
 	Organization struct{
-		Login githubv4.String `json:"orga_name"`
-		Teams []RTeams `json:"team"`
+		Login githubv4.String `json:"orgaName"`
+		Teams []RTeams `json:"teams"`
 	} `json:"organization"`
 }
 func (g *Github) FetchData() (string, error) {
