@@ -44,7 +44,6 @@ func createTables(db *gorm.DB) {
 }
 
 func loadAllPluginsByUserID(db *gorm.DB, userID uint) (plugins []Plugin, err error) {
-    fmt.Println(userID)
     if result :=  db.Where("user_id = ?", userID).Find(&plugins); result.Error != nil {
         log.Printf("loadAllUsers: %q\n", result.Error)
         return plugins, result.Error

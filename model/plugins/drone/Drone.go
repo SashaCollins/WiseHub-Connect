@@ -16,7 +16,6 @@ var (
 	droneClient  drone.Client
 )
 
-
 type Response struct {
 	Repository struct {
 		Name string `json:"repo_name"`
@@ -34,6 +33,9 @@ func init() {
 
 func NewPlugin() plugins.PluginI {
 	return &Drone{}
+}
+func getPluginName() string {
+	return PluginName
 }
 
 func (d *Drone) SubmitCredentials(host, token string) {
@@ -71,6 +73,3 @@ func (d *Drone) FetchPluginName() string {
 	return getPluginName()
 }
 
-func getPluginName() string {
-	return PluginName
-}

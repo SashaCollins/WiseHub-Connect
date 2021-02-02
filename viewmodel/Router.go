@@ -176,31 +176,31 @@ func (r *Router) Profile(w http.ResponseWriter, req *http.Request, ps httprouter
 	return
 }
 
-func (r *Router) Forgot(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
-	reqBody, err := ioutil.ReadAll(req.Body)
-	if err != nil {
-		log.Println(err)
-	}
-
-	var user Request
-	err = json.Unmarshal(reqBody, &user)
-	if err != nil {
-		log.Println(err)
-	}
-
-	var response Response
-	dbUser, err := r.Datastore.Load(user.Email)
-	fmt.Println(dbUser)
-	response.Success = true
-	resp, err := json.Marshal(response)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, "Internal server error", 500)
-		return
-	}
-	_, _ = w.Write(resp)
-	return
-}
+//func (r *Router) Forgot(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+//	reqBody, err := ioutil.ReadAll(req.Body)
+//	if err != nil {
+//		log.Println(err)
+//	}
+//
+//	var user Request
+//	err = json.Unmarshal(reqBody, &user)
+//	if err != nil {
+//		log.Println(err)
+//	}
+//
+//	var response Response
+//	dbUser, err := r.Datastore.Load(user.Email)
+//	fmt.Println(dbUser)
+//	response.Success = true
+//	resp, err := json.Marshal(response)
+//	if err != nil {
+//		log.Println(err)
+//		http.Error(w, "Internal server error", 500)
+//		return
+//	}
+//	_, _ = w.Write(resp)
+//	return
+//}
 
 func (r *Router) Update(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 	reqBody, err := ioutil.ReadAll(req.Body)
