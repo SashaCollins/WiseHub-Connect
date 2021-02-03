@@ -1,6 +1,7 @@
 import UserService from '../services/user.service';
+import Plugin from '../model/plugins';
 
-const userObject = sessionStorage.getItem('user');
+const userObject = JSON.parse(sessionStorage.getItem('user'));
 const initialState = userObject
 	? { user: userObject }
 	: { user: null };
@@ -15,7 +16,6 @@ export const user = {
 	fetchProfile({ commit }, user) {
 	  return UserService.fetchProfile(user).then(onSuccess => {
 	    if (onSuccess.data.success) {
-	      user.plugins = onSuccess.data.plugins;
 		  commit("fetchSuccess", user);
 		}
 		return Promise.resolve(onSuccess);
@@ -60,15 +60,17 @@ export const user = {
 	},
 	fetchData({ commit }, payload) {
 	  return UserService.fetchData(payload).then(onSuccess => {
-		user.allData = [];
 		if (onSuccess.data.success) {
-		  for (const [key, value] of Object.entries(onSuccess.data.response_data)) {
-			// console.log(`${key}: ${value}`);
-			for (let i = 0; i < value.length; i++) {
-			  user.allData.push(value[i]);
+			if (onSuccess.data.pluginData) {
+				payload.user.plugins = [];
+				for (const [key, value] of Object.entries(onSuccess.data.pluginData)) {
+					if (value) {
+						let plugin = new Plugin(key, JSON.parse(value));
+						payload.user.plugins.push(plugin);
+					}
+				}
 			}
-		  }
-		  commit('fetchSuccess', user);
+		  commit('fetchSuccess', payload.user);
 		}
 		return Promise.resolve(onSuccess);
 	  }, onFailure => {

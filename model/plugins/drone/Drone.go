@@ -1,3 +1,9 @@
+/*
+Plugin for Drone CI
+fetches data from Drone CI via REST-API
+@author SashaCollins
+@version 1.0
+ */
 package main
 
 import (
@@ -12,30 +18,32 @@ import (
 type Drone struct{}
 
 var (
-	PluginName   string
+	pluginName   string
 	droneClient  drone.Client
 )
-
+/*
+This is what the response from FetchData looks for Drone CI
+ */
 type Response struct {
 	Repository struct {
-		Name string `json:"repo_name"`
-		Branch string `json:"repo_branch"`
+		Name string `json:"repoName"`
+		Branch string `json:"repoBranch"`
 		Build struct {
-			Number int64 `json:"build_number"`
-			Status string `json:"build_status"`
+			Number int64 `json:"buildNumber"`
+			Status string `json:"buildStatus"`
 		} `json:"build"`
 	} `json:"repo"`
 }
 
 func init() {
-	PluginName = "Drone CI"
+	pluginName = "Drone CI"
 }
 
 func NewPlugin() plugins.PluginI {
 	return &Drone{}
 }
 func getPluginName() string {
-	return PluginName
+	return pluginName
 }
 
 func (d *Drone) SubmitCredentials(host, token string) {

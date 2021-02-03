@@ -1,6 +1,7 @@
-/* This Datastore works with sqlite3 Database.
- to use another database exchange this, and only this, file with a 'Database.go' file t
-hat works with your desired database. Make sure to implement the Interface DatastoreI.go,
+/*
+This Datastore works with sqlite3 Database.
+To use another database exchange this, and only this, file with a 'Database.go' file
+that works with your desired database. Make sure to implement the Interface DatastoreI.go,
 otherwise your dashboard may not work properly.
 @author SashaCollins
  */
@@ -109,13 +110,6 @@ func updatePlugins(db *gorm.DB, userEmail string, updatedPlugins []Plugin) error
     return nil
 }
 
-/* Please note:
-Input either zero, one or two arguments
-zero loads all users from database
-one loads user based on email address
- @param email string
- @param password string
-*/
 func (ds *Datastore) Load(email ...string) (user []User, err error) {
     // Get any parameters passed to us out of the args variable into "real"
     // variables we created for them.
@@ -130,7 +124,7 @@ func (ds *Datastore) Load(email ...string) (user []User, err error) {
     case 1:
         return loadUserByEmail(db, email[0])
     default:
-        fmt.Printf("too many arguments in function load: %v\n", len(email))
+        log.Printf("too many arguments in function load: %v\n", len(email))
         return user, nil
     }
 }
@@ -146,14 +140,18 @@ func (ds *Datastore) Create(password string, email string) error {
         {PluginName: "Drone CI", UsernameHost: "", Token: "", Description: "", Updated: false},
         {PluginName: "Heroku", UsernameHost: "", Token: "", Description: "", Updated: false},
     }
-    user := User{Email: email, Password: password, Admin: false, Plugins: defaultPlugins}
+    user := User{Email: email, Password: password, Plugins: defaultPlugins}
     if result := db.Create(&user); result.Error != nil {
         log.Printf("Save %q: %v\n", err, db)
         return err
-    } // pass pointer of data to Create
+    } //pass pointer of data to Create
     return nil
 }
-
+/*
+@param option - which information is going to be updated,
+in this case either email, password or credentials.
+@param data - the new information
+ */
 func (ds *Datastore) Update(option string, data map[string]interface{}) error {
     db, err := openDB()
     if err != nil {
@@ -162,16 +160,16 @@ func (ds *Datastore) Update(option string, data map[string]interface{}) error {
     }
     switch option {
     case "email":
-       db.Model(User{}).Where("email = ?", data["old"]).Updates(User{Email: data["new"].(string)})
+        db.Model(User{}).Where("email = ?", data["old"]).Updates(User{Email: data["new"].(string)})
     case "password":
-        db.Model(User{}).Where("email = ?",  data["email"]).Updates(User{Password: data["password"].(string)})
+        db.Model(User{}).Where("email = ?", data["email"]).Updates(User{Password: data["password"].(string)})
     case "credentials":
         if err := updatePlugins(db, data["email"].(string), data["updatedPlugins"].([]Plugin)); err != nil {
             log.Printf("Update %q: %v\n", err, db)
             return err
         }
-    case "admin":
-        db.Model(User{}).Where("email = ?", data["email"]).Updates(User{Admin: data["admin"].(bool)})
+    default:
+        return fmt.Errorf("invalid option was given: %v", option)
     }
     return nil
 }

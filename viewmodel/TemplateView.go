@@ -1,3 +1,11 @@
+/*
+This is a template to how a concrete view should look like, which collects all relevant data from all plugins.
+A new View e.g. PersonalView should somehow differentiate from general view.
+You should either trim or extend received data from FetchData Method.
+Or the plugins should extend a new method (e.g. FetchSpecialData, FetchExtendedData, FetchShortenedData) for different data
+@author SashaCollins
+@version 1.0
+*/
 package viewmodel
 
 import (

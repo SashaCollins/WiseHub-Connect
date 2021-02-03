@@ -83,16 +83,12 @@
         this.submitted = true
         this.$validator.validate().then(isValid => {
           if (isValid) {
-            console.log(this.user.password);
             this.$store.dispatch("auth/register", this.user).then(
-              (onSuccess) => {
-                console.log(onSuccess);
-                this.$router.push({name: 'login'})
+              () => {
+                this.$router.push("/login")
               },
               (onFailure) => {
-                console.log(onFailure.response)
                 this.message = onFailure.response.data;
-                console.log(this.message)
                 this.submitted = false;
               },
             )

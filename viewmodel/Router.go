@@ -1,3 +1,8 @@
+/*
+Router delegates requests from frontend to backend and back
+@author SashaCollins
+@version 1.0
+ */
 package viewmodel
 
 import (
@@ -24,8 +29,7 @@ type Response struct{
 	Success 		bool                    	`json:"success"`
 	Email 			string               		`json:"email"`
 	Plugins 		[]data.Plugin           	`json:"plugins"`
-	Data			map[string]string			`json:"response_data"`
-
+	Data			map[string]string			`json:"pluginData"`
 }
 
 type Request struct {
@@ -37,8 +41,10 @@ type Request struct {
 	Repository 		string						`json:"repo"`
 	Course 			string			 			`json:"course"`
 }
-
-func (r *Router) ReloadPlugins() map[string]plugins.PluginI {
+/*
+Loads plugins via PluginLoader
+ */
+func (r *Router) LoadPlugins() map[string]plugins.PluginI {
 	var loader PluginLoader
 	pluginMap, err := loader.LoadAllPlugins()
 	if err != nil {
@@ -46,7 +52,9 @@ func (r *Router) ReloadPlugins() map[string]plugins.PluginI {
 	}
 	return pluginMap
 }
-
+/*
+Fetches credentials for the plugins from datastore
+ */
 func (r *Router) LoadPluginCredentials(userEmail string) map[string]plugins.Credentials {
 	dbUser, err := r.Datastore.Load(userEmail)
 	if err != nil {
@@ -138,7 +146,10 @@ func (r *Router) SignIn(w http.ResponseWriter, req *http.Request, ps httprouter.
 	}
 	return
 }
-
+/*
+Requests a user profile by email from the datastore
+Returns the user profile or an error
+ */
 func (r *Router) Profile(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 	reqBody, err := ioutil.ReadAll(req.Body)
 	if err != nil {
@@ -166,6 +177,7 @@ func (r *Router) Profile(w http.ResponseWriter, req *http.Request, ps httprouter
 	response.Success = true
 	response.Email = dbUser[0].Email
 	response.Plugins = dbUser[0].Plugins
+	fmt.Println(response.Plugins)
 	resp, err := json.Marshal(response)
 	if err != nil {
 		log.Println(err)
@@ -175,7 +187,11 @@ func (r *Router) Profile(w http.ResponseWriter, req *http.Request, ps httprouter
 	_, _ = w.Write(resp)
 	return
 }
-
+/*
+Requests new password
+sending an email is not implemented in v1.0
+is not used in v1.0
+ */
 //func (r *Router) Forgot(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 //	reqBody, err := ioutil.ReadAll(req.Body)
 //	if err != nil {
@@ -190,7 +206,12 @@ func (r *Router) Profile(w http.ResponseWriter, req *http.Request, ps httprouter
 //
 //	var response Response
 //	dbUser, err := r.Datastore.Load(user.Email)
-//	fmt.Println(dbUser)
+//	if err != nil {
+//		log.Println(err)
+//	}
+//
+//	//TODO send email
+//
 //	response.Success = true
 //	resp, err := json.Marshal(response)
 //	if err != nil {
@@ -201,7 +222,10 @@ func (r *Router) Profile(w http.ResponseWriter, req *http.Request, ps httprouter
 //	_, _ = w.Write(resp)
 //	return
 //}
-
+/*
+Requests an update for user profile from datastore for either email, password or credentials
+Returns a success or error message
+ */
 func (r *Router) Update(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 	reqBody, err := ioutil.ReadAll(req.Body)
 	if err != nil {
@@ -271,7 +295,10 @@ func (r *Router) Update(w http.ResponseWriter, req *http.Request, ps httprouter.
 	_, _ = w.Write(resp)
 	return
 }
-
+/*
+Requests all data to show from a view
+Returns fetched data
+ */
 func (r *Router) Show(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 	reqBody, err := ioutil.ReadAll(req.Body)
 	if err != nil {
@@ -327,7 +354,11 @@ func (r *Router) Show(w http.ResponseWriter, req *http.Request, ps httprouter.Pa
 	_, _ = w.Write(resp)
 	return
 }
-
+/*
+Requests a deletion of a user profile from datastore
+Returns a success or error message
+not used in v1.0
+ */
 //func (gv *GeneralView) Delete(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 //	var user Request
 //	var response Response
@@ -364,30 +395,26 @@ func (r *Router) Show(w http.ResponseWriter, req *http.Request, ps httprouter.Pa
 //	_, _ = w.Write(resp)
 //	return
 //}
-
+/*
+Passes on the incomming http Requests
+If functionality is extended add new routes here
+ */
 func (r *Router) New() (router *httprouter.Router) {
 	router = httprouter.New()
 
 	// Authentication
 	router.POST("/auth/signin", r.SignIn)
 	router.POST("/auth/signup", r.SignUp)
+	//router.POST("/user/forgot", r.Forgot)
 
 	// Profile
 	router.POST("/user/profile", r.Profile)
 	router.POST("/user/update/password", r.Update)
 	router.POST("/user/update/credentials", r.Update)
+	//router.POST("/user/delete", r.View.Delete)
 
 	// Fetch view data
 	router.POST("/data/all", r.Show)
-	//router.POST("/user/delete", r.View.Delete)
-	//router.POST("/user/update/email", r.View.Update)
-	//router.POST("/user/update/password", r.View.Update)
-	//router.POST("/user/update/credentials", r.View.Update)
-	//router.POST("/user/repos", r.View.Repositories)
-	//router.POST("/user/all", r.view.Show())
-	//router.POST("/user/teams", r.View.Teams)
-	//router.POST("/admin/delete/plugins", r.View.Delete)
-	//router.POST("/admin/update/plugins", r.View.Update)
 
 	router.GlobalOPTIONS = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("Access-Control-Request-Method") != "" {
@@ -402,10 +429,13 @@ func (r *Router) New() (router *httprouter.Router) {
 	})
 	return
 }
-
+/*
+Starts the router
+router should be running in a go routine
+ */
 func (r *Router) Run(port int, finished chan bool) {
 	router := r.New()
-	PluginMap = r.ReloadPlugins()
+	PluginMap = r.LoadPlugins()
 	fmt.Printf("Run: %s\n", http.ListenAndServe(fmt.Sprintf(":%d", port), router))
 	finished <- true
 }

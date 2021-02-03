@@ -1,3 +1,9 @@
+/*
+Plugin for GitHub
+fetches data from GitHub via graphQL API
+@author SashaCollins
+@version 1.0
+*/
 package main
 
 import (
@@ -10,19 +16,14 @@ import (
 	"os"
 )
 
-//TODO: ask for token in gui for admin or maybe get token from user credentials
-//TODO: save token in file and read from file on startup
-//TODO: error msg if no token
-
-
 var (
-	PluginName    string
+	pluginName    string
 	GithubClient  *githubv4.Client
 	CurrentViewer Viewer
 )
 
 func init() {
-	PluginName = "Github"
+	pluginName = "Github"
 }
 
 type Github struct {}
@@ -32,8 +33,16 @@ func NewPlugin() plugins.PluginI {
 }
 
 func getPluginName() string {
-	return PluginName
+	return pluginName
 }
+
+/*
+These structs are used to fetch data from githubv4 API
+They don't contain every information available,
+for further information please read
+https://docs.github.com/en/graphql
+and github.com/shurcooL/githubv4
+ */
 
 //type Commit struct {
 //	Author    ShortUser
@@ -50,13 +59,10 @@ type Issue struct {
 	Title			githubv4.String
 	//Body           githubv4.String
 	//State			githubv4.IssueState
-	//ViewerCanUpdate githubv4.Boolean
 }
 
 type Organization struct {
 	Login githubv4.String
-	//URL			githubv4.URI
-	//ViewerCanAdminister githubv4.Boolean
 }
 
 type OrganizationTeams struct {
@@ -69,7 +75,6 @@ type OrganizationTeams struct {
 	}`graphql:"organization(login:$login)"`
 }
 
-//var currentPageInfo pageInfo
 type PageInfo struct {
 	StartCursor githubv4.String
 	HasPreviousPage githubv4.Boolean
@@ -88,7 +93,6 @@ type RateLimit struct {
 	ResetAt   githubv4.DateTime
 }
 
-//var currentRepository repository
 type Repository struct {
 	Name  githubv4.String
 	Owner ShortUser
@@ -200,29 +204,34 @@ type Viewer struct {
 
 
 
-type RTeams struct{
-	Name githubv4.String `json:"orga_name"`
-	Members []RMembers `json:"member"`
-	Repositories []RRepositories `json:"repository"`
-}
-type RMembers struct {
-	Login     githubv4.String `json:"orga_name"`
-}
-type RRepositories struct {
-	Name  githubv4.String `json:"repo_name"`
-	URL   githubv4.URI `json:"repo_url"`
-	Issues []RIssues `json:"issue"`
-}
-type RIssues struct {
-	Number			githubv4.Int `json:"issue_number"`
-	Title			githubv4.String `json:"issue_title"`
-}
+
+/*
+This is what the response from FetchData looks for GitHub
+*/
 type Response struct {
 	Organization struct{
-		Login githubv4.String `json:"orga_name"`
-		Teams []RTeams `json:"team"`
+		Login githubv4.String `json:"orgaName"`
+		Teams []RTeams `json:"teams"`
 	} `json:"organization"`
 }
+type RTeams struct{
+	Name githubv4.String `json:"teamName"`
+	Members []RMembers `json:"members"`
+	Repositories []RRepositories `json:"repositories"`
+}
+type RMembers struct {
+	Login     githubv4.String `json:"memberName"`
+}
+type RRepositories struct {
+	Name  githubv4.String `json:"repoName"`
+	URL   githubv4.URI `json:"repoUrl"`
+	Issues []RIssues `json:"issues"`
+}
+type RIssues struct {
+	Number			githubv4.Int `json:"issueNumber"`
+	Title			githubv4.String `json:"issueTitle"`
+}
+
 func (g *Github) FetchData() (string, error) {
 	var response []Response
 
@@ -284,19 +293,23 @@ func (g *Github) FetchData() (string, error) {
 	r, _ := json.Marshal(response)
 	return string(r), nil
 }
-func (g *Github) SubmitCredentials(username, token string) {
+
+func (g *Github) SubmitCredentials(_, token string) {
 	src := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: token},
 	)
 	httpClient := oauth2.NewClient(context.Background(), src)
 	GithubClient = githubv4.NewClient(httpClient)
 }
+
 func (g *Github) FetchPluginName() string {
 	return getPluginName()
 }
 
-
-
+/*
+For debugging purposes,
+to display readable data on console
+ */
 func (g *Github) printJSON(v interface{}) {
 	w := json.NewEncoder(os.Stdout)
 	w.SetIndent("", "\t")
@@ -305,7 +318,9 @@ func (g *Github) printJSON(v interface{}) {
 		panic(err)
 	}
 }
-
+/*
+Fetches the current User, the User with given credentials
+ */
 func (g *Github) getViewer() (*Viewer, error) {
 	err := GithubClient.Query(context.Background(), &CurrentViewer, nil)
 	if err != nil {
@@ -314,7 +329,10 @@ func (g *Github) getViewer() (*Viewer, error) {
 	}
 	return &CurrentViewer, nil
 }
-
+/*
+Fetches all organizations which the user with the name 'ownerLogin' is is a part of.
+Input Parameters can be fetched from getViewer()
+ */
 func (g *Github) getOrganizations(ownerLogin githubv4.String) (*[]Organization, error) {
 	var allOrganizations []Organization
 	var user User
@@ -338,7 +356,10 @@ func (g *Github) getOrganizations(ownerLogin githubv4.String) (*[]Organization, 
 	}
 	return &allOrganizations, nil
 }
-
+/*
+Fetches all teams from the organization with the name 'organizationLogin'
+Input Parameters can be fetched from getOrganizations(ownerLogin githubv4.String) (*[]Organization, error)
+ */
 func (g *Github) getTeamsPerOrganization(organizationLogin githubv4.String) (*[]ShortTeam, error) {
 	var organizationTeams OrganizationTeams
 	var allTeams []ShortTeam
@@ -363,7 +384,10 @@ func (g *Github) getTeamsPerOrganization(organizationLogin githubv4.String) (*[]
 	}
 	return &allTeams, nil
 }
-
+/*
+Fetches all team members and repositories from a given team 'teamName' in an organization 'organizationName'
+Input Parameters can be fetched from getTeamsPerOrganization(organizationLogin githubv4.String) (*[]ShortTeam, error)
+ */
 func (g *Github) getTeamMembersAndRepositories(organizationLogin githubv4.String, teamName githubv4.String) (*Team, error){
 	var team Team
 	allTeamMembersAndRepos := Team{}
@@ -409,7 +433,10 @@ func (g *Github) getTeamMembersAndRepositories(organizationLogin githubv4.String
 	}
 	return &allTeamMembersAndRepos, nil
 }
-
+/*
+Fetches Information about a given Repository 'repositoryName' and the owners name 'ownerLogin'
+Input Parameters can be fetched from getTeamMembersAndRepositories(organizationLogin githubv4.String, teamName githubv4.String) (*Team, error)
+ */
 func (g *Github) getRepositoryInfo(repositoryName githubv4.String, ownerLogin githubv4.String) (*[]Issue, error) {
 	var repositoryInfo RepositoryInfo
 	var allIssuesAssigned []Issue

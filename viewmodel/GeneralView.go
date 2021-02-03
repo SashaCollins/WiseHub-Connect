@@ -1,3 +1,8 @@
+/*
+This is the general view which collects all relevant data from all plugins
+@author SashaCollins
+@version 1.0
+ */
 package viewmodel
 
 import (

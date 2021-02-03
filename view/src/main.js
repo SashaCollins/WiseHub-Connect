@@ -7,8 +7,7 @@ import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
-// import BootstrapVue from 'bootstrap-vue/dist/bootstrap-vue.esm';
-import {BootstrapVue, IconsPlugin, vue} from 'bootstrap-vue'
+import {BootstrapVue, IconsPlugin} from 'bootstrap-vue'
 import { LayoutPlugin } from 'bootstrap-vue'
 Vue.use(LayoutPlugin)
 import { BContainer, BRow, BCol } from 'bootstrap-vue'

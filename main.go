@@ -1,3 +1,6 @@
+/*
+Starting point of backend
+*/
 package main
 
 import (
