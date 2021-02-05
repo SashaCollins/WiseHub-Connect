@@ -2,7 +2,7 @@
   <div class="container-fluid">
     <div class="row">
       <div v-for="(orga, index) in vmCards.pluginData" :key="index">
-        <h2 class="text-center" style="background-color: #008B8B; color: white; border-radius: 3px; padding: 10px">
+        <h2 class="text-center" style="background-color: #008b8b; color: white; border-radius: 3px; padding: 10px">
           Organisation: {{orga.organization.orgaName}}
         </h2>
         <div class="card-columns">
@@ -18,8 +18,8 @@
                   URL: {{repo.repoUrl}}
                 </h5>
                 <div class="card bg-white text-center">
-                  <Github v-bind:github="team"></Github>
-                  <DroneCI v-bind:drone="getRepo('Drone CI', repo.repoName)"></DroneCI>
+                  <Github v-bind:githubTeam="team" v-bind:githubRepo="getGithubRepo(team, repo.repoName)"></Github>
+                  <DroneCI v-bind:drone="getDroneCIRepo('Drone CI', repo.repoName)"></DroneCI>
 <!--                  <Template v-bind:template="getRepo('TemplateName', repo.repoName)"></Template>-->
                 </div>
               </div>
@@ -58,7 +58,7 @@ export default {
       this.clicked = true;
     },
     //combines repo information from all plugins based on the repoName
-    getRepo (pluginName, repoName) {
+    getDroneCIRepo (pluginName, repoName) {
       for (let i = 0; i < this.getUser.plugins.length; i++) {
         let plugin = this.getUser.plugins[i];
         if (pluginName === plugin.pluginName) {
@@ -68,6 +68,14 @@ export default {
               return data;
             }
           }
+        }
+      }
+    },
+    getGithubRepo (githubTeam, repoName) {
+      for (let i = 0; i < githubTeam.repositories.length; i++) {
+        let repo = githubTeam.repositories[i];
+        if (repoName === repo.repoName) {
+          return repo;
         }
       }
     }

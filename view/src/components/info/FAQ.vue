@@ -92,19 +92,19 @@
 
 <style scoped lang="scss">
 
-.bg-img {
-  /* The image used */
-  background-image: url("");
+    .bg-img {
+      /* The image used */
+      background-image: url("/");
 
-  /* Control the height of the image */
-  min-height: 100vh;
+      /* Control the height of the image */
+      min-height: 100vh;
 
-  /* Center and scale the image nicely */
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  position: relative;
-}
+      /* Center and scale the image nicely */
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+      position: relative;
+    }
     .container-fluid {
       float: contour;
       horiz-align: center;

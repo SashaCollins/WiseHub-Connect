@@ -1,6 +1,5 @@
 <template>
   <div class="card">
-    {{ this.github}}
     <div class="card-header">
       <h5
           class="text-center"
@@ -8,26 +7,20 @@
         Github
       </h5>
     </div>
-    <div class="card-body text-left">
-      <table class="card-table table table-bordered">
-        <thead>
-        <tr>
-          <th>Members</th>
-          <th>Your Issues</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr v-for="(member, index) in github.members" :key="index">
-          <td>{{ member.memberName }}</td>
-        </tr>
-        <tr v-for="(issue, index) in github.issues" :key="index">
-          <td>
-            <p>ID: #{{issue.issueNumber}}</p>
-            <p>Title: {{issue.issueTitle}}</p>
-          </td>
-        </tr>
-        </tbody>
-      </table>
+    <div class="card-body text-left" style="overflow-y: auto; min-width: fit-content;">
+      <div>
+        Members:
+        <div class="col-12" v-for="(member, index) in githubTeam.members" :key="index">
+          {{ member.memberName }}
+        </div>
+      </div>
+      <div>
+        My Issues:
+        <div class="col-12" v-for="(issue, index) in githubRepo.issues" :key="index">
+          ID: #{{issue.issueNumber}}
+          Title: {{issue.issueTitle}}
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -36,7 +29,7 @@
 
 export default {
   name: "Github",
-  props: ["github"],
+  props: ["githubTeam", "githubRepo"],
   computed: {
     loggedIn() {
       return this.$store.state.auth.status.loggedIn;
