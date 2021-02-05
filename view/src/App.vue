@@ -1,48 +1,45 @@
 <!--   Quelle: [https://github.com/yaminncco/vue-sidebar-menu/blob/master/demo/App.vue]   -->
 <template>
-  <div
-          id="sidebar"
-          :class="[{'collapsed' : collapsed}, {'onmobile' : isOnMobile}]"
-  >
-    <div class="container" id="containerTheme">
-<!--      <hr style="border: 1px solid #e3e3e3;">-->
+    <div
+            id="sidebar"
+            :class="[{'collapsed' : collapsed}, {'onmobile' : isOnMobile}]"
+    >
+      <router-view />
+      <div class="sidebar">
+        <sidebar-menu
+                :key="selectedTheme"
+                :menu="loggedIn ? menuLoggedIn : menuLoggedOut"
+                :collapsed="collapsed"
+                :theme="selectedTheme"
+                :show-one-child="true"
+                :show-child="false"
+                @toggle-collapse="onToggleCollapse"
+                @item-click="onItemClick"
+        />
+        <div
+                v-if="isOnMobile && !collapsed"
+                class="sidebar-overlay"
+                @click="collapsed = true"
+        />
+      </div>
+
+      <div class="theme">
+        <!--        {{ loggedIn }}:-->
+        <select v-model="selectedTheme">
+          <option
+              v-for="(theme, index) in themes"
+              :key="index"
+              :value="theme.input"
+          >
+            {{ theme.name }}
+          </option>
+        </select>
+      </div>
     </div>
-    <router-view />
-    <div class="sidebar">
-      <sidebar-menu
-              :key="selectedTheme"
-              :menu="loggedIn ? menuLoggedIn : menuLoggedOut"
-              :collapsed="collapsed"
-              :theme="selectedTheme"
-              :show-one-child="true"
-              :show-child="false"
-              @toggle-collapse="onToggleCollapse"
-              @item-click="onItemClick"
-      />
-      <div
-              v-if="isOnMobile && !collapsed"
-              class="sidebar-overlay"
-              @click="collapsed = true"
-      />
-    </div>
-    <div class="theme">
-      <!--        {{ loggedIn }}:-->
-      <select v-model="selectedTheme">
-        <option
-            v-for="(theme, index) in themes"
-            :key="index"
-            :value="theme.input"
-        >
-          {{ theme.name }}
-        </option>
-      </select>
-    </div>
-  </div>
 </template>
 
 <script>
-    // import wisehubIcon from '@/assets/wiesehub-small.svg';
-    import Icon from './assets/logo.png';
+    import Icon from './assets/wisehubIcon.png';
 
     const separator = {
         render (h) {
@@ -118,13 +115,13 @@
                 icon: 'far fa-comments fa-fw',
               },
               {
-                href:'/view/template',
-                title: 'Template',
+                href:'/view/templateview',
+                title: 'TemplateView',
                 icon: 'fa fa-code fa-fw',
               },
               {
-                href: '/view/manager',
-                title: 'General',
+                href: '/view/generalview',
+                title: 'GeneralView',
                 icon: 'fa fa-chalkboard-teacher fa-fw',
               },
               {
@@ -136,11 +133,12 @@
                     title: 'Profile',
                     icon: 'fas fa-user fa-fw',
                   },
-                  {
-                    href: '/settings/contact',
-                    title: 'Contact',
-                    icon: 'fas fa-bullhorn fa-fw',
-                  },
+                    // Activate contact  form to enable sending contact messages
+                  // {
+                  //   href: '/settings/contact',
+                  //   title: 'Contact',
+                  //   icon: 'fas fa-bullhorn fa-fw',
+                  // },
                 ]
               },
               {
@@ -173,10 +171,8 @@
           }
         },
         computed: {
+          //switch menu between user is loggedIn and user is loggedOut
           loggedIn() {
-            return this.$store.state.auth.status.loggedIn;
-          },
-          isAdmin() {
             return this.$store.state.auth.status.loggedIn;
           },
         },
@@ -219,6 +215,23 @@
 <style lang="scss">
     @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600');
     @import "./scss/sidebar-menu.scss";
+
+    * {
+      box-sizing: border-box;
+    }
+    .bg-img {
+      /* The image used */
+      background-image: url("./assets/wisehubLogoV.png");
+
+      /* Control the height of the image */
+      min-height: 100vh;
+
+      /* Center and scale the image nicely */
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+      position: relative;
+    }
 
     div.header {
         margin-top: 35px;

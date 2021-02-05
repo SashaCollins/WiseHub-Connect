@@ -18,7 +18,7 @@ import (
 type Drone struct{}
 
 var (
-	pluginName   string
+	PluginName   string
 	droneClient  drone.Client
 )
 /*
@@ -32,18 +32,18 @@ type Response struct {
 			Number int64 `json:"buildNumber"`
 			Status string `json:"buildStatus"`
 		} `json:"build"`
-	} `json:"repo"`
+	} `json:"repositories"`
 }
 
 func init() {
-	pluginName = "Drone CI"
+	PluginName = "Drone CI"
 }
 
 func NewPlugin() plugins.PluginI {
 	return &Drone{}
 }
 func getPluginName() string {
-	return pluginName
+	return PluginName
 }
 
 func (d *Drone) SubmitCredentials(host, token string) {

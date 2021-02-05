@@ -177,7 +177,6 @@ func (r *Router) Profile(w http.ResponseWriter, req *http.Request, ps httprouter
 	response.Success = true
 	response.Email = dbUser[0].Email
 	response.Plugins = dbUser[0].Plugins
-	fmt.Println(response.Plugins)
 	resp, err := json.Marshal(response)
 	if err != nil {
 		log.Println(err)

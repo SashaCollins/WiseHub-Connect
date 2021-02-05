@@ -15,12 +15,11 @@ package main
 
 import (
 	"github/SashaCollins/Wisehub-Connect/model/plugins"
-	"go/doc"
 )
 
 var (
-	pluginName string
-	templateClient doc.Example.Client
+	PluginName string
+	//templateClient Example.Client
 )
 /*
 Your response should look something like this
@@ -40,7 +39,7 @@ type Response struct {
 type Template struct {}
 
 func init() {
-	pluginName = "Template"
+	PluginName = "Template"
 }
 /*
 Every Plugin must implement this method
@@ -50,7 +49,7 @@ func NewPlugin() plugins.PluginI {
 	return &Template{}
 }
 func getPluginName() string {
-	return pluginName
+	return PluginName
 }
 /*
 Ensure for readability purposes that the return data matches a (custom) response struct, which is convertible to JSON.
@@ -67,6 +66,7 @@ func (h *Template) FetchData() (string, error) {
 }
 /*
 This Method should start the client connection to the respective API with the provided credentials.
+Don't forget to create a table for your plugin in Datastore.go
  */
 func (h *Template) SubmitCredentials(username string, token string) {
 	/*

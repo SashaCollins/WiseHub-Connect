@@ -31,7 +31,7 @@ func derefString(s *string) string {
 Loads the absolute path from plugins
  */
 func getAllPluginPaths() (list []string) {
-	if err := filepath.Walk("./plugins", func(path string, info os.FileInfo, err error) error {
+	if err := filepath.Walk("./model/plugins", func(path string, info os.FileInfo, err error) error {
 		if info.IsDir() {
 			return nil
 		}

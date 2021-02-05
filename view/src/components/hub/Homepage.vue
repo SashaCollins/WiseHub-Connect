@@ -1,17 +1,10 @@
 <template>
-    <div class="container">
-        <div class="header">
-            <h1>WiseHub-Connect</h1>
-        </div>
-        <b-container fluid="true" class="container-fluid">
+  <div class="bg-img">
 
-        </b-container>
-
-    </div>
+  </div>
 </template>
 
 <script>
-
     export default {
         name: "Homepage",
 
@@ -20,16 +13,29 @@
 
 <style scoped lang="scss">
 
-    h1 {
-        color: #008B8B;
-        width: 100%;
-        margin-top: 15px;
-        border-radius: 10px;
-        text-align: center;
-        background: #F5FFFA;
-    }
+  .bg-img {
+    /* The image used */
+    background-image: url("../../assets/wisehubLogoV.png");
 
-    @media screen and (max-width: 767px) {
+    /* Control the height of the image */
+    min-height: 100vh;
 
-    }
+    /* Center and scale the image nicely */
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    position: relative;
+  }
+  h1 {
+      color: #008B8B;
+      width: 100%;
+      margin-top: 15px;
+      border-radius: 10px;
+      text-align: center;
+      background: #F5FFFA;
+  }
+
+  @media screen and (max-width: 767px) {
+
+  }
 </style>

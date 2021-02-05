@@ -3,7 +3,6 @@
         <div class="header">
             <h2>WiseHub-Impressum</h2>
         </div>
-<!--        TODO schmalen container links anheften -->
         <div class="container-fluid">
             <div class="container-fluid" id='impressum'>
                 <h3>Impressum</h3>

@@ -1,4 +1,5 @@
 <template>
+  <div class="bg-img">
     <div class="container">
         <div class="header">
                <h2>WiseHub-How-To</h2>
@@ -15,6 +16,7 @@
                         initialTab="Basic Usage"
                         :initialQuestionIndex="0"
                         activeColor="#008B8B"
+                        style="white-space: pre-line"
                 >
                     <!-- any html -->
                     <!-- and item data if available via itemData -->
@@ -24,6 +26,7 @@
             </div>
         </div>
     </div>
+  </div>
 </template>
 
 <script>
@@ -39,37 +42,36 @@
                 myItems: [
                     {
                         title: 'What is WiseHub-Connect for and how do I use it?',
-                        value: 'Given a 24-hour day and 360 degrees of longitude around the Earth... biowefugwrpeo fugperug54745475perugerugp0erjhfds giuesdhgi uewhrjgoieiugh iuregheiorgji ewrhgoie;rhgi roightoir jgioe',
+                        value: 'WiseHub-Connect is a tool for programmers, especially programming teams.\n' +
+                            'It connects version management tool and continuous integration tool and gives you an all-in-one overview',
                         category: 'Basic Usage',
                     },
                     {
                         title: 'How to register?',
-                        value: 'You can either register via the \'SignUp\' button or with your GitHub or GitLab account.',
+                        value: 'You can either register via the \'SignUp\' button or with your GitHub or GitLab account.\n' +
+                            'In version v1.0 only registration via \'SignUp\' is available.\n',
                         category: 'Basic Usage'
                     },
                     {
                         title: 'What plugins are used?',
-                        value: 'Venus takes 224.7 Earth days to complete one orbit around the Sun.',
+                        value: 'In version v1.0 plugins for GitHub and Drone CI are available.\n',
                         category: 'Basic Usage'
                     },
                     {
                         title: 'What credentials do I need to use these plugins?',
-                        value: 'Binturongs smell like popcorn.',
+                        value: 'You need to have an API Token for GitHub to use WiseHub Connect.\n' +
+                            'In the menu under \'Settings/Profile\' you can enter the respective credentials for GitHub and Drone CI.\n',
                         category: 'Basic Usage'
                     },
                     {
-                        title: 'How to get Admin privileges?',
-                        value: 'Binturongs smell like popcorn.',
-                        category: 'Admin Usage'
-                    },
-                    {
                         title: 'How to set up my own WiseHub?',
-                        value: 'Binturongs smell like popcorn.',
+                        value: 'The simplest way to do this is to run the application in a docker container.',
                         category: 'Admin Usage'
                     },
                     {
                         title: 'How to write your own WiseHub-Plugin?',
-                        value: 'Binturongs smell like popcorn.',
+                        value: 'The only way to create and use your own plugin is to Host WiseHub Connect by yourself.\n' +
+                            'You can find instructions on how to write a plugin in the file ./model/template/Template.go. \n',
                         category: 'Admin Usage'
                     },
 
@@ -90,6 +92,19 @@
 
 <style scoped lang="scss">
 
+.bg-img {
+  /* The image used */
+  background-image: url("");
+
+  /* Control the height of the image */
+  min-height: 100vh;
+
+  /* Center and scale the image nicely */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  position: relative;
+}
     .container-fluid {
       float: contour;
       horiz-align: center;

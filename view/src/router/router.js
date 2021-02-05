@@ -9,8 +9,8 @@ import Impressum from "../components/info/Impressum";
 import LogIn from '../components/auth/LogIn.vue';
 import SignUp from '../components/auth/SignUp.vue';
 import Forgot from '../components/auth/Forgot.vue';
-import Template from "../components/hub/Template";
-import VersionManager from "../components/hub/VersionManager";
+import TemplateView from "../components/hub/TemplateView";
+import GeneralView from "../components/hub/GeneralView";
 
 Vue.use(Router);
 
@@ -28,14 +28,14 @@ export const router = new Router({
            component: FAQ,
        },
        {
-           name: 'template',
-           path: '/view/template',
-           component: Template,
+           name: 'templateview',
+           path: '/view/templateview',
+           component: TemplateView,
        },
        {
-           name: 'manager',
-           path: '/view/manager',
-           component: VersionManager,
+           name: 'generalview',
+           path: '/view/generalview',
+           component: GeneralView,
        },
        {
            name: 'profile',

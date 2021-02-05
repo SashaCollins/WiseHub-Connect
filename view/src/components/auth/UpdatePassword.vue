@@ -61,6 +61,7 @@
       }
     },
     methods: {
+      //handle a change password request
       changePassword: function () {
         this.$validator.validate().then(isValid => {
           if (isValid) {
@@ -76,6 +77,7 @@
         });
       }
     },
+    //when user is not logged in this component is unavailable
     mounted() {
       if (!this.loggedIn) {
         this.$router.push('/login');

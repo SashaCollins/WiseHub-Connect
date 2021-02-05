@@ -1,20 +1,22 @@
 <template>
   <div class="container-fluid">
     <div class="row">
-      <div v-for="(orga, index) in vmcards.pluginData" :key="index">
-        <h2 class="text-center" style="background-color: #464646; color: white; border-radius: 3px; padding: 10px">
+      <div v-for="(orga, index) in vmCards.pluginData" :key="index">
+        <h2 class="text-center" style="background-color: #008B8B; color: white; border-radius: 3px; padding: 10px">
           Organisation: {{orga.organization.orgaName}}
         </h2>
-        <div class="card-deck">
+        <div class="card-columns">
           <div v-for="(team, index) in orga.organization.teams" :key="index">
             <div class="card">
-              <h3 class="text-center" style="background-color: #464646; color: white; border-radius: 3px; padding: 10px">
+              <h5 class="text-center" style="background-color: white; color: black; border-radius: 3px; padding: 10px">
                 Team: {{ team.teamName }}
-              </h3>
+              </h5>
               <div v-for="(repo, index) in team.repositories" :key="index">
-                <h4 class="text-center" style="background-color: #464646; color: white; border-radius: 3px; padding: 10px">
+                <h5 class="text-center" style="background-color: white; color: black; border-radius: 3px; padding: 10px">
                   Repository: {{repo.repoName}}
-                </h4>
+                  <br>
+                  URL: {{repo.repoUrl}}
+                </h5>
                 <div class="card bg-white text-center">
                   <Github v-bind:github="team"></Github>
                   <DroneCI v-bind:drone="getRepo('Drone CI', repo.repoName)"></DroneCI>
@@ -37,7 +39,7 @@ import DroneCI from "@/components/plugins/DroneCI";
 
 export default {
   name: "VersionManagerCards",
-  props: ["vmcards"],
+  props: ["vmCards"],
   components: {
     Github,
     DroneCI,
@@ -54,23 +56,15 @@ export default {
   methods: {
     onItemClick (event, item) {
       this.clicked = true;
-      // console.log('onItemClick');
-      // this.$store.dispatch('user/fetchTeams', {
-      //   user: this.getUser,
-      //   organization: course
-      // }).then((onSuccess) => {
-      //   this.plugins = onSuccess.data.plugins;
-      // }, (onError) => {
-      //   this.message = onError.toString() || onError.message;
-      // });
     },
+    //combines repo information from all plugins based on the repoName
     getRepo (pluginName, repoName) {
       for (let i = 0; i < this.getUser.plugins.length; i++) {
         let plugin = this.getUser.plugins[i];
         if (pluginName === plugin.pluginName) {
           for (let j = 0; j < plugin.pluginData.length; j++) {
             let data = plugin.pluginData[j];
-            if (repoName.trim() === data.repo.repoName.trim()) {
+            if (repoName.trim() === data.repositories.repoName.trim()) {
               return data;
             }
           }

@@ -62,9 +62,10 @@
 					<div class="col">
 						<router-link to="/signup" style="color:white" class="btn">Sign up</router-link>
 					</div>
-<!--          TODO-->
+<!--          TODO Backend for Forgot Button-->
 					<div class="col">
-						<router-link to="/forgot" style="color:white" class="btn">Forgot password?</router-link>
+<!--            Activate to allow requests for password reset-->
+<!--						<router-link to="/forgot" style="color:white" class="btn">Forgot password?</router-link>-->
 					</div>
 				</div>
 			</div>
@@ -86,11 +87,13 @@
         }
       },
       computed: {
+        //check if user is loggedIn
         loggedIn() {
           return this.$store.state.auth.status.loggedIn;
         }
       },
       methods: {
+        //handle an user login request
         handleSubmit: function() {
           this.submitted = true;
           this.$validator.validate().then(isValid => {
@@ -109,6 +112,7 @@
           })
         },
       },
+      //when user is logged in this component is unavailable
       mounted() {
         if (this.loggedIn){
           this.$router.push("/");
@@ -124,7 +128,7 @@
 
 	.bg-img {
 		/* The image used */
-		background-image: url("https://www.w3schools.com/howto/img_nature.jpg");
+		background-image: url("../../assets/wisehubLogoV.png");
 
 		/* Control the height of the image */
 		min-height: 100vh;

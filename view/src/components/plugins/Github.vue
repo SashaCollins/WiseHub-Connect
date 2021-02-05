@@ -1,9 +1,10 @@
 <template>
   <div class="card">
+    {{ this.github}}
     <div class="card-header">
       <h5
           class="text-center"
-          style="background-color: #464646; color: white; border-radius: 3px; padding: 15px">
+          style="background-color: #008B8B; color: white; border-radius: 3px; padding: 15px">
         Github
       </h5>
     </div>
@@ -12,7 +13,7 @@
         <thead>
         <tr>
           <th>Members</th>
-          <th>Issues</th>
+          <th>Your Issues</th>
         </tr>
         </thead>
         <tbody>
@@ -20,7 +21,10 @@
           <td>{{ member.memberName }}</td>
         </tr>
         <tr v-for="(issue, index) in github.issues" :key="index">
-          <td>{{ issue }}</td>
+          <td>
+            <p>ID: #{{issue.issueNumber}}</p>
+            <p>Title: {{issue.issueTitle}}</p>
+          </td>
         </tr>
         </tbody>
       </table>
@@ -44,15 +48,6 @@ export default {
   methods: {
     onItemClick (event, item) {
       this.clicked = true;
-      // console.log('onItemClick');
-      // this.$store.dispatch('user/fetchTeams', {
-      //   user: this.getUser,
-      //   organization: course
-      // }).then((onSuccess) => {
-      //   this.plugins = onSuccess.data.plugins;
-      // }, (onError) => {
-      //   this.message = onError.toString() || onError.message;
-      // });
     },
   },
 }

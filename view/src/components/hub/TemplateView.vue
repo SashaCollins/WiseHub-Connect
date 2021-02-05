@@ -1,9 +1,10 @@
 <template>
     <div class="container">
       <div class="header">
-        <h2>WiseHub-Repositories</h2>
+        <h2>WiseHub-Template View</h2>
       </div>
 
+<!--      This is an example of how you can display your data-->
       <div class="row">
         <div
             v-for="(item, index) in repos"
@@ -14,12 +15,12 @@
               v-on:click="onItemClick">
             <h3
                 class="text-center"
-                style="background-color: #464646; color: white; border-radius: 3px; padding: 15px">
+                style="background-color: #008B8B; color: white; border-radius: 3px; padding: 15px">
               {{ item.RepoName }}
             </h3>
 <!--            <div class="card-body" style="padding: 0; margin: 0;">-->
             <div class="row" style="padding-left: 30px; padding-bottom: 10px;">
-              <div class="col" style="background-color: #283230; color: white; border-radius: 3px;">
+              <div class="col" style="background-color: #008B8B; color: white; border-radius: 3px;">
                 <div class="centered">
                   <label
                       :for="item.Contributors"
@@ -33,7 +34,7 @@
                   </ul>
                 </div>
               </div>
-              <div class="col offset-1" style="background-color: #283230; color: white; border-radius: 3px;">
+              <div class="col offset-1" style="background-color: #008B8B; color: white; border-radius: 3px;">
                 <div class="centered">
                   <label
                       :for="item.Description"
@@ -75,40 +76,22 @@
           </div>
         </div>
       </div>
-<!--        <div-->
-<!--            v-for="(dings, index) in plugins"-->
-<!--            :key="index"-->
-<!--            class="col-12">-->
-<!--          <div-->
-<!--              class="card">-->
-<!--            <h3-->
-<!--                class="text-center"-->
-<!--                style="background-color: #464646; color: white; border-radius: 3px; padding: 15px">-->
-<!--              {{ dings.PluginName }}-->
-<!--            </h3>-->
-<!--            <div class="centered">-->
-<!--              <label-->
-<!--                  :for="dings.PluginContent"-->
-<!--                  class="col-md col-form-label">-->
-<!--              </label>-->
-<!--              {{ dings.PluginContent }}-->
-<!--            </div>-->
-<!--          </div>-->
-<!--        </div>-->
+
     </div>
 </template>
 
 <script>
     export default {
-      name: "Repositories",
+      name: "Template",
       data() {
         return {
           clicked: false,
-          //dummy only exists if connection fails
+          //this is dummy information
+          // data should come from database
           repos: [{
             'RepoName': 'Dummy',
             'Contributors': ['Hans Wurst', 'Axel Schweiß'],
-            'Description': 'This Repo is not real fetch data from GR',
+            'Description': 'This Repo is not real fetch data from plugins',
           }],
           plugins: [{
             'PluginName': 'DummyPlugin1',
@@ -130,34 +113,30 @@
       methods: {
         onItemClick: function (event, item) {
           this.clicked = true;
-          console.log('onItemClick')
-          console.log(event)
-          console.log(item)
         },
-        fetchAllRepos: function() {
-          this.$store.dispatch('courses/fetchRepos', this.getUser).then(
-              (onSuccess) => {
-
-          }, (onError) => {
-
-          })
-        },
-        fetchRepo: function(item) {
-
-        }
       },
+      //triggers fetchData when page is mounted
       mounted() {
-        console.log(this.getUser);
-        this.$store.dispatch('courses/fetchRepos', this.getUser).then(
-            (onSuccess) => {
-              if (onSuccess.data.success) {
-                // this.plugins = onSuccess.data.plugins;
+        this.loading = true;
+        if (this.getUser.plugins.length === 0) {
+          this.$store.dispatch('user/fetchData', {
+            // option defines which view you want to use
+            option: "template",
+            user: this.getUser,
+          }).then(
+              (onSuccess) => {
+                if (onSuccess.data.success) {
+                  if (onSuccess.data.pluginData) {
+                    //TODO decide what to do with the response data
+                  }
+                }
+              },
+              (onError) => {
+                this.message = onError.toString() || onError.message;
               }
-            },
-            (onError) => {
-              // this.message = onError.toString() || onError.message;
-            }
-        )
+          );
+        }
+        this.loading = false;
       },
     }
 </script>

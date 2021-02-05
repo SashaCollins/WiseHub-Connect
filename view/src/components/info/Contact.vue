@@ -1,4 +1,5 @@
 <template>
+  <div>
     <div class="container">
         <div class="header">
             <h2>WiseHub-Contact</h2>
@@ -11,7 +12,7 @@
                 </div>
                 <div class="row">
                     <div class="column">
-                        <img src="../../assets/logo.png" style="width:100%">
+                        <img src="../../assets/wisehubIcon.png" style="width:100%">
                     </div>
                     <div class="column">
                         <form @submit.prevent="handleSubmit">
@@ -43,6 +44,7 @@
             </div>
         </b-container>
     </div>
+  </div>
 </template>
 
 <script>

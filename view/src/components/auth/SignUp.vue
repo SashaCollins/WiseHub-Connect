@@ -74,11 +74,13 @@
 	  }
 	},
     computed: {
+	  //check if user is loggedIn
 	  loggedIn() {
 	    return this.$store.state.auth.status.loggedIn
 	  }
     },
     methods: {
+	  //handle an user registration request
       handleSubmit: function() {
         this.submitted = true
         this.$validator.validate().then(isValid => {
@@ -96,6 +98,7 @@
         })
       },
     },
+    //when user is logged in this component is unavailable
     mounted() {
       if (this.loggedIn){
         this.$router.push("/")
@@ -111,7 +114,7 @@
 
 	.bg-img {
 		/* The image used */
-		background-image: url("https://www.w3schools.com/howto/img_nature.jpg");
+		background-image: url("../../assets/wisehubLogoV.png");
 
 		/* Control the height of the image */
 		min-height: 100vh;

@@ -17,13 +17,13 @@ import (
 )
 
 var (
-	pluginName    string
+	PluginName    string
 	GithubClient  *githubv4.Client
 	CurrentViewer Viewer
 )
 
 func init() {
-	pluginName = "Github"
+	PluginName = "Github"
 }
 
 type Github struct {}
@@ -33,7 +33,7 @@ func NewPlugin() plugins.PluginI {
 }
 
 func getPluginName() string {
-	return pluginName
+	return PluginName
 }
 
 /*
@@ -273,7 +273,7 @@ func (g *Github) FetchData() (string, error) {
 				rr.Name = repo.Name
 				rr.URL = repo.URL
 
-				allIssuesAssigned, err := g.getRepositoryInfo((githubv4.String)(repo.Name), (githubv4.String)(repo.Owner.Login))
+				allIssuesAssigned, err := g.getRepositoryInfo((githubv4.String)(repo.Name), (githubv4.String)(repo.Owner.Login), viewer.Viewer.Login)
 				if err != nil {
 					log.Println(err)
 					return "", err
@@ -437,7 +437,7 @@ func (g *Github) getTeamMembersAndRepositories(organizationLogin githubv4.String
 Fetches Information about a given Repository 'repositoryName' and the owners name 'ownerLogin'
 Input Parameters can be fetched from getTeamMembersAndRepositories(organizationLogin githubv4.String, teamName githubv4.String) (*Team, error)
  */
-func (g *Github) getRepositoryInfo(repositoryName githubv4.String, ownerLogin githubv4.String) (*[]Issue, error) {
+func (g *Github) getRepositoryInfo(repositoryName githubv4.String, ownerLogin githubv4.String, assigneeLogin githubv4.String) (*[]Issue, error) {
 	var repositoryInfo RepositoryInfo
 	var allIssuesAssigned []Issue
 
@@ -451,7 +451,7 @@ func (g *Github) getRepositoryInfo(repositoryName githubv4.String, ownerLogin gi
 	}
 	variables["repositoryName"] = repositoryName
 	variables["login"] = ownerLogin
-	variables["assignee"] = ownerLogin
+	variables["assignee"] = assigneeLogin
 	for {
 		err := GithubClient.Query(context.Background(), &repositoryInfo, variables)
 		if err != nil {

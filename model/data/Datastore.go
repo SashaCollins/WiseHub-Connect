@@ -26,7 +26,7 @@ func init() {
 }
 
 func openDB() (db *gorm.DB, err error) {
-    return gorm.Open(sqlite.Open("wisehub.db"), &gorm.Config{})
+    return gorm.Open(sqlite.Open("./model/wisehub.db"), &gorm.Config{})
 }
 
 func createTables(db *gorm.DB) {
@@ -128,7 +128,9 @@ func (ds *Datastore) Load(email ...string) (user []User, err error) {
         return user, nil
     }
 }
-
+/*
+Add an entry in defaultPlugins for your custom plugin
+ */
 func (ds *Datastore) Create(password string, email string) error {
     db, err := openDB()
     if err != nil {
@@ -138,7 +140,7 @@ func (ds *Datastore) Create(password string, email string) error {
     defaultPlugins := []Plugin{
         {PluginName: "Github", UsernameHost: "", Token: "", Description: "", Updated: false},
         {PluginName: "Drone CI", UsernameHost: "", Token: "", Description: "", Updated: false},
-        {PluginName: "Heroku", UsernameHost: "", Token: "", Description: "", Updated: false},
+        {PluginName: "Template", UsernameHost: "", Token: "", Description: "", Updated: false},
     }
     user := User{Email: email, Password: password, Plugins: defaultPlugins}
     if result := db.Create(&user); result.Error != nil {
