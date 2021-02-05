@@ -17,7 +17,7 @@ import (
 )
 
 type Router struct {
-	Datastore *data.Datastore
+	Datastore data.DatastoreI
 	View ViewI
 }
 

@@ -3,6 +3,7 @@
     <div class="header">
       <h2>WiseHub-Courses</h2>
     </div>
+
     <div v-if="!message">
       <div v-if="!loading">
         <VersionManagerCards v-bind:vmCards="getVersionManagerCards('Github')"></VersionManagerCards>
@@ -59,25 +60,26 @@ export default {
   //triggers fetchData when page is mounted
   mounted() {
     this.loading = true;
-    if (this.getUser.plugins.length === 0) {
-      this.$store.dispatch('user/fetchData', {
-        option: "general",
-        user: this.getUser,
-      }).then(
-          (onSuccess) => {
-            if (onSuccess.data.success) {
-              if (onSuccess.data.pluginData) {
-                this.plugins = this.getUser.plugins;
-                this.loading = false;
-              }
+
+    this.$store.dispatch('user/fetchData', {
+      option: "general",
+      user: this.getUser,
+    }).then(
+        (onSuccess) => {
+          if (onSuccess.data.success) {
+            if (onSuccess.data.pluginData) {
+              this.plugins = this.getUser.plugins;
+              this.loading = false;
             }
-          },
-          (onError) => {
-            this.message = onError.toString() || onError.message;
-            this.loading = false;
           }
-      );
-    }
+        },
+        (onError) => {
+          this.message = onError.toString() || onError.message;
+          this.loading = false;
+        }
+    );
+
+    this.$forceUpdate()
     console.log("loading:")
     console.log(this.loading)
   },
