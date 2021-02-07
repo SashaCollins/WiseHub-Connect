@@ -170,7 +170,6 @@
           disabled: false,
           newEmail: '',
           updatedCredentials: [],
-          //dummy only exists if connection fails
           plugins: [],
           errors: [],
           error: false
@@ -200,7 +199,7 @@
                 this.errors = [{
                   'Tag': 'Error - Try again',
                   'Code': onError.status,
-                  'Description': onError.message || onError.toString()
+                  'Description': (onError.response && onError.response.data) || onError.message || onError.toString()
                 }];
               }
           );
@@ -222,7 +221,7 @@
                 this.errors = [{
                   'Tag': 'Error - Try again',
                   'Code': onError.status,
-                  'Description': onError.message || onError.toString()
+                  'Description': (onError.response && onError.response.data) || onError.message || onError.toString()
                 }];
               }
           );
@@ -242,7 +241,7 @@
               this.errors = [{
                 'Tag': 'Error - Try again',
                 'Code': onError.status,
-                'Description': onError.message || onError.toString()
+                'Description': (onError.response && onError.response.data) || onError.message || onError.toString()
               }];
             }
         );

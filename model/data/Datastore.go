@@ -10,12 +10,12 @@ package data
 
 import (
     "fmt"
-    "gorm.io/driver/sqlite"
+    "github.com/caarlos0/env"
     "gorm.io/driver/mysql"
     "gorm.io/driver/postgres"
+    "gorm.io/driver/sqlite"
     "gorm.io/driver/sqlserver"
     "gorm.io/gorm"
-    "github.com/caarlos0/env"
     "log"
     "os"
 )
@@ -43,6 +43,7 @@ func openDB() (db *gorm.DB, err error) {
     config := DatabaseConfig{}
     err = env.Parse(&config)
     if err != nil || config.Driver == ""{
+        log.Printf("init %q\n", err)
         return nil, fmt.Errorf("the required environment variables don't exist, \nrequired: DB_DRIVER, DB_NAME, DB_User, DB_PASSWORD, DB_SSL_MODE, DB_HOST, DB_PORT")
     }
     var dialector gorm.Dialector
@@ -50,16 +51,16 @@ func openDB() (db *gorm.DB, err error) {
     case "sqlite":
         dialector = sqlite.Open(config.Database)
     case "mysql":
-        dsn := fmt.Sprintf("", config.Username, config.Password, config.Host, config.Port, config.Database)
+        dsn := fmt.Sprintf("%v:%v@tcp(%v:%v)/%v?charset=utf8mb4&parseTime=True&loc=Local", config.Username, config.Password, config.Host, config.Port, config.Database)
         dialector = mysql.Open(dsn)
     case "postgres":
-        dsn := fmt.Sprintf("", config.Host, config.Username, config.Password, config.Database, config.Port, config.SSLMode)
+        dsn := fmt.Sprintf("host=%v user=%v password=%v dbname=%v port=%v sslmode=%v TimeZone=Europe/Berlin", config.Host, config.Username, config.Password, config.Database, config.Port, config.SSLMode)
         dialector = postgres.Open(dsn)
     case "sqlserver":
-        dsn := fmt.Sprintf("", config.Username, config.Password, config.Host, config.Port, config.Database)
+        dsn := fmt.Sprintf("sqlserver://%v:%v@%v:%v?database=%v", config.Username, config.Password, config.Host, config.Port, config.Database)
         dialector = sqlserver.Open(dsn)
     default:
-        return nil, fmt.Errorf("environment variable 'DB_DRIVER' was: %v and doesn't match a compatible database (sqlite, mysql, postgres, sqlserver)", os.Getenv("DB_DRIVER"))
+        return nil, fmt.Errorf("environment variable 'DB_DRIVER' (%v) does not official supported. Supported databases are sqlite, mysql, postgres, sqlserver", os.Getenv("DB_DRIVER"))
     }
     return gorm.Open(dialector, &gorm.Config{})
 }

@@ -76,7 +76,6 @@
                           'You can find instructions on how to write a plugin in the file ./model/template/Template.go. \n',
                       category: 'Admin Usage'
                   },
-
               ],
             }
         },
@@ -96,7 +95,7 @@
 
     .bg-img {
       /* The image used */
-      background-image: url("/");
+      background-image: url("");
 
       /* Control the height of the image */
       min-height: 100vh;

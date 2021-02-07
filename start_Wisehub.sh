@@ -25,3 +25,4 @@ if [ $? -ne 1 ]
   else
     echo "nodejs and npm are not installed. Please install nodejs and npm!"
 fi
+

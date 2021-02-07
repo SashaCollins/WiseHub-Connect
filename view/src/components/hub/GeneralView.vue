@@ -3,7 +3,6 @@
     <div class="header">
       <h2>WiseHub-Courses</h2>
     </div>
-
     <div v-if="!message">
       <div v-if="!loading">
         <VersionManagerCards v-bind:vmCards="getVersionManagerCards('Github')"></VersionManagerCards>
@@ -15,7 +14,15 @@
       </div>
     </div>
     <div v-else>
-      {{ this.message }}
+      <div class="alert alert-danger" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="alert-heading">Error</h4>
+        <p>{{ message }}</p>
+        <hr>
+        <p class="mb-0">Please check your Credentials!</p>
+      </div>
     </div>
   </div>
 </template>
@@ -60,7 +67,6 @@ export default {
   //triggers fetchData when page is mounted
   mounted() {
     this.loading = true;
-
     this.$store.dispatch('user/fetchData', {
       option: "general",
       user: this.getUser,
@@ -74,14 +80,11 @@ export default {
           }
         },
         (onError) => {
-          this.message = onError.toString() || onError.message;
+          this.message = (onError.response && onError.response.data) || onError.message || onError.toString();
           this.loading = false;
         }
     );
-
-    this.$forceUpdate()
-    console.log("loading:")
-    console.log(this.loading)
+    this.$forceUpdate();
   },
 }
 </script>
