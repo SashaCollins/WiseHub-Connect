@@ -21,7 +21,7 @@
                     <!-- any html -->
                     <!-- and item data if available via itemData -->
                     <!-- don't add margins to this element (animation become choppy) -->
-                    <small>{{ itemData }}</small>
+                    <small>{{ itemData.value }}</small>
                 </VueFaqAccordion>
             </div>
         </div>
