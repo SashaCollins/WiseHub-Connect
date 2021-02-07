@@ -80,13 +80,13 @@ services:
   api:
     container_name: api
     environment:
-      DB_DRIVER: sqlite
-      DB_NAME: wisehub.db
-      DB_USER: wisehub
-      DB_PASSWORD: test1234!!
-      DB_HOST: db
-      DB_PORT: 3306
-      DB_SSL_MODE: disabled
+      DB_DRIVER: sqlite # Change to the official supported gorm.io/database_driver
+      DB_NAME: wisehub.db # For sqlite: name of db-file; for other databases: database_name
+      DB_USER: wisehub # database user
+      DB_PASSWORD: test1234!! # database password
+      DB_HOST: db # database host -> docker service name or localhost
+      DB_PORT: 3306 # database port
+      DB_SSL_MODE: disabled # 'disabled' or 'enabled' ssl mode
       CGO_ENBLED: 0
     build: ./
     restart: always

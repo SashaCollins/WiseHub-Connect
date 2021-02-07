@@ -66,7 +66,9 @@
                   },
                   {
                       title: 'How to set up my own WiseHub?',
-                      value: 'The simplest way to do this is to run the application in a docker container.',
+                      value: 'You start the Application on your server via the bash script \'start_wisehub.sh\' which is located in the root directory.\n' +
+                          'Please make sure that you have installed \'screen\', \'go\' and \'npm\' on your server to run WiseHub Connect.\n' +
+                          'Another and probably simpler way to do this is to run the application in a docker container.',
                       category: 'Admin Usage'
                   },
                   {
@@ -94,7 +96,7 @@
 
     .bg-img {
       /* The image used */
-      background-image: url("/");
+      background-image: url("");
 
       /* Control the height of the image */
       min-height: 100vh;

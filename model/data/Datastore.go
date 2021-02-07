@@ -1,5 +1,6 @@
 /*
 This Datastore works with sqlite3 Database.
+This Datastore.go works with sqlite, mysql, postgres, sqlserver dialect, based on the credentials in the environment variables.
 To use another database exchange this, and only this, file with a 'Database.go' file
 that works with your desired database. Make sure to implement the Interface DatastoreI.go,
 otherwise your dashboard may not work properly.
@@ -19,17 +20,16 @@ import (
     "os"
 )
 
-type Datastore struct{}
-
-type DatabaseConfig struct{
+type DatabaseConfig struct {
     Driver string `env:"DB_DRIVER"`
     Database string `env:"DB_NAME"`
-    Username string `env:"DB_USER"`
+    Username string `env:"DB_User"`
     Password string `env:"DB_PASSWORD"`
     SSLMode string `env:"DB_SSL_MODE"`
     Host string `env:"DB_HOST"`
     Port int `env:"DB_PORT"`
 }
+type Datastore struct{}
 
 func init() {
     db, err := openDB()
@@ -43,25 +43,25 @@ func init() {
 func openDB() (db *gorm.DB, err error) {
     config := DatabaseConfig{}
     err = env.Parse(&config)
-    if err != nil || config.Driver == "" {
+    if err != nil || config.Driver == ""{
         log.Printf("init %q\n", err)
-        return nil, err
+        return nil, fmt.Errorf("the required environment variables don't exist, \nrequired: DB_DRIVER, DB_NAME, DB_User, DB_PASSWORD, DB_SSL_MODE, DB_HOST, DB_PORT")
     }
     var dialector gorm.Dialector
     switch os.Getenv("DB_DRIVER") {
+    case "sqlite":
+        dialector = sqlite.Open(config.Database)
     case "mysql":
         dsn := fmt.Sprintf("%v:%v@tcp(%v:%v)/%v?charset=utf8mb4&parseTime=True&loc=Local", config.Username, config.Password, config.Host, config.Port, config.Database)
         dialector = mysql.Open(dsn)
     case "postgres":
         dsn := fmt.Sprintf("host=%v user=%v password=%v dbname=%v port=%v sslmode=%v TimeZone=Europe/Berlin", config.Host, config.Username, config.Password, config.Database, config.Port, config.SSLMode)
         dialector = postgres.Open(dsn)
-    case "sqlite":
-        dialector = sqlite.Open(config.Database)
     case "sqlserver":
         dsn := fmt.Sprintf("sqlserver://%v:%v@%v:%v?database=%v", config.Username, config.Password, config.Host, config.Port, config.Database)
         dialector = sqlserver.Open(dsn)
     default:
-        return nil, fmt.Errorf("database driver (%v) does not official supported", config.Driver)
+        return nil, fmt.Errorf("environment variable 'DB_DRIVER' (%v) does not official supported. Supported databases are sqlite, mysql, postgres, sqlserver", os.Getenv("DB_DRIVER"))
     }
     return gorm.Open(dialector, &gorm.Config{})
 }
@@ -174,6 +174,7 @@ func (ds *Datastore) Create(password string, email string) error {
         log.Printf("Save %q: %v\n", err, db)
         return err
     }
+
     defaultPlugins := []Plugin{
         {PluginName: "Github", UsernameHost: "", Token: "", Description: "", Updated: false},
         {PluginName: "Drone CI", UsernameHost: "", Token: "", Description: "", Updated: false},
