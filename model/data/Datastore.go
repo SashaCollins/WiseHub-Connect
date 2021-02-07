@@ -19,6 +19,7 @@ import (
     "log"
     "os"
 )
+
 type DatabaseConfig struct {
     Driver string `env:"DB_DRIVER"`
     Database string `env:"DB_NAME"`

@@ -39,6 +39,7 @@
         },
         data () {
             return {
+              itemData: "",
               myItems: [
                   {
                       title: 'What is WiseHub-Connect for and how do I use it?',
