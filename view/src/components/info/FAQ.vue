@@ -39,43 +39,45 @@
         },
         data () {
             return {
-                myItems: [
-                    {
-                        title: 'What is WiseHub-Connect for and how do I use it?',
-                        value: 'WiseHub-Connect is a tool for programmers, especially programming teams.\n' +
-                            'It connects version management tool and continuous integration tool and gives you an all-in-one overview',
-                        category: 'Basic Usage',
-                    },
-                    {
-                        title: 'How to register?',
-                        value: 'You can either register via the \'SignUp\' button or with your GitHub or GitLab account.\n' +
-                            'In version v1.0 only registration via \'SignUp\' is available.\n',
-                        category: 'Basic Usage'
-                    },
-                    {
-                        title: 'What plugins are used?',
-                        value: 'In version v1.0 plugins for GitHub and Drone CI are available.\n',
-                        category: 'Basic Usage'
-                    },
-                    {
-                        title: 'What credentials do I need to use these plugins?',
-                        value: 'You need to have an API Token for GitHub to use WiseHub Connect.\n' +
-                            'In the menu under \'Settings/Profile\' you can enter the respective credentials for GitHub and Drone CI.\n',
-                        category: 'Basic Usage'
-                    },
-                    {
-                        title: 'How to set up my own WiseHub?',
-                        value: 'The simplest way to do this is to run the application in a docker container.',
-                        category: 'Admin Usage'
-                    },
-                    {
-                        title: 'How to write your own WiseHub-Plugin?',
-                        value: 'The only way to create and use your own plugin is to Host WiseHub Connect by yourself.\n' +
-                            'You can find instructions on how to write a plugin in the file ./model/template/Template.go. \n',
-                        category: 'Admin Usage'
-                    },
+              myItems: [
+                  {
+                      title: 'What is WiseHub-Connect for and how do I use it?',
+                      value: 'WiseHub-Connect is a tool for programmers, especially programming teams.\n' +
+                          'It connects version management tool and continuous integration tool and gives you an all-in-one overview',
+                      category: 'Basic Usage',
+                  },
+                  {
+                      title: 'How to register?',
+                      value: 'You can either register via the \'SignUp\' button or with your GitHub or GitLab account.\n' +
+                          'In version v1.0 only registration via \'SignUp\' is available.\n',
+                      category: 'Basic Usage'
+                  },
+                  {
+                      title: 'What plugins are used?',
+                      value: 'In version v1.0 plugins for GitHub and Drone CI are available.\n',
+                      category: 'Basic Usage'
+                  },
+                  {
+                      title: 'What credentials do I need to use these plugins?',
+                      value: 'You need to have an API Token for GitHub to use WiseHub Connect.\n' +
+                          'In the menu under \'Settings/Profile\' you can enter the respective credentials for GitHub and Drone CI.\n',
+                      category: 'Basic Usage'
+                  },
+                  {
+                      title: 'How to set up my own WiseHub?',
+                      value: 'You start the Application on your server via the bash script \'start_wisehub.sh\' which is located in the root directory.\n' +
+                          'Please make sure that you have installed \'screen\', \'go\' and \'npm\' on your server to run WiseHub Connect.\n' +
+                          'Another and probably simpler way to do this is to run the application in a docker container.',
+                      category: 'Admin Usage'
+                  },
+                  {
+                      title: 'How to write your own WiseHub-Plugin?',
+                      value: 'The only way to create and use your own plugin is to Host WiseHub Connect by yourself.\n' +
+                          'You can find instructions on how to write a plugin in the file ./model/template/Template.go. \n',
+                      category: 'Admin Usage'
+                  },
 
-                ],
+              ],
             }
         },
         methods: {

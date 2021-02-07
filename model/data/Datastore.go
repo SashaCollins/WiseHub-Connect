@@ -1,5 +1,6 @@
 /*
 This Datastore works with sqlite3 Database.
+This Datastore.go works with sqlite, mysql, postgres, sqlserver dialect, based on the credentials in the environment variables.
 To use another database exchange this, and only this, file with a 'Database.go' file
 that works with your desired database. Make sure to implement the Interface DatastoreI.go,
 otherwise your dashboard may not work properly.
@@ -10,10 +11,23 @@ package data
 import (
     "fmt"
     "gorm.io/driver/sqlite"
+    "gorm.io/driver/mysql"
+    "gorm.io/driver/postgres"
+    "gorm.io/driver/sqlserver"
     "gorm.io/gorm"
+    "github.com/caarlos0/env"
     "log"
+    "os"
 )
-
+type DatabaseConfig struct {
+    Driver string `env:"DB_DRIVER"`
+    Database string `env:"DB_NAME"`
+    Username string `env:"DB_User"`
+    Password string `env:"DB_PASSWORD"`
+    SSLMode string `env:"DB_SSL_MODE"`
+    Host string `env:"DB_HOST"`
+    Port int `env:"DB_PORT"`
+}
 type Datastore struct{}
 
 func init() {
@@ -26,7 +40,28 @@ func init() {
 }
 
 func openDB() (db *gorm.DB, err error) {
-    return gorm.Open(sqlite.Open("./model/wisehub.db"), &gorm.Config{})
+    config := DatabaseConfig{}
+    err = env.Parse(&config)
+    if err != nil || config.Driver == ""{
+        return nil, fmt.Errorf("the required environment variables don't exist, \nrequired: DB_DRIVER, DB_NAME, DB_User, DB_PASSWORD, DB_SSL_MODE, DB_HOST, DB_PORT")
+    }
+    var dialector gorm.Dialector
+    switch os.Getenv("DB_DRIVER") {
+    case "sqlite":
+        dialector = sqlite.Open(config.Database)
+    case "mysql":
+        dsn := fmt.Sprintf("", config.Username, config.Password, config.Host, config.Port, config.Database)
+        dialector = mysql.Open(dsn)
+    case "postgres":
+        dsn := fmt.Sprintf("", config.Host, config.Username, config.Password, config.Database, config.Port, config.SSLMode)
+        dialector = postgres.Open(dsn)
+    case "sqlserver":
+        dsn := fmt.Sprintf("", config.Username, config.Password, config.Host, config.Port, config.Database)
+        dialector = sqlserver.Open(dsn)
+    default:
+        return nil, fmt.Errorf("environment variable 'DB_DRIVER' was: %v and doesn't match a compatible database (sqlite, mysql, postgres, sqlserver)", os.Getenv("DB_DRIVER"))
+    }
+    return gorm.Open(dialector, &gorm.Config{})
 }
 
 func createTables(db *gorm.DB) {
@@ -137,6 +172,7 @@ func (ds *Datastore) Create(password string, email string) error {
         log.Printf("Save %q: %v\n", err, db)
         return err
     }
+
     defaultPlugins := []Plugin{
         {PluginName: "Github", UsernameHost: "", Token: "", Description: "", Updated: false},
         {PluginName: "Drone CI", UsernameHost: "", Token: "", Description: "", Updated: false},
