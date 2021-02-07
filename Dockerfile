@@ -1,17 +1,16 @@
 # Start from base image
-FROM golang:alpine
+FROM golang:latest
 
 # Set the current working directory inside the container
 WORKDIR /backend
+
+RUN go get -u github.com/mattn/go-sqlite3
 
 # Copy go mod and sum files
 COPY go.mod go.sum ./
 
 # Download all dependencies
 RUN go mod download
-
-# Copy entrypoint
-COPY wait-for.sh ./
 
 # Copy source from current directory to working directory
 COPY . .
@@ -23,4 +22,4 @@ RUN go build -o main .
 EXPOSE 9010
 
 # Run the created binary executable after wait for mysql container to be up
-CMD ["./wait-for.sh" , "mysql:3306" ,  "--" , "./main"]
+CMD ["./main"]

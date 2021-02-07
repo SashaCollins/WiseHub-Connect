@@ -20,6 +20,6 @@ vendor/
 .docker_build/
 bin/
 certbot/
-nginx/
+view/nginx/
 node_modules/
 venv/

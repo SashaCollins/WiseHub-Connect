@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-dpkg -s nodejs npm &> /dev/null
+npm version &> /dev/null
 
 if [ $? -ne 1 ]
   then
@@ -8,8 +8,7 @@ if [ $? -ne 1 ]
     cd ./view
     echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
     npm i
-    npm run serve
+    screen -dS "frontend" npm run serve
   else
     echo "nodejs and npm are not installed. Please install nodejs and npm!"
 fi
-

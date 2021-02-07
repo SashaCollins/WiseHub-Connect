@@ -109,6 +109,9 @@ func (r *Router) SignUp(w http.ResponseWriter, req *http.Request, ps httprouter.
 }
 
 func (r *Router) SignIn(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+	if (*req).Method == "OPTIONS" {
+		return
+	}
 	reqBody, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		log.Println(err)
@@ -151,6 +154,9 @@ Requests a user profile by email from the datastore
 Returns the user profile or an error
  */
 func (r *Router) Profile(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+	if (*req).Method == "OPTIONS" {
+		return
+	}
 	reqBody, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		log.Println(err)
@@ -192,6 +198,9 @@ sending an email is not implemented in v1.0
 is not used in v1.0
  */
 //func (r *Router) Forgot(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+//	if (*req).Method == "OPTIONS" {
+//	return
+//	}
 //	reqBody, err := ioutil.ReadAll(req.Body)
 //	if err != nil {
 //		log.Println(err)
@@ -226,6 +235,9 @@ Requests an update for user profile from datastore for either email, password or
 Returns a success or error message
  */
 func (r *Router) Update(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+	if (*req).Method == "OPTIONS" {
+		return
+	}
 	reqBody, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		log.Println(err)
@@ -299,6 +311,9 @@ Requests all data to show from a view
 Returns fetched data
  */
 func (r *Router) Show(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+	if (*req).Method == "OPTIONS" {
+		return
+	}
 	reqBody, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		log.Println(err)
@@ -360,6 +375,9 @@ Returns a success or error message
 not used in v1.0
  */
 //func (gv *GeneralView) Delete(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+//	if (*req).Method == "OPTIONS" {
+//	return
+//	}
 //	var user Request
 //	var response Response
 //
@@ -397,32 +415,33 @@ not used in v1.0
 //}
 
 /*
-Passes on the incomming http Requests
+Passes on the incoming http Requests
 If functionality is extended add new routes here
  */
 func (r *Router) New() (router *httprouter.Router) {
 	router = httprouter.New()
 
 	// Authentication
-	router.POST("/auth/signin", r.SignIn)
-	router.POST("/auth/signup", r.SignUp)
-	//router.POST("/user/forgot", r.Forgot)
+	router.POST("/api/auth/signin", r.SignIn)
+	router.POST("/api/auth/signup", r.SignUp)
+	//router.POST("/api/user/forgot", r.Forgot)
 
 	// Profile
-	router.POST("/user/profile", r.Profile)
-	router.POST("/user/update/password", r.Update)
-	router.POST("/user/update/credentials", r.Update)
-	//router.POST("/user/delete", r.View.Delete)
+	router.POST("/api/user/profile", r.Profile)
+	router.POST("/api/user/update/password", r.Update)
+	router.POST("/api/user/update/credentials", r.Update)
+	//router.POST("/api/user/delete", r.View.Delete)
 
 	// Fetch view data
-	router.POST("/data/all", r.Show)
+	router.POST("/api/data/all", r.Show)
 
 	router.GlobalOPTIONS = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("Access-Control-Request-Method") != "" {
 			// Set CORS headers
 			header := w.Header()
-			header.Set("Access-Control-Allow-Methods", header.Get("Allow"))
 			header.Set("Access-Control-Allow-Origin", "*")
+			header.Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+			header.Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
 		}
 
 		// Adjust status code to 204
