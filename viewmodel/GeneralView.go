@@ -15,22 +15,23 @@ type GeneralView struct {
 	Credentials map[string]plugins.Credentials
 }
 
-func (gv *GeneralView) GetData() (map[string]string, error) {
-	response := make(map[string]string)
+func (gv *GeneralView) GetData() (response map[string]string, err error) {
+	response = make(map[string]string)
 	for pName, pValue := range gv.Credentials {
 		extension := gv.Plugin[pName]
 		if extension == nil {
 			continue
 		}
 		extension.SubmitCredentials(pValue.UserNameHost, pValue.Token)
-		data, err := extension.FetchData()
+		var data string
+		data, err = extension.FetchData()
 		if err != nil {
 			log.Println("Data could not be fetched!")
 			continue
 		}
 		response[extension.FetchPluginName()] = data
 	}
-	return response, nil
+	return response, err
 }
 
 func (gv *GeneralView) SetPlugins(plugin map[string]plugins.PluginI) {

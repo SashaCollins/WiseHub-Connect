@@ -5,3 +5,4 @@ go build -buildmode=plugin -o model/plugins/github/github.so model/plugins/githu
 
 
 go run main.go
+

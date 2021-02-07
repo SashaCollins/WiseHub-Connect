@@ -14,7 +14,15 @@
       </div>
     </div>
     <div v-else>
-      {{ this.message }}
+      <div class="alert alert-danger" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="alert-heading">Error</h4>
+        <p>{{ message }}</p>
+        <hr>
+        <p class="mb-0">Please check your Credentials!</p>
+      </div>
     </div>
   </div>
 </template>
@@ -59,27 +67,24 @@ export default {
   //triggers fetchData when page is mounted
   mounted() {
     this.loading = true;
-    if (this.getUser.plugins.length === 0) {
-      this.$store.dispatch('user/fetchData', {
-        option: "general",
-        user: this.getUser,
-      }).then(
-          (onSuccess) => {
-            if (onSuccess.data.success) {
-              if (onSuccess.data.pluginData) {
-                this.plugins = this.getUser.plugins;
-                this.loading = false;
-              }
+    this.$store.dispatch('user/fetchData', {
+      option: "general",
+      user: this.getUser,
+    }).then(
+        (onSuccess) => {
+          if (onSuccess.data.success) {
+            if (onSuccess.data.pluginData) {
+              this.plugins = this.getUser.plugins;
+              this.loading = false;
             }
-          },
-          (onError) => {
-            this.message = onError.toString() || onError.message;
-            this.loading = false;
           }
-      );
-    }
-    console.log("loading:")
-    console.log(this.loading)
+        },
+        (onError) => {
+          this.message = (onError.response && onError.response.data) || onError.message || onError.toString();
+          this.loading = false;
+        }
+    );
+    this.$forceUpdate();
   },
 }
 </script>

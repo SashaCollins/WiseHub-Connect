@@ -17,7 +17,7 @@ import (
 )
 
 type Router struct {
-	Datastore *data.Datastore
+	Datastore data.DatastoreI
 	View ViewI
 }
 
@@ -327,17 +327,17 @@ func (r *Router) Show(w http.ResponseWriter, req *http.Request, ps httprouter.Pa
 		r.View = &GeneralView{}
 	case "template":
 		//r.View = &TemplateView{}
-		fmt.Println("Template")
+		log.Println("Template")
 	default:
 		//r.View = &DefaultView{}
-		fmt.Println("test")
+		log.Println("test")
 	}
 	r.View.SetPlugins(PluginMap)
 	r.View.SetCredentials(credentials)
 	pluginData, err := r.View.GetData()
 	if err != nil {
 		log.Println(err)
-		http.Error(w, "Invalid data", 668)
+		http.Error(w, err.Error(), 669)
 		return
 	}
 
@@ -353,6 +353,7 @@ func (r *Router) Show(w http.ResponseWriter, req *http.Request, ps httprouter.Pa
 	_, _ = w.Write(resp)
 	return
 }
+
 /*
 Requests a deletion of a user profile from datastore
 Returns a success or error message
@@ -394,6 +395,7 @@ not used in v1.0
 //	_, _ = w.Write(resp)
 //	return
 //}
+
 /*
 Passes on the incomming http Requests
 If functionality is extended add new routes here
@@ -435,6 +437,6 @@ router should be running in a go routine
 func (r *Router) Run(port int, finished chan bool) {
 	router := r.New()
 	PluginMap = r.LoadPlugins()
-	fmt.Printf("Run: %s\n", http.ListenAndServe(fmt.Sprintf(":%d", port), router))
+	log.Printf("Run: %s\n", http.ListenAndServe(fmt.Sprintf(":%d", port), router))
 	finished <- true
 }

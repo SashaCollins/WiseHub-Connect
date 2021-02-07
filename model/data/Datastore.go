@@ -9,12 +9,27 @@ package data
 
 import (
     "fmt"
+    "github.com/caarlos0/env"
+    "gorm.io/driver/mysql"
+    "gorm.io/driver/postgres"
     "gorm.io/driver/sqlite"
+    "gorm.io/driver/sqlserver"
     "gorm.io/gorm"
     "log"
+    "os"
 )
 
 type Datastore struct{}
+
+type DatabaseConfig struct{
+    Driver string `env:"DB_DRIVER"`
+    Database string `env:"DB_NAME"`
+    Username string `env:"DB_USER"`
+    Password string `env:"DB_PASSWORD"`
+    SSLMode string `env:"DB_SSL_MODE"`
+    Host string `env:"DB_HOST"`
+    Port int `env:"DB_PORT"`
+}
 
 func init() {
     db, err := openDB()
@@ -26,7 +41,29 @@ func init() {
 }
 
 func openDB() (db *gorm.DB, err error) {
-    return gorm.Open(sqlite.Open("./model/wisehub.db"), &gorm.Config{})
+    config := DatabaseConfig{}
+    err = env.Parse(&config)
+    if err != nil || config.Driver == "" {
+        log.Printf("init %q\n", err)
+        return nil, err
+    }
+    var dialector gorm.Dialector
+    switch os.Getenv("DB_DRIVER") {
+    case "mysql":
+        dsn := fmt.Sprintf("%v:%v@tcp(%v:%v)/%v?charset=utf8mb4&parseTime=True&loc=Local", config.Username, config.Password, config.Host, config.Port, config.Database)
+        dialector = mysql.Open(dsn)
+    case "postgres":
+        dsn := fmt.Sprintf("host=%v user=%v password=%v dbname=%v port=%v sslmode=%v TimeZone=Europe/Berlin", config.Host, config.Username, config.Password, config.Database, config.Port, config.SSLMode)
+        dialector = postgres.Open(dsn)
+    case "sqlite":
+        dialector = sqlite.Open(config.Database)
+    case "sqlserver":
+        dsn := fmt.Sprintf("sqlserver://%v:%v@%v:%v?database=%v", config.Username, config.Password, config.Host, config.Port, config.Database)
+        dialector = sqlserver.Open(dsn)
+    default:
+        return nil, err
+    }
+    return gorm.Open(dialector, &gorm.Config{})
 }
 
 func createTables(db *gorm.DB) {
