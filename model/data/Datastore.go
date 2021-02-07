@@ -61,7 +61,7 @@ func openDB() (db *gorm.DB, err error) {
         dsn := fmt.Sprintf("sqlserver://%v:%v@%v:%v?database=%v", config.Username, config.Password, config.Host, config.Port, config.Database)
         dialector = sqlserver.Open(dsn)
     default:
-        return nil, err
+        return nil, fmt.Errorf("database driver (%v) does not official supported", config.Driver)
     }
     return gorm.Open(dialector, &gorm.Config{})
 }

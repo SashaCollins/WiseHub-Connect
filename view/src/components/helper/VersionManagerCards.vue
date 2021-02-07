@@ -15,7 +15,7 @@
                 <h5 class="text-center" style="background-color: white; color: black; border-radius: 3px; padding: 10px">
                   Repository: {{repo.repoName}}
                   <br>
-                  URL: <a :href="repo.repoUrl">{{ repo.repoName }}</a>
+                  URL: <a :href="repo.repoUrl" >{{repo.repoName}}</a>
                 </h5>
                 <div class="card bg-white text-center">
                   <Github v-bind:githubTeam="team" v-bind:githubRepo="getGithubRepo(team, repo.repoName)"></Github>

@@ -132,7 +132,7 @@
                 }
               },
               (onError) => {
-                this.message = onError.toString() || onError.message;
+                this.message = (onError.response && onError.response.data) || onError.message || onError.toString();
               }
           );
         }

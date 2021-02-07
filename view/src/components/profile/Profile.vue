@@ -50,9 +50,10 @@
                     <div class="col-sm">
                       <button
                           type="button"
-                          class="btn btn-primary"
+                          class="btn"
                           data-toggle="modal"
-                          data-target="#updatePassword">
+                          data-target="#updatePassword"
+                          style="background-color: #008b8b; color: white">
                         Change password
                       </button>
                     </div>
@@ -98,7 +99,7 @@
                 </div>
                 <div class="btn-group" role="group">
                   <button @click="updateCredentials(item)" type="submit" class="btn btn-danger" :disabled="!disabled">Submit</button>
-                  <button @click="disabled = !disabled" type="button" class="btn btn-primary">Edit</button>
+                  <button @click="disabled = !disabled" type="button" class="btn" style="background-color: #008b8b; color: white">Edit</button>
                 </div>
               </div>
             </div>
@@ -169,7 +170,6 @@
           disabled: false,
           newEmail: '',
           updatedCredentials: [],
-          //dummy only exists if connection fails
           plugins: [],
           errors: [],
           error: false
@@ -199,7 +199,7 @@
                 this.errors = [{
                   'Tag': 'Error - Try again',
                   'Code': onError.status,
-                  'Description': onError.message || onError.toString()
+                  'Description': (onError.response && onError.response.data) || onError.message || onError.toString()
                 }];
               }
           );
@@ -221,7 +221,7 @@
                 this.errors = [{
                   'Tag': 'Error - Try again',
                   'Code': onError.status,
-                  'Description': onError.message || onError.toString()
+                  'Description': (onError.response && onError.response.data) || onError.message || onError.toString()
                 }];
               }
           );
@@ -241,7 +241,7 @@
               this.errors = [{
                 'Tag': 'Error - Try again',
                 'Code': onError.status,
-                'Description': onError.message || onError.toString()
+                'Description': (onError.response && onError.response.data) || onError.message || onError.toString()
               }];
             }
         );

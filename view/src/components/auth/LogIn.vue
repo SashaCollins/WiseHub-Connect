@@ -104,8 +104,8 @@
                   this.$store.dispatch("user/initUser", this.user);
                   this.$router.push("/");
                 },
-                (onFailure) => {
-                  this.message = (onFailure.response && onFailure.response.data) || onFailure.message || onFailure.toString();
+                (onError) => {
+                  this.message = (onError.response && onError.response.data) || onError.message || onError.toString();
                   this.submitted = false;
                 })
             }
