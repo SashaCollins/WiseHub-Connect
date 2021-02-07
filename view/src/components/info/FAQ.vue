@@ -65,15 +65,21 @@
                   },
                   {
                       title: 'How to set up my own WiseHub?',
-                      value: 'You start the Application on your server via the bash script \'start_wisehub.sh\' which is located in the root directory.\n' +
+                      value: 'You clone the project from the GitHub repository onto your server first.\n' +
+                          'Then you start the Application on your server via the bash script \'start_wisehub.sh\' which is located in the root directory.\n' +
                           'Please make sure that you have installed \'screen\', \'go\' and \'npm\' on your server to run WiseHub Connect.\n' +
-                          'Another and probably simpler way to do this is to run the application in a docker container.',
+                          'Another and probably much simpler way to do this is to run the application in a docker container.\n' +
+                          'Therefore you run in root directory the following comands:\n' +
+                          '\'docker-compose build\' to compile\n' +
+                          '\'docker-compose up\' to run\n' +
+                          '\'docker-compose down\' to stop and delete\n' +
+                          'For further information please check the documentation on docker container.',
                       category: 'Admin Usage'
                   },
                   {
                       title: 'How to write your own WiseHub-Plugin?',
                       value: 'The only way to create and use your own plugin is to Host WiseHub Connect by yourself.\n' +
-                          'You can find instructions on how to write a plugin in the file ./model/template/Template.go. \n',
+                          'You can find instructions on how to write a plugin in the file ./model/template/Template.go.\n',
                       category: 'Admin Usage'
                   },
               ],
