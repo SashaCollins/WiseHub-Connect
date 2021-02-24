@@ -71,6 +71,9 @@ export const router = new Router({
            path: '/forgot',
            component: Forgot,
        },
+      
+      // otherwise redirect to home
+      { path: '*', redirect: '/' },
    ]
 });
 
