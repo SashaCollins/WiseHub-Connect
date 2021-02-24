@@ -11,6 +11,7 @@ import SignUp from '../components/auth/SignUp.vue';
 import Forgot from '../components/auth/Forgot.vue';
 import TemplateView from "../components/hub/TemplateView";
 import GeneralView from "../components/hub/GeneralView";
+import { secure } from '@/services/encryption.service';
 
 Vue.use(Router);
 
@@ -74,15 +75,18 @@ export const router = new Router({
       
       // otherwise redirect to home
       { path: '*', redirect: '/' },
-   ]
+   ],
+   linkActiveClass: 'active',
 });
 
 router.beforeEach((to,from,next) => {
-    let publicPages = ['/','/login','/faq','/impressum','/signup','/forgot'];
-    let authRequired = !publicPages.includes(to.path);
-    let loggedIn = sessionStorage.getItem('loggedIn');
-    if (authRequired && !loggedIn) {
-        return next('/login');
-    }
-    next();
+   let publicPages = ['/','/login','/faq','/impressum','/signup','/forgot', '/validate'];
+   let authRequired = !publicPages.includes(to.path);
+   const loggedIn = secure.get('user');
+   
+   //let loggedIn = sessionStorage.getItem('loggedIn');
+   if (authRequired && !loggedIn) {
+       next('/login');
+   }
+   next();
 })
