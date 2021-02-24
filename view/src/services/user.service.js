@@ -1,7 +1,8 @@
 import axios from 'axios';
 
-const API_USER_URL = '/api/user/';
-const API_DATA_URL = '/api/data/';
+const API_URL = '/api';
+const API_USER_URL = API_URL + '/user/';
+const API_DATA_URL = API_URL + '/data/';
 
 class UserService {
 
