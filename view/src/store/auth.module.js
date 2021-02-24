@@ -18,7 +18,6 @@ export const auth = {
                     return Promise.resolve(onSuccess);
                 },
                 (onFailure) => {
-                    commit('loginFailure');
                     return Promise.reject(onFailure);
                 }
             );
@@ -31,11 +30,9 @@ export const auth = {
             return AuthService.register(user).then(
                 onSuccess => {
                     user.password = '';
-                    commit('registerSuccess');
                     return Promise.resolve(onSuccess.data);
                 },
                 onFailure => {
-                    commit('registerFailure');
                     return Promise.reject(onFailure);
                 }
             );
@@ -45,16 +42,7 @@ export const auth = {
         loginSuccess(state) {
             state.status.loggedIn = true;
         },
-        loginFailure(state) {
-            state.status.loggedIn = false;
-        },
         logout(state) {
-            state.status.loggedIn = false;
-        },
-        registerSuccess(state) {
-            state.status.loggedIn = false;
-        },
-        registerFailure(state) {
             state.status.loggedIn = false;
         },
     }
