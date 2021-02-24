@@ -1,8 +1,12 @@
 import axios from 'axios';
+import authHeader from "./auth-header";
+import sha3 from 'crypto-js/sha3';
+
 
 const API_URL = '/api';
 const API_USER_URL = API_URL + '/user/';
 const API_DATA_URL = API_URL + '/data/';
+
 
 class UserService {
 
@@ -29,12 +33,11 @@ class UserService {
     })
   }
   updatePassword(user) {
-    let hashedPassword = require('crypto').createHash('sha512')
-        .update(user.password).digest('hex');
+    //let hashedPassword = require('crypto').createHash('sha512').update(user.password).digest('hex');
     return axios.post(API_USER_URL + 'update/password', {
       option: 'password',
       email: user.email,
-      password: hashedPassword
+      password: sha3(user.password).toString()
     })
   }
   deleteAccount(user) {
