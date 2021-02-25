@@ -104,7 +104,7 @@ services:
     depends_on:
       - api
     ports:
-      - "80:80"
+      - "127.0.0.1:10080:80"
     networks:
       - wisehub
 
