@@ -8,12 +8,16 @@ package viewmodel
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/dgrijalva/jwt-go"
+	"github.com/harlow/authtoken"
 	"github.com/julienschmidt/httprouter"
+	"github.com/rs/cors"
 	"github/SashaCollins/Wisehub-Connect/model/data"
 	"github/SashaCollins/Wisehub-Connect/model/plugins"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 )
 
 type Router struct {
@@ -23,13 +27,20 @@ type Router struct {
 
 var (
 	PluginMap map[string]plugins.PluginI
+	jwtKey = []byte("GyOqHEOUmbtYMADLxXG3rrinGbh535my")
 )
+
+type Claims struct {
+	Email string `json:"email"`
+	jwt.StandardClaims
+}
 
 type Response struct{
 	Success 		bool                    	`json:"success"`
 	Email 			string               		`json:"email"`
 	Plugins 		[]data.Plugin           	`json:"plugins"`
 	Data			map[string]string			`json:"pluginData"`
+	Token			string						`json:"token"`
 }
 
 type Request struct {
@@ -41,6 +52,63 @@ type Request struct {
 	Repository 		string						`json:"repo"`
 	Course 			string			 			`json:"course"`
 }
+
+func (r *Router) loadEMailTokenHeader(w http.ResponseWriter, req *http.Request) (string, error) {
+	authToken, err := authtoken.FromRequest(req)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "invalid token", 670)
+		return "", err
+	}
+	token, err := jwt.ParseWithClaims(authToken, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return jwtKey, nil
+	})
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "invalid token", 670)
+		return "" , err
+	}
+	claims, ok := token.Claims.(*Claims)
+	if !ok && !token.Valid {
+		log.Println(ok && token.Valid)
+		http.Error(w, "invalid token", 670)
+		return "", err
+	}
+	return claims.Email, nil
+}
+
+//func (r *Router) loadEMailFromCookieToken(w http.ResponseWriter, req *http.Request) string {
+//	c, err := req.Cookie("refresh")
+//	log.Println(c)
+//	log.Println(err)
+//	if err != nil {
+//		if err == http.ErrNoCookie {
+//			w.WriteHeader(http.StatusUnauthorized)
+//			return ""
+//		}
+//		w.WriteHeader(http.StatusBadRequest)
+//		return ""
+//	}
+//	tknStr := c.Value
+//	claims := &Claims{}
+//	tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
+//		return jwtKey, nil
+//	})
+//	if err != nil {
+//		if err == jwt.ErrSignatureInvalid {
+//			w.WriteHeader(http.StatusUnauthorized)
+//			return ""
+//		}
+//		w.WriteHeader(http.StatusBadRequest)
+//		return ""
+//	}
+//	if !tkn.Valid {
+//		w.WriteHeader(http.StatusUnauthorized)
+//		return ""
+//	}
+//	return claims.Email
+//}
+
 /*
 Loads plugins via PluginLoader
  */
@@ -52,6 +120,7 @@ func (r *Router) LoadPlugins() map[string]plugins.PluginI {
 	}
 	return pluginMap
 }
+
 /*
 Fetches credentials for the plugins from datastore
  */
@@ -108,6 +177,64 @@ func (r *Router) SignUp(w http.ResponseWriter, req *http.Request, ps httprouter.
 	}
 }
 
+func (r *Router) Refresh(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+	if (*req).Method == "OPTIONS" {
+		return
+	}
+
+	c, err := req.Cookie("refresh")
+	if err != nil {
+		if err == http.ErrNoCookie {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	tknStr := c.Value
+	claims := &Claims{}
+	tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
+		return jwtKey, nil
+	})
+	if err != nil {
+		if err == jwt.ErrSignatureInvalid {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	if !tkn.Valid {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	if time.Unix(claims.ExpiresAt, 0).Sub(time.Now()) > 24 * time.Hour {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	expirationTime := time.Now().Add(24 * time.Hour)
+	claims.ExpiresAt = expirationTime.Unix()
+	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
+	access, err := accessToken.SignedString(jwtKey)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	var response Response
+	response.Success = true
+	response.Token = access
+
+	resp, err := json.Marshal(response)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "Internal server error", 500)
+	}
+	_, _ = w.Write(resp)
+}
+
 func (r *Router) SignIn(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 	if (*req).Method == "OPTIONS" {
 		return
@@ -137,6 +264,44 @@ func (r *Router) SignIn(w http.ResponseWriter, req *http.Request, ps httprouter.
 	var response Response
 	if dbUser[0].Password == user.Password {
 		response.Success = true
+
+		expirationTime := time.Now().Add(24 * time.Hour)
+		claims := &Claims{
+			Email: user.Email,
+			StandardClaims: jwt.StandardClaims{
+				ExpiresAt: expirationTime.Unix(),
+			},
+		}
+
+		refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
+		refresh, err := refreshToken.SignedString(jwtKey)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		http.SetCookie(w, &http.Cookie{
+			Name:    "refresh",
+			Value:   refresh,
+			Expires: expirationTime,
+			SameSite: http.SameSiteLaxMode,
+		})
+
+		expirationTime = time.Now().Add(12 * time.Hour)
+		claims = &Claims{
+			Email: user.Email,
+			StandardClaims: jwt.StandardClaims{
+				ExpiresAt: expirationTime.Unix(),
+			},
+		}
+		accessToken := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
+		access, err := accessToken.SignedString(jwtKey)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		response.Token = access
+
 		resp, err := json.Marshal(response)
 		if err != nil {
 			log.Println(err)
@@ -149,6 +314,7 @@ func (r *Router) SignIn(w http.ResponseWriter, req *http.Request, ps httprouter.
 	}
 	return
 }
+
 /*
 Requests a user profile by email from the datastore
 Returns the user profile or an error
@@ -157,22 +323,15 @@ func (r *Router) Profile(w http.ResponseWriter, req *http.Request, ps httprouter
 	if (*req).Method == "OPTIONS" {
 		return
 	}
-	reqBody, err := ioutil.ReadAll(req.Body)
+
+	email, err := r.loadEMailTokenHeader(w, req)
 	if err != nil {
-		log.Println(err)
-		http.Error(w, "Internal server error", 500)
+		log.Println("invalid token")
+		http.Error(w, "invalid token", 670)
 		return
 	}
 
-	var request Request
-	err = json.Unmarshal(reqBody, &request)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, "Internal server error", 500)
-		return
-	}
-
-	dbUser, err := r.Datastore.Load(request.Email)
+	dbUser, err := r.Datastore.Load(email)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, "Invalid email", 668)
@@ -181,7 +340,7 @@ func (r *Router) Profile(w http.ResponseWriter, req *http.Request, ps httprouter
 
 	var response Response
 	response.Success = true
-	response.Email = dbUser[0].Email
+	//response.Email = dbUser[0].Email
 	response.Plugins = dbUser[0].Plugins
 	resp, err := json.Marshal(response)
 	if err != nil {
@@ -192,6 +351,7 @@ func (r *Router) Profile(w http.ResponseWriter, req *http.Request, ps httprouter
 	_, _ = w.Write(resp)
 	return
 }
+
 /*
 Requests new password
 sending an email is not implemented in v1.0
@@ -230,6 +390,7 @@ is not used in v1.0
 //	_, _ = w.Write(resp)
 //	return
 //}
+
 /*
 Requests an update for user profile from datastore for either email, password or credentials
 Returns a success or error message
@@ -238,6 +399,7 @@ func (r *Router) Update(w http.ResponseWriter, req *http.Request, ps httprouter.
 	if (*req).Method == "OPTIONS" {
 		return
 	}
+
 	reqBody, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		log.Println(err)
@@ -253,31 +415,23 @@ func (r *Router) Update(w http.ResponseWriter, req *http.Request, ps httprouter.
 		return
 	}
 
+	email, err := r.loadEMailTokenHeader(w, req)
+	if err != nil {
+		log.Println("invalid token")
+		http.Error(w, "invalid token", 670)
+		return
+	}
+
 	var response Response
 	switch update.Option {
-	case "email":
-		_, err := r.Datastore.Load(update.Email)
-		if err != nil {
-			log.Println(err)
-			http.Error(w, "Invalid email", 668)
-			return
-		}
-		change := make(map[string]interface{})
-		change["old"] = update.Email
-		change["new"] = update.NewEmail
-		if err = r.Datastore.Update(update.Option, change); err != nil {
-			log.Println(err)
-			http.Error(w, "Invalid email", 668)
-			return
-		}
 	case "password":
-		if _, err := r.Datastore.Load(update.Email); err != nil {
+		if _, err := r.Datastore.Load(email); err != nil {
 			log.Println(err)
 			http.Error(w, "Invalid email", 668)
 			return
 		}
 		change := make(map[string]interface{})
-		change["email"] = update.Email
+		change["email"] = email
 		change["password"] = update.Password
 		if err = r.Datastore.Update(update.Option, change); err != nil {
 			log.Println(err)
@@ -286,7 +440,7 @@ func (r *Router) Update(w http.ResponseWriter, req *http.Request, ps httprouter.
 		}
 	case "credentials":
 		change := make(map[string]interface{})
-		change["email"] = update.Email
+		change["email"] = email
 		change["updatedPlugins"] = update.Plugins
 		if err := r.Datastore.Update(update.Option, change); err != nil {
 			log.Println(err)
@@ -314,6 +468,7 @@ func (r *Router) Show(w http.ResponseWriter, req *http.Request, ps httprouter.Pa
 	if (*req).Method == "OPTIONS" {
 		return
 	}
+
 	reqBody, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		log.Println(err)
@@ -329,7 +484,14 @@ func (r *Router) Show(w http.ResponseWriter, req *http.Request, ps httprouter.Pa
 		return
 	}
 
-	dbUser, err := r.Datastore.Load(request.Email)
+	email, err := r.loadEMailTokenHeader(w, req)
+	if err != nil {
+		log.Println("invalid token")
+		http.Error(w, "invalid token", 670)
+		return
+	}
+
+	dbUser, err := r.Datastore.Load(email)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, "Invalid email", 668)
@@ -374,56 +536,53 @@ Requests a deletion of a user profile from datastore
 Returns a success or error message
 not used in v1.0
  */
-//func (gv *GeneralView) Delete(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
-//	if (*req).Method == "OPTIONS" {
-//	return
-//	}
-//	var user Request
-//	var response Response
-//
-//	reqBody, err := ioutil.ReadAll(req.Body)
-//	if err != nil {
-//		fmt.Printf("DeleteProfile: %s\n", err)
-//		http.Error(w, "Internal server error", 500)
-//		return
-//	}
-//	if err := json.Unmarshal(reqBody, &user); err != nil {
-//		fmt.Printf("DeleteProfile: %s\n", err)
-//		http.Error(w, "Internal server error", 500)
-//		return
-//	}
-//	if _, err := gv.Datastore.Load(user.Email); err != nil {
-//		fmt.Printf("DeleteProfile: %v\n", err)
-//		http.Error(w, "Invalid email", 668)
-//		return
-//	}
-//	if err := gv.Datastore.Delete(user.Email); err != nil {
-//		fmt.Printf("DeleteProfile: %s\n", err)
-//		http.Error(w, "Invalid email", 668)
-//		return
-//	}
-//	response.Success = true
-//	resp, err := json.Marshal(response)
-//	fmt.Println(resp)
-//	if err != nil {
-//		fmt.Printf("DeleteProfile: %s\n", err)
-//		http.Error(w, "Internal server error", 500)
-//		return
-//	}
-//	_, _ = w.Write(resp)
-//	return
-//}
+func (r *Router) Delete(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+	if (*req).Method == "OPTIONS" {
+		return
+	}
+	//var user Request
+	var response Response
+
+	email, err := r.loadEMailTokenHeader(w, req)
+	if err != nil {
+		log.Println("invalid token")
+		http.Error(w, "invalid token", 670)
+		return
+	}
+
+	if _, err := r.Datastore.Load(email); err != nil {
+		fmt.Printf("DeleteProfile: %v\n", err)
+		http.Error(w, "Invalid email", 668)
+		return
+	}
+	if err := r.Datastore.Delete(email); err != nil {
+		fmt.Printf("DeleteProfile: %s\n", err)
+		http.Error(w, "Invalid email", 668)
+		return
+	}
+	response.Success = true
+	resp, err := json.Marshal(response)
+	fmt.Println(resp)
+	if err != nil {
+		fmt.Printf("DeleteProfile: %s\n", err)
+		http.Error(w, "Internal server error", 500)
+		return
+	}
+	_, _ = w.Write(resp)
+	return
+}
 
 /*
 Passes on the incoming http Requests
 If functionality is extended add new routes here
  */
-func (r *Router) New() (router *httprouter.Router) {
-	router = httprouter.New()
+func (r *Router) New() (handler http.Handler) {
+	router := httprouter.New()
 
 	// Authentication
 	router.POST("/api/auth/signin", r.SignIn)
 	router.POST("/api/auth/signup", r.SignUp)
+	router.POST("/api/auth/refresh", r.Refresh)
 	//router.POST("/api/user/forgot", r.Forgot)
 
 	// Profile
@@ -439,14 +598,24 @@ func (r *Router) New() (router *httprouter.Router) {
 		if r.Header.Get("Access-Control-Request-Method") != "" {
 			// Set CORS headers
 			header := w.Header()
-			header.Set("Access-Control-Allow-Origin", "*")
-			header.Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
-			header.Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+			header.Set("Content-Type", "application/json")
 		}
 
 		// Adjust status code to 204
 		w.WriteHeader(http.StatusNoContent)
 	})
+
+	httpCors := cors.New(cors.Options{
+		AllowCredentials: true,
+		AllowedMethods: []string{http.MethodGet, http.MethodPost, http.MethodDelete, http.MethodOptions, http.MethodPut},
+		ExposedHeaders: []string{"Authorization"},
+		AllowedHeaders: []string{"X-Requested-With", "Accept", "Content-Type", "Content-Length", "Accept-Encoding", "Authorization", "X-CSRF-Token"},
+		// Debugging for testing, consider disabling in production
+		Debug: false,
+	})
+
+	handler = httpCors.Handler(router)
+
 	return
 }
 /*

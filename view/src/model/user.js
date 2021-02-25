@@ -3,6 +3,6 @@ export default class User {
 	this.email = email;
 	this.password = password;
 	this.plugins = [];
-    	this.token = '';
+	this.token = '';
   };
 }

@@ -2,7 +2,6 @@ import Vue from 'vue';
 import App from './App.vue';
 import VueResource from 'vue-resource';
 import * as VeeValidate from 'vee-validate';
-
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/css/bootstrap.css';

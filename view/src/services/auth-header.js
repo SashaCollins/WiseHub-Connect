@@ -1,7 +1,7 @@
 import { secure } from './encryption.service';
 
 export default function authHeader() {
-  let token = secure.get('user');
+  let token = secure.get('token');
 
   if (token) {
     return {

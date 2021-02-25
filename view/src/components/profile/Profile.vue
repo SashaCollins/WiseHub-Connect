@@ -237,6 +237,9 @@
               }
             },
             (onError) => {
+              if (onError.status_code === 401) {
+                this.$router.push('/logout');
+              }
               this.error = true;
               this.errors = [{
                 'Tag': 'Error - Try again',

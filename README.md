@@ -8,7 +8,7 @@ Status | Message
 667 | invalid email or password
 668 | invalid email
 669 | invalid data
-670 | 
+670 | invalid token
 
 ####Ports
 Port | Listener
