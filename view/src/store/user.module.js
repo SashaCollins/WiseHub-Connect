@@ -1,5 +1,6 @@
 import UserService from '../services/user.service';
 import Plugin from '../model/plugins';
+import { secure } from '@/services/encryption.service'
 
 const userObject = JSON.parse(sessionStorage.getItem('user'));
 const initialState = userObject
@@ -51,6 +52,7 @@ export const user = {
 	deleteAccount({ commit }, user) {
 	  return UserService.delete(user).then(onSuccess => {
 		commit("deleteSuccess");
+		secure.removeAll();
 		sessionStorage.clear();
 		localStorage.clear();
 		return Promise.resolve(onSuccess);

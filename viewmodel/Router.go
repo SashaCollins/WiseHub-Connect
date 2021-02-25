@@ -53,6 +53,9 @@ type Request struct {
 	Course 			string			 			`json:"course"`
 }
 
+/*
+Loads email from authorized header token
+ */
 func (r *Router) loadEMailTokenHeader(w http.ResponseWriter, req *http.Request) (string, error) {
 	authToken, err := authtoken.FromRequest(req)
 	if err != nil {
@@ -340,7 +343,6 @@ func (r *Router) Profile(w http.ResponseWriter, req *http.Request, ps httprouter
 
 	var response Response
 	response.Success = true
-	//response.Email = dbUser[0].Email
 	response.Plugins = dbUser[0].Plugins
 	resp, err := json.Marshal(response)
 	if err != nil {
@@ -540,7 +542,6 @@ func (r *Router) Delete(w http.ResponseWriter, req *http.Request, ps httprouter.
 	if (*req).Method == "OPTIONS" {
 		return
 	}
-	//var user Request
 	var response Response
 
 	email, err := r.loadEMailTokenHeader(w, req)
