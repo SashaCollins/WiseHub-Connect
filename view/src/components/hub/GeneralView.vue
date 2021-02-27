@@ -80,6 +80,9 @@ export default {
           }
         },
         (onError) => {
+          if (onError.status === 403 || onError.status === 401) {
+            this.$store.dispatch('auth/refresh');
+          }
           this.message = (onError.response && onError.response.data) || onError.message || onError.toString();
           this.loading = false;
         }

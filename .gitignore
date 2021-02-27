@@ -23,3 +23,4 @@ view/nginx/
 node_modules/
 venv/
 token
+main

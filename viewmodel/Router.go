@@ -185,47 +185,88 @@ func (r *Router) Refresh(w http.ResponseWriter, req *http.Request, ps httprouter
 		return
 	}
 
-	c, err := req.Cookie("refresh")
+	email, err := r.loadEMailTokenHeader(w, req)
 	if err != nil {
-		if err == http.ErrNoCookie {
-			log.Println(err)
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-		log.Println(err)
-		w.WriteHeader(http.StatusBadRequest)
+		log.Println("invalid token")
+		http.Error(w, "invalid token", 670)
 		return
 	}
-	tknStr := c.Value
-	claims := &Claims{}
-	tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
+
+	_, err = r.Datastore.Load(email)
+	if err != nil {
 		log.Println(err)
-		return jwtKey, nil
+		http.Error(w, "Invalid token", 670)
+		return
+	}
+
+	//c, err := req.Cookie("refresh")
+	//if err != nil {
+	//	if err == http.ErrNoCookie {
+	//		log.Println(err)
+	//		w.WriteHeader(http.StatusUnauthorized)
+	//		return
+	//	}
+	//	log.Println(err)
+	//	w.WriteHeader(http.StatusBadRequest)
+	//	return
+	//}
+	//tknStr := c.Value
+	//claims := &Claims{}
+	//tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
+	//	log.Println(err)
+	//	return jwtKey, nil
+	//})
+	//if err != nil {
+	//	if err == jwt.ErrSignatureInvalid {
+	//		log.Println(err)
+	//		w.WriteHeader(http.StatusUnauthorized)
+	//		return
+	//	}
+	//	log.Println(err)
+	//	w.WriteHeader(http.StatusBadRequest)
+	//	return
+	//}
+	//if !tkn.Valid {
+	//	log.Println(err)
+	//	w.WriteHeader(http.StatusUnauthorized)
+	//	return
+	//}
+	//
+	//if time.Unix(claims.ExpiresAt, 0).Sub(time.Now()) > 24 * time.Hour {
+	//	log.Println(err)
+	//	w.WriteHeader(http.StatusBadRequest)
+	//	return
+	//}
+
+	expirationTime := time.Now().Add(48 * time.Hour)
+	claims := &Claims{
+		Email: email,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: expirationTime.Unix(),
+		},
+	}
+	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
+	refresh, err := refreshToken.SignedString(jwtKey)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:    "refresh",
+		Value:   refresh,
+		Expires: expirationTime,
+		SameSite: http.SameSiteLaxMode,
 	})
-	if err != nil {
-		if err == jwt.ErrSignatureInvalid {
-			log.Println(err)
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-		log.Println(err)
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-	if !tkn.Valid {
-		log.Println(err)
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
 
-	if time.Unix(claims.ExpiresAt, 0).Sub(time.Now()) > 24 * time.Hour {
-		log.Println(err)
-		w.WriteHeader(http.StatusBadRequest)
-		return
+	expirationTime = time.Now().Add(12 * time.Hour)
+	claims = &Claims{
+		Email: email,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: expirationTime.Unix(),
+		},
 	}
-
-	expirationTime := time.Now().Add(24 * time.Hour)
-	claims.ExpiresAt = expirationTime.Unix()
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
 	access, err := accessToken.SignedString(jwtKey)
 	if err != nil {
@@ -276,7 +317,7 @@ func (r *Router) SignIn(w http.ResponseWriter, req *http.Request, ps httprouter.
 	if dbUser[0].Password == user.Password {
 		response.Success = true
 
-		expirationTime := time.Now().Add(24 * time.Hour)
+		expirationTime := time.Now().Add(48 * time.Hour)
 		claims := &Claims{
 			Email: user.Email,
 			StandardClaims: jwt.StandardClaims{
@@ -594,7 +635,7 @@ func (r *Router) New() (handler http.Handler) {
 	router.POST("/api/auth/signin", r.SignIn)
 	router.POST("/api/auth/signup", r.SignUp)
 	router.POST("/api/auth/refresh", r.Refresh)
-	//router.POST("/api/user/forgot", r.Forgot)
+	//router.GET("/api/auth/forgot", r.Forgot)
 
 	// Profile
 	router.GET("/api/user/profile", r.Profile)

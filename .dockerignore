@@ -6,3 +6,4 @@ start*.sh
 .idea
 token
 *.db
+main

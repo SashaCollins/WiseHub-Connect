@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { secure } from './encryption.service';
 import sha3 from 'crypto-js/sha3';
+import refreshHeader from "@/services/refresh-header";
 
 const HOST_API_URL = 'http://localhost:9010';
 const DOCKER_API_URL = '/api';
@@ -39,6 +40,14 @@ class AuthService {
             email: user.email
         },
         );
+    }
+
+    refresh() {
+        return axios.get(AUTH_API_URL + 'refresh', {
+            headers: refreshHeader(),
+            withCredentials: true,
+            credentials: 'include'
+        });
     }
     
     validate_token(token) {
