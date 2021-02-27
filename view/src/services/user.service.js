@@ -5,15 +5,16 @@ import sha3 from 'crypto-js/sha3';
 axios.defaults.xsrfCookieName = 'csrftoken'
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
 
-const API_URL = '/api';
-const API_USER_URL = API_URL + '/user/';
-const API_DATA_URL = API_URL + '/data/';
+const HOST_API_URL = 'http://localhost:9010';
+const DOCKER_API_URL = '/api';
+const API_USER_URL = HOST_API_URL + '/user/';
+const API_DATA_URL = HOST_API_URL + '/data/';
 
 
 class UserService {
 
   fetchProfile(user) {
-   return axios.post(API_USER_URL + 'profile', {}, {
+   return axios.get(API_USER_URL + 'profile', {
      headers: authHeader(),
      withCredentials: true,
      credentials: 'include'
@@ -26,7 +27,6 @@ class UserService {
   updateEmail(payload) {
     return axios.post(API_USER_URL + 'update/email', {
       option: 'email',
-      email: payload.oldEmail,
       new_email: payload.newEmail
     }, {
       headers: authHeader(),
@@ -58,7 +58,7 @@ class UserService {
   }
   
   deleteAccount(user) {
-    return axios.post(API_USER_URL + 'delete', {}, {
+    return axios.get(API_USER_URL + 'delete', {
       headers: authHeader(),
       withCredentials: true,
       credentials: 'include'

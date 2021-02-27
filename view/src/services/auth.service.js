@@ -2,13 +2,14 @@ import axios from 'axios';
 import { secure } from './encryption.service';
 import sha3 from 'crypto-js/sha3';
 
-
-const API_URL = '/api/auth/';
+const HOST_API_URL = 'http://localhost:9010';
+const DOCKER_API_URL = '/api';
+const AUTH_API_URL = HOST_API_URL + '/api/auth/';
 
 
 class AuthService {
     login(user) {
-        return axios.post(API_URL + 'signin', {
+        return axios.post(AUTH_API_URL + 'signin', {
             email: user.email,
             password: sha3(user.password).toString()
         }).then((response) => {
@@ -32,7 +33,7 @@ class AuthService {
     }
 
     register(user) {
-        return axios.post(API_URL + 'signup', {
+        return axios.post(AUTH_API_URL + 'signup', {
             name: user.name,
             password: sha3(user.password).toString(),
             email: user.email
@@ -41,7 +42,7 @@ class AuthService {
     }
     
     validate_token(token) {
-        return axios.get(API_URL + 'validate/' + token);
+        return axios.get(AUTH_API_URL + 'validate/' + token);
     }
 }
 

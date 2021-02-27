@@ -73,7 +73,7 @@ func (r *Router) loadEMailTokenHeader(w http.ResponseWriter, req *http.Request) 
 	}
 	claims, ok := token.Claims.(*Claims)
 	if !ok && !token.Valid {
-		log.Println(ok && token.Valid)
+		log.Println("token claims not valid")
 		http.Error(w, "invalid token", 670)
 		return "", err
 	}
@@ -188,31 +188,38 @@ func (r *Router) Refresh(w http.ResponseWriter, req *http.Request, ps httprouter
 	c, err := req.Cookie("refresh")
 	if err != nil {
 		if err == http.ErrNoCookie {
+			log.Println(err)
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
+		log.Println(err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	tknStr := c.Value
 	claims := &Claims{}
 	tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
+		log.Println(err)
 		return jwtKey, nil
 	})
 	if err != nil {
 		if err == jwt.ErrSignatureInvalid {
+			log.Println(err)
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
+		log.Println(err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	if !tkn.Valid {
+		log.Println(err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
 	if time.Unix(claims.ExpiresAt, 0).Sub(time.Now()) > 24 * time.Hour {
+		log.Println(err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -222,6 +229,7 @@ func (r *Router) Refresh(w http.ResponseWriter, req *http.Request, ps httprouter
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
 	access, err := accessToken.SignedString(jwtKey)
 	if err != nil {
+		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -279,6 +287,7 @@ func (r *Router) SignIn(w http.ResponseWriter, req *http.Request, ps httprouter.
 		refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
 		refresh, err := refreshToken.SignedString(jwtKey)
 		if err != nil {
+			log.Println(err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -300,6 +309,7 @@ func (r *Router) SignIn(w http.ResponseWriter, req *http.Request, ps httprouter.
 		accessToken := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
 		access, err := accessToken.SignedString(jwtKey)
 		if err != nil {
+			log.Println(err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -493,14 +503,14 @@ func (r *Router) Show(w http.ResponseWriter, req *http.Request, ps httprouter.Pa
 		return
 	}
 
-	dbUser, err := r.Datastore.Load(email)
+	_, err = r.Datastore.Load(email)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, "Invalid email", 668)
 		return
 	}
 
-	credentials := r.LoadPluginCredentials(dbUser[0].Email)
+	credentials := r.LoadPluginCredentials(email)
 	switch request.Option {
 	case "general":
 		r.View = &GeneralView{}
@@ -552,12 +562,12 @@ func (r *Router) Delete(w http.ResponseWriter, req *http.Request, ps httprouter.
 	}
 
 	if _, err := r.Datastore.Load(email); err != nil {
-		fmt.Printf("DeleteProfile: %v\n", err)
+		log.Printf("DeleteProfile: %v\n", err)
 		http.Error(w, "Invalid email", 668)
 		return
 	}
 	if err := r.Datastore.Delete(email); err != nil {
-		fmt.Printf("DeleteProfile: %s\n", err)
+		log.Printf("DeleteProfile: %s\n", err)
 		http.Error(w, "Invalid email", 668)
 		return
 	}
@@ -565,7 +575,7 @@ func (r *Router) Delete(w http.ResponseWriter, req *http.Request, ps httprouter.
 	resp, err := json.Marshal(response)
 	fmt.Println(resp)
 	if err != nil {
-		fmt.Printf("DeleteProfile: %s\n", err)
+		log.Printf("DeleteProfile: %s\n", err)
 		http.Error(w, "Internal server error", 500)
 		return
 	}
@@ -587,10 +597,10 @@ func (r *Router) New() (handler http.Handler) {
 	//router.POST("/api/user/forgot", r.Forgot)
 
 	// Profile
-	router.POST("/api/user/profile", r.Profile)
+	router.GET("/api/user/profile", r.Profile)
 	router.POST("/api/user/update/password", r.Update)
 	router.POST("/api/user/update/credentials", r.Update)
-	//router.POST("/api/user/delete", r.View.Delete)
+	//router.GET("/api/user/delete", r.View.Delete)
 
 	// Fetch view data
 	router.POST("/api/data/all", r.Show)
@@ -612,7 +622,7 @@ func (r *Router) New() (handler http.Handler) {
 		ExposedHeaders: []string{"Authorization"},
 		AllowedHeaders: []string{"X-Requested-With", "Accept", "Content-Type", "Content-Length", "Accept-Encoding", "Authorization", "X-CSRF-Token"},
 		// Debugging for testing, consider disabling in production
-		Debug: false,
+		Debug: true,
 	})
 
 	handler = httpCors.Handler(router)

@@ -178,7 +178,7 @@ func (ds *Datastore) Create(password string, email string) error {
     defaultPlugins := []Plugin{
         {PluginName: "Github", UsernameHost: "", Token: "", Description: "", Updated: false},
         {PluginName: "Drone CI", UsernameHost: "", Token: "", Description: "", Updated: false},
-        {PluginName: "Template", UsernameHost: "", Token: "", Description: "", Updated: false},
+        //{PluginName: "Template", UsernameHost: "", Token: "", Description: "", Updated: false},
     }
     user := User{Email: email, Password: password, Plugins: defaultPlugins}
     if result := db.Create(&user); result.Error != nil {

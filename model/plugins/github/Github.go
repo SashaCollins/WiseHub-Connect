@@ -203,8 +203,6 @@ type Viewer struct {
 }
 
 
-
-
 /*
 This is what the response from FetchData looks for GitHub
 */
@@ -315,7 +313,9 @@ func (g *Github) printJSON(v interface{}) {
 	w.SetIndent("", "\t")
 	err := w.Encode(v)
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		return
+		//panic(err)
 	}
 }
 /*
