@@ -1,6 +1,7 @@
 # WiseHub-Connect
 Bachelorarbeit: Konzeption und Umsetzung eines Dashboards mit Plugin-Architektur / Conception and implementation of a dashboard with plugin-architecture
 
+
 ####HTTP Status
 Status | Message
 ---: | :---
@@ -10,13 +11,16 @@ Status | Message
 669 | invalid data
 670 | invalid token
 
+
 ####Ports
 Port | Listener
 ---: | :---
 9010 | WiseHubConnect - Backend
 
+
 # Create Plugins
 - go build -buildmode=plugin -o model/plugins/github/github.so model/plugins/github/Github.go 
+
 
 # Run this Project
 To run this project you will need <strong>go, gcc and musl</strong> installed.
