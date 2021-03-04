@@ -1,7 +1,7 @@
 /*
 This Datastore works with sqlite3 Database.
 This Datastore.go works with sqlite, mysql, postgres, sqlserver dialect, based on the credentials in the environment variables.
-To use another database exchange this, and only this, file with a 'Database.go' file
+To use another database change the environment variable 'DB_DRIVER'
 that works with your desired database. Make sure to implement the Interface DatastoreI.go,
 otherwise your dashboard may not work properly.
 @author SashaCollins

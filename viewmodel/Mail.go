@@ -10,15 +10,7 @@ import (
 	"text/template"
 )
 
-type Credentials struct {
-	Username string `env:"MAIL_USER"`
-	Password string `env:"MAIL_PASSWORD"`
-}
-
-type Server struct {
-	Host string `env:"MAIL_HOST"`
-	Port string `env:"MAIL_PORT"`
-}
+var emailAuth smtp.Auth
 
 type Mail struct {}
 
@@ -27,7 +19,7 @@ func parseTemplate(templateFileName string, data interface{}) (string, error) {
 	if err != nil {
 		return "", errors.New("invalid template name")
 	}
-	t, err := template.New("validate").Parse("Dear WiseHub-User,\n\n    To authenticate your account\n\n    {{.Url}}\n\n    click here.\n\nAlternatively, you can paste the following link in your browser's address bar.\n\n\nIf you have not requested a authentication simply ignore this message.\n\nSincerely,\nThe WiseHub Team")
+	t, err := template.New("validate").Parse("Dear WiseHub-User,\n\n    To authenticate your account\n\n    {{.Url}}\n\n    click here.\n\nAlternatively, you can paste the link in your browser's address bar.\n\n\nIf you have not requested a authentication simply ignore this message.\n\nSincerely,\nThe WiseHub Team")
 	if err != nil {
 		return "", err
 	}
@@ -38,8 +30,6 @@ func parseTemplate(templateFileName string, data interface{}) (string, error) {
 	body := buf.String()
 	return body, nil
 }
-
-var emailAuth smtp.Auth
 
 func (m *Mail) SendEmailSMTP(to []string, data interface{}, temp string) (bool, error) {
 	emailHost := os.Getenv("MAIL_HOST")
@@ -55,7 +45,7 @@ func (m *Mail) SendEmailSMTP(to []string, data interface{}, temp string) (bool, 
 	}
 
 	mime := "MIME-version: 1.0;\nContent-Type: text/plain; charset=\"UTF-8\";\n\n"
-	subject := "Subject: WiseHub-Connect\n"
+	subject := "Subject: [WiseHub-Connect] EMail Validator\n"
 	msg := []byte(subject + mime + "\n" + emailBody)
 	addr := fmt.Sprintf("%s:%s", emailHost, emailPort)
 

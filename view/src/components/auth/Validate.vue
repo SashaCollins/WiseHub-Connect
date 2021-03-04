@@ -35,7 +35,6 @@ export default {
       let token = window.location.search.replace('?token=', '')
       this.$store.dispatch('auth/validate', token).then(
           (onSuccess) => {
-            console.log(onSuccess)
             if (onSuccess.data.success) {
               this.$router.push('/login');
             }

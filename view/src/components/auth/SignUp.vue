@@ -1,6 +1,5 @@
 <template>
 	<div class="bg-img">
-
 		<form @submit.prevent="handleSubmit" class="container">
 			<h3>SignUp</h3>
 			<input

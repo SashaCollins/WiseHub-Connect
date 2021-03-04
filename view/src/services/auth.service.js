@@ -38,8 +38,7 @@ class AuthService {
             name: user.name,
             password: sha3(user.password).toString(),
             email: user.email
-        },
-        );
+        });
     }
 
     refresh() {
@@ -49,7 +48,7 @@ class AuthService {
             credentials: 'include'
         });
     }
-    
+
     validate(token) {
         return axios.get(AUTH_API_URL + 'validate', {
             headers: {

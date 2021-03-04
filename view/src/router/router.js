@@ -86,7 +86,7 @@ export const router = new Router({
 });
 
 router.beforeEach((to,from,next) => {
-   let publicPages = ['/','/login','/faq','/impressum','/signup','/forgot', '/validate'];
+   let publicPages = ['/', '/login', '/faq', '/impressum', '/signup', '/forgot', '/validate'];
    let authRequired = !publicPages.includes(to.path);
    const loggedIn = secure.get('token');
 

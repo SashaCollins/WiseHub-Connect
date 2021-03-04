@@ -36,8 +36,12 @@
     "vue-router": "^3.5.1",
     "vue-cookies": "^1.7.4",
     "vuex": "^3.6.2",
+<<<<<<< HEAD
     "vuex-shared-mutations": "^1.0.2",
     "vue-authenticate": "^1.4.1"
+=======
+    "vuex-shared-mutations": "^1.0.2"
+>>>>>>> f014f4d992af148752e81524bfcf8485dd97ff64
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "latest",

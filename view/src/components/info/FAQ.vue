@@ -85,7 +85,6 @@
                 console.log('onCategorySelect', args)
             },
             onItemSelect (args) {
-                console.log('onItemSelect', args)
                 this.itemData = this.myItems.value
             }
         }

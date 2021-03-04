@@ -204,6 +204,7 @@ func (r *Router) SignUp(w http.ResponseWriter, req *http.Request, ps httprouter.
 	}
 }
 
+
 func (r *Router) Validate(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 	if (*req).Method == "OPTIONS" {
 		return
@@ -253,7 +254,6 @@ func (r *Router) Refresh(w http.ResponseWriter, req *http.Request, ps httprouter
 		http.Error(w, "Invalid token", 670)
 		return
 	}
-
 	expirationTime := time.Now().Add(48 * time.Hour)
 	claims := &Claims{
 		Email: claim.Email,
@@ -552,7 +552,6 @@ func (r *Router) Show(w http.ResponseWriter, req *http.Request, ps httprouter.Pa
 		http.Error(w, "Internal server error", 500)
 		return
 	}
-
 	claim, err := r.loadEMailTokenHeader(w, req)
 	if err != nil {
 		log.Println("invalid token")
