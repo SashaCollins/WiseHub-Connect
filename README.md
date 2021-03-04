@@ -2,7 +2,7 @@
 Bachelorarbeit: Konzeption und Umsetzung eines Dashboards mit Plugin-Architektur / Conception and implementation of a dashboard with plugin-architecture
 
 
-####HTTP Status
+###HTTP Status
 Status | Message
 ---: | :---
 666 | user already exists
@@ -12,7 +12,7 @@ Status | Message
 670 | invalid token
 
 
-####Ports
+###Ports
 Port | Listener
 ---: | :---
 9010 | WiseHubConnect - Backend
