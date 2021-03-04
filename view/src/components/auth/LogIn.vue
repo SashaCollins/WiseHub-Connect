@@ -63,8 +63,8 @@
 					</div>
 <!--          TODO Backend for Forgot Button-->
 					<div class="col">
-<!--            Activate to allow requests for password reset-->
-<!--						<router-link to="/forgot" style="color:white" class="btn">Forgot password?</router-link>-->
+            Activate to allow requests for password reset
+						<router-link to="/forgot" style="color:white" class="btn">Forgot password?</router-link>
 					</div>
 				</div>
 			</div>
