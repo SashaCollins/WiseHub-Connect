@@ -1,6 +1,7 @@
-import AuthService from '../services/auth.service';
+import AuthService from '@/services/auth.service';
+import { secure } from '@/services/encryption.service';
 
-const loggedIn = sessionStorage.getItem('loggedIn');
+const loggedIn = secure.get('loggedIn');
 const initialState = loggedIn
     ? { status: {loggedIn: true}}
     : { status: {loggedIn: false}};
@@ -12,9 +13,19 @@ export const auth = {
         login({ commit }, user) {
             return AuthService.login(user).then(
                 (onSuccess) => {
-                    if (onSuccess.data.success){
+                    if (onSuccess.data.success) {
                         commit('loginSuccess');
                     }
+                    return Promise.resolve(onSuccess);
+                },
+                (onFailure) => {
+                    return Promise.reject(onFailure);
+                }
+            );
+        },
+        validate({ commit }, token) {
+            return AuthService.validate(token).then(
+                (onSuccess) => {
                     return Promise.resolve(onSuccess);
                 },
                 (onFailure) => {

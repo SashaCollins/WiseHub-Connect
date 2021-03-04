@@ -50,8 +50,14 @@ class AuthService {
         });
     }
     
-    validate_token(token) {
-        return axios.get(AUTH_API_URL + 'validate/' + token);
+    validate(token) {
+        return axios.get(AUTH_API_URL + 'validate', {
+            headers: {
+                'Authorization': 'Bearer ' + token
+            },
+            withCredentials: true,
+            credentials: 'include'
+        });
     }
 }
 

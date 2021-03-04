@@ -1,4 +1,3 @@
-import { secure } from './encryption.service';
 import { cookies } from '@/cookies/cookies';
 
 export default function refreshHeader() {

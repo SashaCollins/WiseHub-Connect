@@ -1,10 +1,10 @@
-import UserService from '../services/user.service';
+import UserService from '@/services/user.service';
 import Plugin from '../model/plugins';
 import { secure } from '@/services/encryption.service'
 
-const userObject = JSON.parse(sessionStorage.getItem('user'));
+const userObject = secure.get('user');
 const initialState = userObject
-	? { user: userObject }
+	? { user: JSON.parse(userObject) }
 	: { user: null };
 
 export const user = {

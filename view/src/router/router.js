@@ -9,6 +9,7 @@ import Impressum from "../components/info/Impressum";
 import LogIn from '../components/auth/LogIn.vue';
 import SignUp from '../components/auth/SignUp.vue';
 import Forgot from '../components/auth/Forgot.vue';
+import Validate from '../components/auth/Validate.vue';
 import TemplateView from "../components/hub/TemplateView";
 import GeneralView from "../components/hub/GeneralView";
 import { secure } from '@/services/encryption.service';
@@ -71,6 +72,11 @@ export const router = new Router({
            name: 'forgot',
            path: '/forgot',
            component: Forgot,
+       },
+       {
+           name: 'validate',
+           path: '/validate',
+           component: Validate,
        },
       
       // otherwise redirect to home
