@@ -2,8 +2,11 @@
 *.exe
 *.exe~
 *.dll
-*.so
 *.dylib
+*.db
+.idea
+.env
+package-lock.json
 
 # Test binary, built with `go test -c`
 *.test
@@ -12,4 +15,12 @@
 *.out
 
 # Dependency directories (remove the comment below to include it)
-# vendor/
+vendor/
+.docker_build/
+bin/
+certbot/
+view/nginx/
+node_modules/
+venv/
+token
+main

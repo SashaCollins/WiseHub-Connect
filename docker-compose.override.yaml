@@ -1,0 +1,61 @@
+version: '3.7'
+services:
+
+  #######################################################
+  #                     Drone CI                        #
+  #######################################################
+
+  #  drone:
+  #    environment:
+  #      DRONE_GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
+  #      DRONE_GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
+  #      DRONE_RPC_SECRET: ${DRONE_RPC_SECRET}
+  #      DRONE_SERVER_HOST: 127.0.0.1
+  #      DRONE_SERVER_PROTO: http
+  #      DRONE_USER_CREATE: username:${USERNAME},admin:${ADMIN}
+  #
+  #  runner:
+  #    environment:
+  #      DRONE_RPC_PROTO: http
+  #      DRONE_RPC_HOST: drone
+  #      DRONE_RPC_SECRET: ${DRONE_RPC_SECRET}
+  #      DRONE_RUNNER_CAPACITY: 2
+  #      DRONE_RUNNER_NAME: drone_runner
+  #      DRONE_DEBUG: 'true'
+  #      DRONE_TRACE: 'true'
+  #      DRONE_RPC_DUMP_HTTP: 'true'
+  #      DRONE_RPC_DUMP_HTTP_BODY: 'true'
+  #      DRONE_UI_USERNAME: root
+  #      DRONE_UI_PASSWORD: root
+
+
+  #######################################################
+  #                     WiseHub                         #
+  #######################################################
+
+  #  db:
+  #    environment:
+  #      MYSQL_ROOT_PASSWORD: test1234!!
+  #      MYSQL_DATABASE: wisehub
+  #      MYSQL_USER: wisehub
+  #      MYSQL_PASSWORD: test1234!!
+  #
+  #  adminer:
+  #    environment:
+  #      ADMINER_DEFAULT_SERVER: db
+
+  api:
+    environment:
+      DB_DRIVER: sqlite # Change to the official supported gorm.io/database_driver
+      DB_NAME: wisehub.db # For sqlite: name of db-file; for other databases: database_name
+      DB_USER: wisehub # database user
+      DB_PASSWORD: test1234!! # database password
+      DB_HOST: db # database host -> docker service name or localhost
+      DB_PORT: 3306 # database port
+      DB_SSL_MODE: disabled # 'disabled' or 'enabled' ssl mode
+      CGO_ENBLED: 0
+      MAIL_HOST: $MAIL_HOST
+      MAIL_PORT: $MAIL_PORT
+      MAIL_USER: $MAIL_USER
+      MAIL_PASSWORD: $MAIL_PASSWORD
+      TARGET_URL: http://localhost:8080

@@ -1,0 +1,9 @@
+Dockerfile*
+docker-compose*
+LICENSE
+README*
+start*.sh
+.idea
+token
+*.db
+main
