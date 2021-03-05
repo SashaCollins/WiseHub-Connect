@@ -60,12 +60,12 @@
     "vue-simple-uploader": "latest",
     "vue-template-compiler": "^2.6.12",
     "vuelidate": "latest",
-    "webpack": "^4.44.0",
-    "webpack-cli": "^4.4.0",
-    "webpack-dev-server": "^3.11.2"
+    "webpack": "latest",
+    "webpack-cli": "latest",
+    "webpack-dev-server": "latest"
   },
   "engines": {
-    "node": ">= 14.0.0",
+    "node": ">= 10.0.0",
     "npm": ">= 5.0.0"
   },
   "postcss": {
