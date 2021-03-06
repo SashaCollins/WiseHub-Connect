@@ -634,7 +634,6 @@ func (r *Router) Delete(w http.ResponseWriter, req *http.Request, ps httprouter.
 	}
 	response.Success = true
 	resp, err := json.Marshal(response)
-	fmt.Println(resp)
 	if err != nil {
 		log.Printf("DeleteProfile: %s\n", err)
 		http.Error(w, "Internal server error", 500)
