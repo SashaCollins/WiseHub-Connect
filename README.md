@@ -1,6 +1,9 @@
 # WiseHub-Connect
 Bachelorarbeit: Konzeption und Umsetzung eines Dashboards mit Plugin-Architektur / Conception and implementation of a dashboard with plugin-architecture
 
+#### Requirements
+- Go v1.15.8
+- nodejs v15.10.0 & npm v7.6.1
 
 #### HTTP Status
 Status | Message
