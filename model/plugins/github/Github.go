@@ -312,7 +312,9 @@ func (g *Github) printJSON(v interface{}) {
 	w.SetIndent("", "\t")
 	err := w.Encode(v)
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		return
+		//panic(err)
 	}
 }
 /*

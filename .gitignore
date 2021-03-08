@@ -2,7 +2,6 @@
 *.exe
 *.exe~
 *.dll
-*.so
 *.dylib
 *.db
 .idea
@@ -23,3 +22,5 @@ certbot/
 view/nginx/
 node_modules/
 venv/
+token
+main

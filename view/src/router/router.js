@@ -9,8 +9,10 @@ import Impressum from "../components/info/Impressum";
 import LogIn from '../components/auth/LogIn.vue';
 import SignUp from '../components/auth/SignUp.vue';
 import Forgot from '../components/auth/Forgot.vue';
+import Validate from '../components/auth/Validate.vue';
 import TemplateView from "../components/hub/TemplateView";
 import GeneralView from "../components/hub/GeneralView";
+import { secure } from '@/services/encryption.service';
 
 Vue.use(Router);
 
@@ -71,15 +73,25 @@ export const router = new Router({
            path: '/forgot',
            component: Forgot,
        },
-   ]
+       {
+           name: 'validate',
+           path: '/validate',
+           component: Validate,
+       },
+      
+      // otherwise redirect to home
+      { path: '*', redirect: '/' },
+   ],
+   linkActiveClass: 'active',
 });
 
 router.beforeEach((to,from,next) => {
-    let publicPages = ['/','/login','/faq','/impressum','/signup','/forgot'];
-    let authRequired = !publicPages.includes(to.path);
-    let loggedIn = sessionStorage.getItem('loggedIn');
-    if (authRequired && !loggedIn) {
-        return next('/login');
-    }
-    next();
+   let publicPages = ['/','/login','/faq','/impressum','/signup','/forgot', '/validate'];
+   let authRequired = !publicPages.includes(to.path);
+   const loggedIn = secure.get('token');
+
+   if (authRequired && !loggedIn) {
+       next('/login');
+   }
+   next();
 })

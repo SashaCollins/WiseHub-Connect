@@ -1,22 +1,26 @@
 import axios from 'axios';
+import { secure } from './encryption.service';
+import sha3 from 'crypto-js/sha3';
+import refreshHeader from "@/services/refresh-header";
 
-const API_URL = '/api/auth/';
+const HOST_API_URL = 'http://localhost:9010';
+const DOCKER_API_URL = '/api';
+const AUTH_API_URL = HOST_API_URL + '/api/auth/';
+
 
 class AuthService {
     login(user) {
-        let hashedPassword = require('crypto').createHash('sha512')
-            .update(user.password).digest('hex');
-        return axios.post(API_URL + 'signin', {
+        return axios.post(AUTH_API_URL + 'signin', {
             email: user.email,
-            password: hashedPassword
+            password: sha3(user.password).toString()
         }).then((response) => {
             //set user to loggedIn
             if (response.data) {
                 if (response.data.success) {
                     user.password = "";
-                    sessionStorage.setItem('loggedIn', response.data.success);
-                    // browser session storage for user module
-                    sessionStorage.setItem('user', JSON.stringify(user));
+                    secure.set('user', JSON.stringify(user));
+                    secure.set('token', response.data.token);
+                    secure.set('loggedIn', response.data.success);
                 }
             }
             return response;
@@ -24,19 +28,36 @@ class AuthService {
     }
 
     logout() {
+        secure.removeAll();
         sessionStorage.clear();
         localStorage.clear();
     }
 
     register(user) {
-        let hashedPassword = require('crypto').createHash('sha512')
-            .update(user.password).digest('hex');
-        return axios.post(API_URL + 'signup', {
+        return axios.post(AUTH_API_URL + 'signup', {
             name: user.name,
-            password: hashedPassword,
+            password: sha3(user.password).toString(),
             email: user.email
         },
         );
+    }
+
+    refresh() {
+        return axios.get(AUTH_API_URL + 'refresh', {
+            headers: refreshHeader(),
+            withCredentials: true,
+            credentials: 'include'
+        });
+    }
+    
+    validate(token) {
+        return axios.get(AUTH_API_URL + 'validate', {
+            headers: {
+                'Authorization': 'Bearer ' + token
+            },
+            withCredentials: true,
+            credentials: 'include'
+        });
     }
 }
 

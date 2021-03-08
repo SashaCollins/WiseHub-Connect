@@ -20,13 +20,14 @@ func (gv *GeneralView) GetData() (response map[string]string, err error) {
 	for pName, pValue := range gv.Credentials {
 		extension := gv.Plugin[pName]
 		if extension == nil {
+			log.Printf("extension {%v} is nil", pName)
 			continue
 		}
 		extension.SubmitCredentials(pValue.UserNameHost, pValue.Token)
 		var data string
 		data, err = extension.FetchData()
 		if err != nil {
-			log.Println("Data could not be fetched!")
+			log.Printf("{%v}: Data could not be fetched!", pName)
 			continue
 		}
 		response[extension.FetchPluginName()] = data

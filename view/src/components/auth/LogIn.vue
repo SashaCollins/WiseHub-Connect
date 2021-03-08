@@ -9,8 +9,7 @@
 					</div>
 <!--          TODO-->
 					<div class="col">
-						<a href="https://github.com/login/oauth/authorize?scope=user:email&client_id=aec4d6e8accd119a47ab"
-						   class="github btn">
+						<a class="github btn">
 							<i class="fab fa-github" aria-hidden="true"></i> Login with GitHub
 						</a>
 						<a href="#" class="gitlab btn">

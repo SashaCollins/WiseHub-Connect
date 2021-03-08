@@ -3,23 +3,6 @@
 
 		<form @submit.prevent="handleSubmit" class="container">
 			<h3>SignUp</h3>
-
-<!--			<span-->
-<!--					v-show="submitted && errors.has('name')"-->
-<!--					class="alert-danger">-->
-<!--				{{errors.first('name')}}-->
-<!--			</span>-->
-<!--			<input-->
-<!--					type="text"-->
-<!--					placeholder="Username"-->
-<!--					name="name"-->
-<!--					v-validate="'required|min:3|max:512'"-->
-<!--					v-model="user.name">-->
-<!--			<span-->
-<!--					v-show="submitted && errors.has('email')"-->
-<!--					class="alert-danger">-->
-<!--				{{errors.first('email')}}-->
-<!--			</span>-->
 			<input
 					type="email"
 			        placeholder="Email"

@@ -69,6 +69,9 @@
               this.successful = true;
               this.message = "Update successfully!";
             }, error => {
+              if (onError.status === 403 || onError.status === 401) {
+                this.$store.dispatch('auth/refresh');
+              }
               this.message = (error.response && error.response.data) || error.message || error.toString();
             });
             this.message = '';

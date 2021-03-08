@@ -195,6 +195,9 @@
                 }
               },
               (onError) => {
+                if (onError.status === 403 || onError.status === 401) {
+                  this.$store.dispatch('auth/refresh');
+                }
                 this.error = true;
                 this.errors = [{
                   'Tag': 'Error - Try again',
@@ -237,6 +240,9 @@
               }
             },
             (onError) => {
+              if (onError.status_code === 401) {
+                this.$router.push('/logout');
+              }
               this.error = true;
               this.errors = [{
                 'Tag': 'Error - Try again',

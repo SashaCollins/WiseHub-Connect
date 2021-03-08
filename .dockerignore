@@ -4,4 +4,6 @@ LICENSE
 README*
 start*.sh
 .idea
-model/*.db
+token
+*.db
+main
