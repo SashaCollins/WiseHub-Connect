@@ -13,7 +13,7 @@ Bachelorarbeit: Konzeption und Umsetzung eines Dashboards mit Plugin-Architektur
 | MAIL_PORT |    SMTP port (TLS)   |   587 |
 | MAIL_USERNAME | SMTP name | test@example.com |
 | MAIL_PASSWORD | SMTP password | test123!! |
-| DB_DRIVER | Database driver | slite,mysql,sqlserver,postgres |
+| DB_DRIVER | Database driver | sqlite,mysql,sqlserver,postgres |
 | DB_NAME | Database name | wisehub.db |
 | DB_USERNAME | Database username| foo |
 | DB_PASSWORD | Database password | bar |
