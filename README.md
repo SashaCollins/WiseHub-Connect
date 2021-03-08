@@ -24,7 +24,7 @@ Bachelorarbeit: Konzeption und Umsetzung eines Dashboards mit Plugin-Architektur
 #### Create Plugins
 - go build -buildmode=plugin -o model/plugins/github/github.so model/plugins/github/Github.go 
 
-#### Run this Project
+#### Run backend
 To run this project you will need <strong>go, gcc or musl</strong> installed.
 Create the plugins by run the command above. Clone this repository, build the plugins and run <strong>go build -o main && ./main</strong>.
 You will also need a reverse-proxy (nginx, apache,...) to host your WiseHub-Connect.
