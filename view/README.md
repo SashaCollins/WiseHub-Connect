@@ -1,6 +1,6 @@
 ## Frontend (Vuejs)
 ### Requirements
-- nodejs v15.10.0 & npm v7.6.1
+- nodejs v14.x 
 
 #### Project setup
 ```
