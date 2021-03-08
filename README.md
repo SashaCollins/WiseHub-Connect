@@ -6,18 +6,20 @@ Bachelorarbeit: Konzeption und Umsetzung eines Dashboards mit Plugin-Architektur
 - Go v1.15.8
 
 ### Environment variables
-Status | Message
----: | :---
-MAIL_HOST | 
-MAIL_PORT |
-MAIL_USERNAME |
-MAIL_PASSWORD |
-DB_DRIVER |
-DB_NAME |
-DB_USERNAME |
-DB_PASSWORD | 
-DB_SSL_MODE |
-TARGET_URL |
+
+| Status   |      Message      |  Example |
+|----------|:-------------:|------:|
+| MAIL_HOST |  SMTP server address | mx.example.com |
+| MAIL_PORT |    SMTP port (TLS)   |   587 |
+| MAIL_USERNAME | SMTP name | test@example.com |
+| MAIL_PASSWORD | SMTP password | test123!! |
+| DB_DRIVER | Database driver | slite,mysql,sqlserver,postgres |
+| DB_NAME | Database name | wisehub.db |
+| DB_USERNAME | Database username| foo |
+| DB_PASSWORD | Database password | bar |
+| DB_SSL_MODE | Database ssl mode | enable,disable |
+| TARGET_URL | Target url for email validation | http://wisehub.localhost |
+
 
 #### Create Plugins
 - go build -buildmode=plugin -o model/plugins/github/github.so model/plugins/github/Github.go 
