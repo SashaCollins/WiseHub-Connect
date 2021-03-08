@@ -44,7 +44,7 @@ type Request struct {
 /*
 Loads plugins via PluginLoader
  */
-func (r *Router) LoadPlugins() map[string]plugins.PluginI {
+func (r *Router) loadPlugins() map[string]plugins.PluginI {
 	var loader PluginLoader
 	pluginMap, err := loader.LoadAllPlugins()
 	if err != nil {
@@ -342,10 +342,10 @@ func (r *Router) Show(w http.ResponseWriter, req *http.Request, ps httprouter.Pa
 		r.View = &GeneralView{}
 	case "template":
 		//r.View = &TemplateView{}
-		log.Println("Template")
+		log.Println("TemplateView not implemented")
 	default:
 		//r.View = &DefaultView{}
-		log.Println("test")
+		log.Println("the given option in Request does not match any available view.")
 	}
 	r.View.SetPlugins(PluginMap)
 	r.View.SetCredentials(credentials)
@@ -451,11 +451,11 @@ func (r *Router) New() (router *httprouter.Router) {
 }
 /*
 Starts the router
-router should be running in a go routine
+Router should be running in a go routine
  */
 func (r *Router) Run(port int, finished chan bool) {
 	router := r.New()
-	PluginMap = r.LoadPlugins()
+	PluginMap = r.loadPlugins()
 	log.Printf("Run: %s\n", http.ListenAndServe(fmt.Sprintf(":%d", port), router))
 	finished <- true
 }

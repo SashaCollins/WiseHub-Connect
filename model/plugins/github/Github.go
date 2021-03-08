@@ -202,9 +202,6 @@ type Viewer struct {
 	}
 }
 
-
-
-
 /*
 This is what the response from FetchData looks for GitHub
 */
