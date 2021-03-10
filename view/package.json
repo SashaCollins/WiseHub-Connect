@@ -7,36 +7,35 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint",
-    "test:unit": "vue-cli-service test:unit"
+    "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "@fortawesome/fontawesome": "^1.1.8",
-    "@fortawesome/fontawesome-free": "^5.15.2",
-    "@fortawesome/fontawesome-free-brands": "^5.0.13",
-    "@fortawesome/fontawesome-svg-core": "^1.2.34",
-    "@fortawesome/free-brands-svg-icons": "^5.15.2",
-    "@fortawesome/free-solid-svg-icons": "^5.15.2",
-    "@fortawesome/vue-fontawesome": "^2.0.2",
-    "axios": "^0.21.1",
-    "bootstrap": "^4.6.0",
-    "bootstrap-vue": "^2.21.2",
-    "core-js": "^3.9.0",
-    "jquery": "^3.5.1",
-    "jwt-decode": "^3.1.2",
-    "perfect-scrollbar": "^1.5.0",
-    "secure-ls": "^1.2.6",
+    "@fortawesome/fontawesome": "latest",
+    "@fortawesome/fontawesome-free": "latest",
+    "@fortawesome/fontawesome-free-brands": "latest",
+    "@fortawesome/fontawesome-svg-core": "latest",
+    "@fortawesome/free-brands-svg-icons": "latest",
+    "@fortawesome/free-solid-svg-icons": "latest",
+    "@fortawesome/vue-fontawesome": "latest",
+    "axios": "latest",
+    "bootstrap": "latest",
+    "bootstrap-vue": "latest",
+    "core-js": "latest",
     "crypto-js": "^4.0.0",
-    "popper.js": "^1.16.1",
+    "jquery": "latest",
+    "jwt-decode": "latest",
+    "perfect-scrollbar": "latest",
+    "popper.js": "latest",
+    "secure-ls": "^1.2.6",
     "vue": "^2.6.12",
-    "vue-class-component": "^7.2.6",
-    "vue-faq-accordion": "^1.6.2",
-    "vue-property-decorator": "^9.1.2",
-    "vue-resource": "^1.5.1",
-    "vue-router": "^3.5.1",
+    "vue-class-component": "latest",
     "vue-cookies": "^1.7.4",
-    "vuex": "^3.6.2",
-    "vuex-shared-mutations": "^1.0.2"
+    "vue-faq-accordion": "latest",
+    "vue-property-decorator": "latest",
+    "vue-resource": "latest",
+    "vue-router": "latest",
+    "vuex": "latest",
+    "vuex-shared-mutations": "latest"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "latest",
@@ -48,34 +47,25 @@
     "babel-preset-stage-0": "latest",
     "babel-preset-vue": "latest",
     "config": "latest",
-    "css-loader": "^5.0.2",
+    "css-loader": "latest",
     "enumify": "latest",
     "html-webpack-plugin": "latest",
-    "node-sass": "^5.0.0",
+    "node-sass": "latest",
     "path": "latest",
-    "sass-loader": "^10.1.1",
+    "sass-loader": "latest",
     "vee-validate": "^2.2.15",
     "vue-loader": "latest",
     "vue-sidebar-menu": "latest",
     "vue-simple-uploader": "latest",
     "vue-template-compiler": "^2.6.12",
     "vuelidate": "latest",
-    "webpack": "latest",
-    "webpack-cli": "latest",
-    "webpack-dev-server": "latest"
-  },
-  "engines": {
-    "node": ">= 10.0.0",
-    "npm": ">= 5.0.0"
-  },
-  "postcss": {
-    "plugins": {
-      "autoprefixer": {}
-    }
+    "webpack": "^4.46.0",
+    "webpack-cli": "^4.4.0",
+    "webpack-dev-server": "^3.11.2"
   },
   "browserslist": [
     "> 1%",
     "last 2 versions",
-    "not ie <= 8"
+    "not dead"
   ]
 }

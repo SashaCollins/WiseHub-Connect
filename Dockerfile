@@ -1,7 +1,5 @@
 # Futer work: fix timeout issues and go plugin error
-FROM golang:alpine
-
-ENV GO111MODULE=on  CGO_ENABLED=1 GOOS=linux GOARCH=amd64
+FROM golang:1.15.8-alpine
 
 RUN set -e; \
         apk add --update --no-cache --virtual .build-deps \
@@ -15,10 +13,10 @@ RUN set -e; \
                 go \
                 git \
                 util-linux-dev \
-                ca-certificates
+                ca-certificates \
+                busybox-extras
 
 RUN update-ca-certificates
-
 
 WORKDIR /go/src/github/SashaCollins/Wisehub-Connect
 
@@ -34,6 +32,7 @@ RUN go build -buildmode=plugin -o model/plugins/drone/drone.so model/plugins/dro
 RUN go build -o main
 
 EXPOSE 9010
+EXPOSE 25
 
 CMD ["./main"]
 #CMD ["go", "run", "main.go"]

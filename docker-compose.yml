@@ -52,13 +52,14 @@ services:
 #      - wisehub
 
   api:
-    container_name: api
+    container_name: wisehub_api
     build: ./
     restart: always
     expose:
       - "9010"
+      - "25"
     volumes:
-      - $HOME/plugins:/backend/model/plugins
+      - ${PLUGIN_PATH}/plugins:/backend/model/plugins
     networks:
       - wisehub
 
@@ -75,5 +76,5 @@ services:
 
 
 networks:
-  drone:
+#  drone:
   wisehub:

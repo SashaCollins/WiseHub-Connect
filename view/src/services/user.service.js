@@ -7,8 +7,8 @@ axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
 
 const HOST_API_URL = 'http://localhost:9010';
 const DOCKER_API_URL = '/api';
-const API_USER_URL = HOST_API_URL + DOCKER_API_URL + '/user/';
-const API_DATA_URL = HOST_API_URL + DOCKER_API_URL + '/data/';
+const API_USER_URL = /*HOST_API_URL +*/ DOCKER_API_URL + '/user/';
+const API_DATA_URL = /*HOST_API_URL +*/ DOCKER_API_URL + '/data/';
 
 
 class UserService {

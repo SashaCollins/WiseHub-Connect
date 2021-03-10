@@ -2,18 +2,30 @@ package viewmodel
 
 import (
 	"bytes"
+	"crypto/tls"
 	"errors"
-	"fmt"
-	"net/smtp"
-	"os"
+	"gopkg.in/gomail.v2"
+	"log"
 	"path/filepath"
+	"strconv"
 	"text/template"
 )
 
-var emailAuth smtp.Auth
+type MailServer struct {
 
-type Mail struct {}
+	// Server credentials
+	ServerHost string
+	ServerPort string
+	LoginName string
+	LoginPassword string
 
+	// Url for validation
+	BodyUrl string
+}
+
+/*
+Parse the mail body.
+ */
 func parseTemplate(templateFileName string, data interface{}) (string, error) {
 	_, err := filepath.Abs(templateFileName)
 	if err != nil {
@@ -31,27 +43,38 @@ func parseTemplate(templateFileName string, data interface{}) (string, error) {
 	return body, nil
 }
 
-func (m *Mail) SendEmailSMTP(to []string, data interface{}, temp string) (bool, error) {
-	emailHost := os.Getenv("MAIL_HOST")
-	emailFrom := os.Getenv("MAIL_USERNAME")
-	emailPassword := os.Getenv("MAIL_PASSWORD")
-	emailPort := os.Getenv("MAIL_PORT")
-
-	emailAuth = smtp.PlainAuth("", emailFrom, emailPassword, emailHost)
-
+/*
+Send email per smtp.
+ */
+func (ms *MailServer) SendEmailSMTP(to string, data interface{}, temp string) (bool, error) {
+	//Generate email body
 	emailBody, err := parseTemplate(temp, data)
 	if err != nil {
 		return false, errors.New("unable to parse email template")
 	}
 
-	mime := "MIME-version: 1.0;\nContent-Type: text/plain; charset=\"UTF-8\";\n\n"
-	subject := "Subject: [WiseHub-Connect] EMail Validator\n"
-	msg := []byte(subject + mime + "\n" + emailBody)
-	addr := fmt.Sprintf("%s:%s", emailHost, emailPort)
+	// Set new connection to email server
+	port, _ := strconv.Atoi(ms.ServerPort)
+	dialer := gomail.NewDialer(ms.ServerHost, port, ms.LoginName, ms.LoginPassword)
+	dialer.TLSConfig = &tls.Config{InsecureSkipVerify: true}
+	s, err := dialer.Dial()
+	if err != nil {
+		log.Println(err)
+		return false, err
+	}
 
-	if err := smtp.SendMail(addr, emailAuth, emailFrom, to, msg); err != nil {
+	// Build message
+	m := gomail.NewMessage()
+	m.SetHeader("From", ms.LoginName)
+	m.SetHeader("To", to)
+	m.SetAddressHeader("Cc", ms.LoginName, "Wisehub-Connect")
+	m.SetHeader("Subject", "[WiseHub-Connect] EMail Validator")
+	m.SetBody("text/plain", emailBody)
+
+	// Send the email
+	if err := gomail.Send(s, m); err != nil {
+		log.Printf("Could not send email to %s: %v", to, err)
 		return false, err
 	}
 	return true, nil
 }
-

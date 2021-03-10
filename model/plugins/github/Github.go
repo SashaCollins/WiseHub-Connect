@@ -198,7 +198,7 @@ type Viewer struct {
 	Viewer struct {
 		Login      githubv4.String
 		CreatedAt  githubv4.DateTime
-		URL 		githubv4.URI
+		URL 	   githubv4.URI
 	}
 }
 
@@ -292,7 +292,7 @@ func (g *Github) FetchData() (string, error) {
 	return string(r), nil
 }
 
-func (g *Github) SubmitCredentials(_, token string) {
+func (g *Github) SubmitCredentials(username, token string) {
 	src := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: token},
 	)

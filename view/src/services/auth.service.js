@@ -5,7 +5,7 @@ import refreshHeader from "@/services/refresh-header";
 
 const HOST_API_URL = 'http://localhost:9010';
 const DOCKER_API_URL = '/api';
-const AUTH_API_URL = HOST_API_URL + '/api/auth/';
+const AUTH_API_URL = /*HOST_API_URL +*/ DOCKER_API_URL + '/auth/';
 
 
 class AuthService {

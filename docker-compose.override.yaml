@@ -52,10 +52,13 @@ services:
       DB_PASSWORD: test1234!! # database password
       DB_HOST: db # database host -> docker service name or localhost
       DB_PORT: 3306 # database port
-      DB_SSL_MODE: disabled # 'disabled' or 'enabled' ssl mode
-      CGO_ENBLED: 0
-      MAIL_HOST: $MAIL_HOST
-      MAIL_PORT: $MAIL_PORT
-      MAIL_USER: $MAIL_USER
-      MAIL_PASSWORD: $MAIL_PASSWORD
-      TARGET_URL: http://localhost:8080
+      DB_SSL_MODE: disable # 'disable' or 'enable' ssl mode
+      GO111MODULE: 1
+      GOOS: linux
+      GOARCH: amd64
+      CGO_ENBLED: 1
+      MAIL_HOST: ${MAIL_HOST}
+      MAIL_PORT: ${MAIL_PORT}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      TARGET_URL: ${TARGET_URL}

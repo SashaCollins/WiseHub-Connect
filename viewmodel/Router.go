@@ -30,7 +30,6 @@ type Router struct {
 var (
 	PluginMap map[string]plugins.PluginI
 	jwtKey = []byte("GyOqHEOUmbtYMADLxXG3rrinGbh535my")
-	mail Mail
 )
 
 type Claims struct {
@@ -128,7 +127,7 @@ func (r *Router) LoadPlugins() map[string]plugins.PluginI {
 	return pluginMap
 }
 
-func (r *Router) GenerateEMailURL(request *http.Request, email, password, requestPath string) string {
+func (r *Router) GenerateEMail(request *http.Request, email, password, requestPath string) (MailServer, error) {
 	expirationTime := time.Now().Add(1 * time.Hour)
 	claims := &Claims{
 		Email: email,
@@ -141,10 +140,17 @@ func (r *Router) GenerateEMailURL(request *http.Request, email, password, reques
 	validate, err := validateToken.SignedString(jwtKey)
 	if err != nil {
 		log.Println(err)
-		return ""
+		return MailServer{}, err
 	}
 	url := strings.ReplaceAll(request.URL.String(), requestPath, "/validate")
-	return fmt.Sprintf("%v%v?token=%v", os.Getenv("TARGET_URL"), url, validate)
+	mail := MailServer{
+		ServerHost: os.Getenv("MAIL_HOST"),
+		ServerPort: os.Getenv("MAIL_PORT"),
+		LoginName: os.Getenv("MAIL_USERNAME"),
+		LoginPassword: os.Getenv("MAIL_PASSWORD"),
+		BodyUrl: fmt.Sprintf("%v%v?token=%v", os.Getenv("TARGET_URL"), url, validate),
+	}
+	return mail, nil
 }
 
 /*
@@ -181,13 +187,18 @@ func (r *Router) SignUp(w http.ResponseWriter, req *http.Request, ps httprouter.
 
 	dbUser, _ := r.Datastore.Load(user.Email)
 	if len(dbUser) == 0 {
-		url := r.GenerateEMailURL(req, user.Email, user.Password, "/api/auth/signup")
+		mail, err := r.GenerateEMail(req, user.Email, user.Password, "/api/auth/signup")
+		if err != nil {
+			log.Println(err)
+			http.Error(w, "invalid token", 670)
+			return
+		}
 		dataStruct := struct {
 			Url string
 		}{
-			Url: url,
+			Url: mail.BodyUrl,
 		}
-		status, err := mail.SendEmailSMTP([]string{user.Email}, dataStruct, "validate.txt")
+		status, err := mail.SendEmailSMTP(user.Email, dataStruct, "validate.txt")
 		if err != nil {
 			log.Println(err)
 			http.Error(w, "invalid email", 668)
@@ -582,6 +593,11 @@ func (r *Router) Show(w http.ResponseWriter, req *http.Request, ps httprouter.Pa
 		//r.View = &DefaultView{}
 		log.Println("test")
 	}
+	if r.View == nil {
+		log.Println("r.View is nil")
+		http.Error(w, "invalid data", 669)
+		return
+	}
 	r.View.SetPlugins(PluginMap)
 	r.View.SetCredentials(credentials)
 	pluginData, err := r.View.GetData()
@@ -662,7 +678,7 @@ func (r *Router) New() (handler http.Handler) {
 	router.GET("/api/user/profile", r.Profile)
 	router.POST("/api/user/update/password", r.Update)
 	router.POST("/api/user/update/credentials", r.Update)
-	//router.GET("/api/user/delete", r.View.Delete)
+	//router.GET("/api/user/delete", r.Delete)
 
 	// Fetch view data
 	router.POST("/api/data/all", r.Show)
@@ -684,7 +700,7 @@ func (r *Router) New() (handler http.Handler) {
 		ExposedHeaders: []string{"Authorization"},
 		AllowedHeaders: []string{"X-Requested-With", "Accept", "Content-Type", "Content-Length", "Accept-Encoding", "Authorization", "X-CSRF-Token"},
 		// Debugging for testing, consider disabling in production
-		Debug: true,
+		Debug: false,
 	})
 
 	handler = httpCors.Handler(router)
