@@ -1,6 +1,6 @@
 {
   "name": "visualization",
-  "author": "SashaCollins",
+  "author": "A. Wimmer <scollins@maxuniverse.de>",
   "version": "1.0.0",
   "license": "MIT",
   "private": true,
