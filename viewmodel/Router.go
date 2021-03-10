@@ -127,6 +127,9 @@ func (r *Router) LoadPlugins() map[string]plugins.PluginI {
 	return pluginMap
 }
 
+/*
+Generate email struct
+ */
 func (r *Router) GenerateEMail(request *http.Request, email, password, requestPath string) (MailServer, error) {
 	expirationTime := time.Now().Add(1 * time.Hour)
 	claims := &Claims{
@@ -171,6 +174,9 @@ func (r *Router) LoadPluginCredentials(userEmail string) (credentials map[string
 	return credentials
 }
 
+/*
+Signs up a user
+ */
 func (r *Router) SignUp(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 	reqBody, err := ioutil.ReadAll(req.Body)
 	if err != nil {
@@ -215,7 +221,9 @@ func (r *Router) SignUp(w http.ResponseWriter, req *http.Request, ps httprouter.
 	}
 }
 
-
+/*
+Validate email
+ */
 func (r *Router) Validate(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 	if (*req).Method == "OPTIONS" {
 		return
@@ -247,6 +255,9 @@ func (r *Router) Validate(w http.ResponseWriter, req *http.Request, ps httproute
 	return
 }
 
+/*
+Refresh access token
+ */
 func (r *Router) Refresh(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 	if (*req).Method == "OPTIONS" {
 		return
@@ -314,6 +325,9 @@ func (r *Router) Refresh(w http.ResponseWriter, req *http.Request, ps httprouter
 	_, _ = w.Write(resp)
 }
 
+/*
+Signin user
+ */
 func (r *Router) SignIn(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 	if (*req).Method == "OPTIONS" {
 		return
@@ -650,7 +664,6 @@ func (r *Router) Delete(w http.ResponseWriter, req *http.Request, ps httprouter.
 	}
 	response.Success = true
 	resp, err := json.Marshal(response)
-	fmt.Println(resp)
 	if err != nil {
 		log.Printf("DeleteProfile: %s\n", err)
 		http.Error(w, "Internal server error", 500)
